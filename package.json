@@ -1,0 +1,23 @@
+{
+  "name": "cs546_group17_final_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DanielleDauphinais/cs546_group17_final_project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DanielleDauphinais/cs546_group17_final_project/issues"
+  },
+  "homepage": "https://github.com/DanielleDauphinais/cs546_group17_final_project#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongodb": "^5.1.0"
+  }
+}
