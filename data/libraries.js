@@ -24,6 +24,33 @@ const getAllComments = async (id) => {
     return commentsList;
 }
 
+const createComment = async (libraryId, userId, text) => {
+    // ejinks
+    libraryId = validation.checkValidId(libraryId, "Library ID");
+    userId = validation.checkValidId(userId, "User ID");
+
+    text = validation.checkValidString(text, "Comment Body");
+
+    let newComment = {
+        _id: new ObjectId(),
+        userId: userId,
+        dateCreated: new Date().toLocaleDateString(),
+        text: text,
+        likes: []
+    }
+
+    const libraryCollection = await libraries();
+    await libraryCollection.updateOne(
+        {_id: new ObjectId(libraryId)},
+        {$push: {comments: newComment}}
+    );
+}
+
+// getNumLikes
+// getNumFavorites
+// addLiketoComment
+// addLiketoLibrary
+
 export default {
     getAllComments
 };
