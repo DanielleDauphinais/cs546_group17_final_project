@@ -53,9 +53,8 @@ const exportedMethods = {
         const librariesCollection = await libraries();
         return await librariesCollection.find({}).toArray();
     },
-
     async get (id) {
-        // ejinks - reconfiged to export all 
+        // ejinks - reconfiged to export all
         id = validation.checkValidId(id, "Library ID");
         const libraryCollection = await libraries();
         let library = await libraryCollection.findOne({_id: new ObjectId(id)});
@@ -63,8 +62,7 @@ const exportedMethods = {
         library._id = library._id.toString();
         return library;
     },
-
-    async getAllComments (id) {
+    async getAllComments(id) {
         // ejinks
         id = validation.checkValidId(id, "Library ID");
         const libraryCollection = await libraries();
@@ -75,6 +73,32 @@ const exportedMethods = {
         if (commentsList == null) throw "Error: No library found with given ID.";
         return commentsList;
     },
+    async createComment(libraryId, userId, text) {
+        // ejinks
+        libraryId = validation.checkValidId(libraryId, "Library ID");
+        userId = validation.checkValidId(userId, "User ID");
+
+        text = validation.checkValidString(text, "Comment Body");
+
+        let newComment = {
+            _id: new ObjectId(),
+            userId: userId,
+            dateCreated: new Date().toLocaleDateString(),
+            text: text,
+            likes: []
+        }
+
+        const libraryCollection = await libraries();
+        await libraryCollection.updateOne(
+            {_id: new ObjectId(libraryId)},
+            {$push: {comments: newComment}}
+        );
+    }
+    // getNumLikes
+    // getNumFavorites
+    // addLiketoComment
+    // addLiketoLibrary
+
     /** This function gets an array of Libaries by ownerID*/
     async getLibrariesByOwnerID(ownerId) {
         ownerId = validation.checkId(ownerId);
@@ -98,7 +122,7 @@ const exportedMethods = {
         else{ 
         throw `Error: Could not delete post with id of ${libraryId}`;
         }
-    },
+    }
 }
 
 export default exportedMethods;

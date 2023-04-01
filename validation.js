@@ -25,7 +25,6 @@ const validationFunctions = {
         }
         return val;
       },
-
       checkStringArray(arr, varName) {
         //We will allow an empty array for this,
         //if it's not empty, we will make sure all tags are strings
@@ -38,7 +37,7 @@ const validationFunctions = {
           arr[i] = arr[i].trim();
         }
         return arr;
-      },
+      }
 }
 
 export default validationFunctions;
