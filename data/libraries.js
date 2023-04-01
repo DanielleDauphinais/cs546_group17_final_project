@@ -93,7 +93,7 @@ const exportedMethods = {
             {_id: new ObjectId(libraryId)},
             {$push: {comments: newComment}}
         );
-    }
+    },
     // getNumLikes
     // getNumFavorites
     // addLiketoComment
