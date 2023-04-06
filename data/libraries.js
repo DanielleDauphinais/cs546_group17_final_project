@@ -6,7 +6,7 @@ const exportedMethods = {
 /** This function creates a library and adds it to the collection
    *  Return value: return the information of the library created
    */
-    async create  (
+    async create (
         name,
         location, // Might need to change the 
         image,    // need to figure out how to save image??
@@ -92,6 +92,25 @@ const exportedMethods = {
         await libraryCollection.updateOne(
             {_id: new ObjectId(libraryId)},
             {$push: {comments: newComment}}
+        );
+    },
+    async likeComment(userId, commentId) {
+        // ejinks
+        userId = validation.checkValidId(userId, "User ID");
+        commentId = validation.checkValidId(commentId, "Comment ID");
+
+        const libraryCollection = await libraries();
+        const library = await libraryCollection.findOne(
+            {'comments._id': new ObjectId(commentId)},
+            {projection: {_id: 1}}
+        );
+        if (library === null) throw "Error: No library found with given ID.";
+
+        const libraryId = library._id;
+
+        await libraryCollection.updateOne(
+            {_id: libraryId},
+            {$push: {'comments.likes': userId}}
         );
     },
     // getNumLikes
