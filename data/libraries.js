@@ -8,11 +8,10 @@ const exportedMethods = {
    */
     async create  (
         name,
-        location, // Might need to change the 
-        image,    // need to figure out how to save image??
+        location, // Vish will help!! possibly using the API?
+        image,    // Vish will help!!
         ownerID,
         fullnessRating,
-        //lastServayed, // need to figure out how to get this connected to the data from the form
         genres
     ) {
         name = validation.checkString(name, "Library Name");
