@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/public/css/main.css">
+</head>
+<body>
+    <header>
+        <nav>
+        <ul>
+            <li>
+                {{!-- This will take user back to the list of libaries  --}}
+                <href="/libraries/">Home</a>
+            </li>
+            <li>
+                {{!-- id will the the users id, since they will be logged on to get to this point--}}
+                <a href="/user/{{id}}">{{id.userName}} Profile</a>
+            </li> 
+        </ul>
+        </nav>
+    </header>
+    <main>
+        {{{body}}}
+    </main>
+</body>
+</html>

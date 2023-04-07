@@ -1,0 +1,71 @@
+{{!-- need to connect to the backend and check using front end JS --}}
+<article>
+  <h1>Create a Library</h1>
+  <form action="/posts" method="POST" class="new-Library-form">
+    <label>
+      Library Title
+      <input type="text" name="title" placeholder="Library Title" value="{{library.title}}" class="full-width-input" />
+    </label>
+
+    <label for="library-address">
+      Library Body
+    </label>
+    <textarea id="library-body" name="address" rows="4" placeholder="library address"
+      class="full-width-input">{{post.address}}</textarea>
+
+    <label for="library-image">
+      Library image
+    </label>
+    {{!-- Vish will update this when figuring out photo input  --}}
+    <input type="text" id="library-image" name="image" placeholder="Library image" value="{{library.image}}" class="full-width-input" />
+    
+    {{!-- This is to get data on the fullness --}}
+    <label for="fullness">
+      Please select how full the library is, 0 being empty and 5 being full
+    </label>
+    <select class="full-width-input" name="fullness">
+      <option value="">Fullness is...</option>
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+    <p>Please select the genres of books currently present in the library</p>
+    <form>
+      <div>
+        <label for="Picture Books">
+          <input type="checkbox" id="pictureBooks" />Picture Books</label>
+        <label for="Young Adult Fiction">
+          <input type="checkbox" id="youngAdultFiction" />Young Adult Fiction</label>
+        <label for="Fantasy Fiction">
+          <input type="checkbox" id="fantasyFiction" />Fantasy Fiction</label>
+        <label for="Fairy tale">
+          <input type="checkbox" id="fairyTale" />Fairy Tale</label>
+        <label for="Board book">
+          <input type="checkbox" id="boardBook" />Board Book</label>
+        <label for="Non-fiction">
+          <input type="checkbox" id="nonFiction" />Non-fiction</label>
+        <label for="Mystery">
+          <input type="checkbox" id="mystery" />Mystery</label>
+        <label for="Graphic novel">
+          <input type="checkbox" id="graphicNovel" />Graphic novel</label>
+      </div>
+    </form>
+
+    <button type="submit">Create New Post</button>
+    <button type="reset">Clear Form</button>
+
+  </form>
+  {{#if hasErrors}}
+  <ul class="error-list">
+    {{#each errors}}
+    <li>
+      {{this}}
+    </li>
+    {{/each}}
+  </ul>
+  {{/if}}
+
+</article>
