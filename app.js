@@ -1,6 +1,7 @@
 import express from 'express';
 const app = express();
 import configRoutes from './routes/index.js';
+import morgan from "morgan";
 import {fileURLToPath} from 'url';
 import {dirname} from 'path';
 import exphbs from 'express-handlebars';
@@ -24,6 +25,14 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
 
 app.use('/public', staticDir);
 app.use(express.json());
+app.use(express.static('public'));
+
+/** 
+ * This is a small middleware which will give output the 
+ * summary of each request in the console, to understand
+ * what's happening. TLDR; It is a logger
+ */
+app.use(morgan("dev"));
 app.use(express.urlencoded({extended: true}));
 app.use(rewriteUnsupportedBrowserMethods);
 
