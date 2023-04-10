@@ -40,5 +40,24 @@ router
 
 router
   .route('/:id')
+  .get(async (req, res) => {
+    let id = req.params.id;
+    
+    id = validation.checkValidId(id);
+
+    let library;
+
+    try {
+      library = await libraryData.get(id);
+    } catch (e) {
+      return res.status(404).send("Error: No library with given ID");
+    }
+
+    try {
+      res.render('libraries/library', {title: library.name, library: library});
+    } catch (e) {
+      res.status(500).send(e);
+    }
+  })
   
 export default router;
