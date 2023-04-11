@@ -102,3 +102,27 @@ label {
 .author-link:active {
 	color: #ff0000;
 }
+
+.error h1 {
+	font-size: 72px;
+	margin-bottom: 50px;
+  }
+
+.error p {
+	font-size: 24px;
+	margin-bottom: 20px;
+  }
+
+.error button {
+	background-color: #ffffff;
+	color: #202020;
+	border: none;
+	padding: 10px 20px;
+	font-size: 18px;
+	border-radius: 5px;
+	cursor: pointer;
+  }
+
+.error button:hover {
+	background-color: #e6e6e6;
+  }
