@@ -1,0 +1,13 @@
+{{! 
+This page renders if the user searches either a library or user that does not exists or the id is invalid
+}}
+
+<div class="error">
+    {{#if (eq errorCode "404")}}
+    <h1>{{errorCode}} Error: {{capitalize searchValue}} Not Found</h1>
+    <p>Oops, it looks like the {{searchValue}} you're looking for doesn't exist.</p>
+    <p>Don't worry, you can try searching again or head back to our homepage.</p>
+    {{/if}}
+    <button onclick="window.history.back();">Go Back</button>
+    <button onclick='/'>Go to Homepage</button>
+</div>
