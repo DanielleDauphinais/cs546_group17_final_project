@@ -19,7 +19,7 @@ const getAllUsers = async () => {
 };
 
 const getUserById = async (id) => {
-	id = validation.checkId(id);
+	id = validation.checkValidId(id, "user_id");
 	const userCollection = await users();
 	const user = await userCollection.findOne({ _id: ObjectId(id) });
 	if (!user) throw 'Error: User not found';
@@ -64,7 +64,7 @@ const create = async user => {
 const valid = async user => {
 	validationsForLogin(user);
 
-    let userFromDb = await userCollection.findOne({ email });
+	let userFromDb = await userCollection.findOne({ email });
 
 	/** Eeven though we don't have a user under this email we shouldn't say user not found */
 	if (!userFromDb) throw "VError: Invalid Credentials";
