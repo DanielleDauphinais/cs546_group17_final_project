@@ -5,6 +5,8 @@ import morgan from "morgan";
 import {fileURLToPath} from 'url';
 import {dirname} from 'path';
 import exphbs from 'express-handlebars';
+import cookieParser from "cookie-parser";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -25,6 +27,7 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
 
 app.use('/public', staticDir);
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.static('public'));
 
 /** 
