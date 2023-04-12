@@ -126,3 +126,28 @@ label {
 .error button:hover {
 	background-color: #e6e6e6;
   }
+
+/* Style for the restaurant boxes */
+.restaurant {
+border: 1px solid #ccc;
+border-radius: 5px;
+padding: 10px;
+margin-bottom: 10px;
+}
+
+/* Style for the restaurant name */
+.restaurant h2 {
+margin-top: 0;
+margin-bottom: 5px;
+}
+
+/* Style for the restaurant description */
+.restaurant p {
+margin-top: 0;
+margin-bottom: 10px;
+}
+
+/* Style for the unfollow and expand buttons */
+.restaurant button {
+margin-right: 10px;
+}

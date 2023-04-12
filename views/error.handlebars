@@ -6,8 +6,14 @@ This page renders if the user searches either a library or user that does not ex
     {{#if (eq errorCode "404")}}
     <h1>{{errorCode}} Error: {{capitalize searchValue}} Not Found</h1>
     <p>Oops, it looks like the {{searchValue}} you're looking for doesn't exist.</p>
-    <p>Don't worry, you can try searching again or head back to our homepage.</p>
+    {{else if (eq errorCode "400")}}
+    <h1>{{errorCode}} Error: Invalid {{capitalize searchValue}} ID</h1>
+    <p>Oops, it looks like the {{searchValue}} ID you are searching for is not valid.</p>
+    {{else if (eq errorCode "500")}}
+    <h1>{{errorCode}} Error: Server Error</h1>
+    <p>Oops, it looks like there is problem on our end.</p>
     {{/if}}
+    <p>Don't worry, you can try searching again or head back to our homepage.</p>
     <button onclick="window.history.back();">Go Back</button>
     <button onclick='/'>Go to Homepage</button>
 </div>
