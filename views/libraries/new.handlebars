@@ -1,17 +1,18 @@
 {{!-- need to connect to the backend and check using front end JS --}}
 <article>
   <h1>Create a Library</h1>
-  <form action="/posts" method="POST" class="new-Library-form">
+  <form action="/libraries" method="POST" class="new-Library-form">
     <label>
       Library Title
       <input type="text" name="title" placeholder="Library Title" value="{{library.title}}" class="full-width-input" />
     </label>
 
+    {{!-- TODO: need to fix to be using the maps API --}}
     <label for="library-address">
       Library Body
     </label>
     <textarea id="library-body" name="address" rows="4" placeholder="library address"
-      class="full-width-input">{{post.address}}</textarea>
+      class="full-width-input">{{library.title}}</textarea>
 
     <label for="library-image">
       Library image
