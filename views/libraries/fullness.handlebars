@@ -1,4 +1,55 @@
 <article>
     <h1>Library Update Form</h1>
-    <form action="/libraries/" method="POST" class="fullness-form"></form>
+    <form action="/libraries/{{id}}" method="POST" class="fullness-form"></form>
+     {{!-- This Code is from Danielle's branch's new --}}
+     {{!-- This is to get data on the fullness --}}
+    <label for="fullness">
+      Please select how full the library is, 0 being empty and 5 being full
+    </label>
+    <select class="full-width-input" name="fullness">
+      <option value="">Fullness is...</option>
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+    <p>Please select the genres of books currently present in the library</p>
+    <form>
+      <div>
+        <label for="Picture Books">
+          <input type="checkbox" id="pictureBooks" />Picture Books</label>
+        <label for="Young Adult Fiction">
+          <input type="checkbox" id="youngAdultFiction" />Young Adult Fiction</label>
+        <label for="Fantasy Fiction">
+          <input type="checkbox" id="fantasyFiction" />Fantasy Fiction</label>
+        <label for="Fairy tale">
+          <input type="checkbox" id="fairyTale" />Fairy Tale</label>
+        <label for="Board book">
+          <input type="checkbox" id="boardBook" />Board Book</label>
+        <label for="Non-fiction">
+          <input type="checkbox" id="nonFiction" />Non-fiction</label>
+        <label for="Mystery">
+          <input type="checkbox" id="mystery" />Mystery</label>
+        <label for="Graphic novel">
+          <input type="checkbox" id="graphicNovel" />Graphic Novel</label>
+        <label for="Chapter Book">
+          <input type="checkbox" id="chapterBooks" />Chapter Book</label>
+      </div>
+    </form>
+
+    <button type="submit">Update Library</button>
+    <button type="reset">Clear Form</button>
+
+  </form>
+  {{#if hasErrors}}
+  <ul class="error-list">
+    {{#each errors}}
+    <li>
+      {{this}}
+    </li>
+    {{/each}}
+  </ul>
+  {{/if}}
 </article>

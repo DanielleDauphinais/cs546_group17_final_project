@@ -138,4 +138,12 @@ router.route("/:id").post(async (req, res) => {
   }
 });
 
+router.route("/fullnessForm").get(async (req, res) => {
+  // need to come back and fix the ID with cookie stuff
+  res.render("libraries/fullness", {
+    title: "Fullness Update Form",
+    id: "NEED TO FIX",
+  });
+});
+
 export default router;
