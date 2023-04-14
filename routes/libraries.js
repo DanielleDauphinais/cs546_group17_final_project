@@ -28,7 +28,11 @@ router
       errors.push(e)
     }
     try { // TODO: THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
+      newLibraryData.fullnessRating = parseInt(newLibraryData.fullnessRating)
       newLibraryData.fullnessRating  = validation.isValidNumber(newLibraryData.fullnessRating, "Fullness Rating");
+      if(0>newLibraryData.fullnessRating || newLibraryData.fullnessRating<5){
+        throw "Fullness rating must be between 0-5";
+      }
     } catch (e) {
       errors.push(e)
     }
