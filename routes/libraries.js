@@ -15,32 +15,58 @@ router
     }
   })
   .post(async (req, res) => {
-    // Currently creates libary and sents json of created library
+    // TODO: Will need to edit for location and new servay
     const newLibraryData = req.body;
-    if (!newLibraryData || Object.keys(newLibraryData).length === 0) {
-      return res
-        .status(400)
-        .json({ error: "There are no fields in the request body" });
+    let errors = [];
+    // TODO: NEED TO UNDATE FOR LOCATION AND IMAGE
+    try {
+      newLibraryData.title = validation.checkString(
+        newLibraryData.title,
+        "Name"
+      );
+    } catch (e) {
+      errors.push(e);
     }
     try {
-      // NEED TO UNDATE FOR LOCATION AND IMAGE
-      newLibraryData.name = validation.checkString(newLibraryData.name, "Name");
-      newLibraryData.ownerID = validation.checkId(
+      newLibraryData.ownerID = validation.checkValidId(
         newLibraryData.ownerID,
         "Library Owner ID"
       );
-      newLibraryData.fullnessRating = validation.isValidNumber(
-        newLibraryData.fullnessRating,
+    } catch (e) {
+      errors.push(e);
+    }
+    try {
+      // TODO: THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
+      newLibraryData.fullness = parseInt(newLibraryData.fullness);
+      newLibraryData.fullness = validation.isValidNumber(
+        newLibraryData.fullness,
         "Fullness Rating"
       );
+      if (0 > newLibraryData.fullness || newLibraryData.fullness > 5) {
+        throw "Fullness rating must be between 0-5";
+      }
+    } catch (e) {
+      errors.push(e);
+    }
+    try {
+      // TODO:THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
       newLibraryData.genres = validation.checkStringArray(
         newLibraryData.genres,
         "Genres Available"
       );
     } catch (e) {
-      return res.status(400).json({ error: e });
+      errors.push(e);
     }
-
+    if (errors.length > 0) {
+      res.render("libraries/new", {
+        errors: errors,
+        hasErrors: true,
+        library: newLibraryData,
+        title: "Creating a Library",
+        id: "NEED TO FIX",
+      });
+      return;
+    }
     try {
       const { name, ownerID, fullnessRating, genres } = newLibraryData;
       const newLibrary = await libraryData.create(
@@ -51,18 +77,22 @@ router
         fullnessRating,
         genres
       );
-      res.json(newLibrary);
+      res.json(newLibrary); // TODO: will probably be to the library's page
     } catch (e) {
-      res.status(500).json({ error: e });
+      res
+        .status(500)
+        .render({ errorCode: 500, title: "error", id: "NEED TO FIX" });
     }
   });
 
-/**
- * @name libraries/:id
- * Library Update Route, first attempt
- * This route is bound to get changed to a different one for updating other information, but for proof of concept, we're going with this.
- * @example This should take in data from a form, which should include fullness data and current genres available within the library.
- */
+router.route("/new").get(async (req, res) => {
+  // need to come back and fix the ID with cookie stuff
+  res.render("libraries/new", {
+    title: "Creating a Library",
+    id: "NEED TO FIX",
+  });
+});
+
 router.route("/:id").post(async (req, res) => {
   // Grab the library id
   const libraryId = req.params.id;
@@ -83,8 +113,8 @@ router.route("/:id").post(async (req, res) => {
    * This is using the error checking from before, using the helper functions for uniformity.
    */
   try {
-    updateData.fullnessRating = validation.isValidNumber(
-      updateData.fullnessRating,
+    updateData.fullness = validation.isValidNumber(
+      updateData.fullness,
       "Fullness Rating"
     );
     updateData.genres = validation.checkStringArray(
@@ -96,10 +126,10 @@ router.route("/:id").post(async (req, res) => {
   }
   // At this point, assume the form data is completely valid.
   try {
-    const { fullnessRating, genres } = updateData;
+    const { fullness, genres } = updateData;
     const updatedLibrary = await libraryData.formUpdate(
       libraryId,
-      fullnessRating,
+      fullness,
       genres
     );
     res.json(updatedLibrary);
