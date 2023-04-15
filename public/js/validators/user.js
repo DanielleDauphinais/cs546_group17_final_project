@@ -49,7 +49,7 @@ const validationsForLogin = user => {
 
     if (!user.password) throw "VError: password field is required";
 
-    validationsForStrings("username", user.username)
+    validationsForStrings("email", user.email)
     validationsForStrings("password", user.password)
 }
 
