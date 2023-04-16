@@ -1,3 +1,5 @@
+import {ObjectId} from 'mongodb';
+
 const validationFunctions = {
     checkValidId(id, varName){
         if (!id) throw `Error: You must provide a ${varName}`;
