@@ -24,8 +24,28 @@
                 <p>{{comments.text}}</p>
                 <div id="likes">
                     <p>{{comments.numLikes}}</p>
+                    <form action="/libraries/comments/like/{{library._id}}" method="POST">
+                        <button type="submit" name="addCommentLike" value="{{comments._id}}">Like</button>
+                    </form>
                 </div>
             </article>
         {{/each}}
+        <div id="createComment">
+            <form action="/libraries/comments/create/{{library._id}}" method="POST">
+                <label for="text_input">
+                    <textarea name="text" id="text_input"></textarea>
+                    <button type="submit">Post Comment</button>
+                </label>
+            </form>
+        </div>
     </div>
+    {{#if hasErrors}}
+    <ul class="error-list">
+        {{#each errors}}
+        <li>
+        {{this}}
+        </li>
+        {{/each}}
+    </ul>
+    {{/if}}
 </article>
