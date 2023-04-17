@@ -1,0 +1,52 @@
+<article>
+    <h1>{{library.name}}</h1>
+    <img alt="{{library.name}}" src="{{library.imageURL}}">
+    <address>{{library.location}}</address>
+    <p>Created by: {{library.owner}}</p>
+    <h2>Fullness: {{library.fullness}}</h2>
+    <p>Last Rated On: {{library.lastRating}}</p>
+    <ul>
+        {{#each library.genres}}
+            <li>
+                <p>{{genre}}</p>
+            </li>
+        {{/each}}
+    </ul>
+    <div id="favorites">
+        <p>{{library.numFavorites}}</p>
+    </div>
+    <br>
+    <div id="comments">
+        {{#each library.comments}}
+            <article class="comment">
+                <h2>{{comments.user}}</h2>
+                <p>{{comments.dateCreated}}</p>
+                <p>{{comments.text}}</p>
+                <div id="likes">
+                    <p>{{comments.numLikes}}</p>
+                    <form action="/libraries/comments/like/{{library._id}}" method="POST">
+                    {{!-- change to a tag --}}
+                        <button type="submit" name="addCommentLike" value="{{comments._id}}">Like</button>
+                    </form>
+                </div>
+            </article>
+        {{/each}}
+        <div id="createComment">
+            <form action="/libraries/comments/create/{{library._id}}" method="POST">
+                <label for="text_input">
+                    <textarea name="text" id="text_input"></textarea>
+                    <button type="submit">Post Comment</button>
+                </label>
+            </form>
+        </div>
+    </div>
+    {{#if hasErrors}}
+    <ul class="error-list">
+        {{#each errors}}
+        <li>
+        {{this}}
+        </li>
+        {{/each}}
+    </ul>
+    {{/if}}
+</article>

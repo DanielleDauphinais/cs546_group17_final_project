@@ -23,7 +23,7 @@ const validationFunctions = {
       // Checks to make sure val is a valid string
       isValidNumber(val, varName) {
         if(typeof val !== 'number' || isNaN(val)){
-            throw `Error:: ${varName || 'provided variable'} is not a number`;
+            throw `Error: ${varName || 'provided variable'} is not a number`;
         }
         return val;
       },

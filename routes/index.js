@@ -6,6 +6,9 @@ import { validate } from '../services/auth.js';
 import authRouter from './auth.js';
 
 const constructorMethod = (app) => {
+  app.get('/about', (req, res) => {
+    res.sendFile(path.resolve('static/about.html'));
+  });
   app.use("/auth", authRouter);
   
   /** 
@@ -20,10 +23,6 @@ const constructorMethod = (app) => {
   app.use('/users', userRoutes);
   
   app.use('/image', imageRouter);
-
-  app.get('/about', (req, res) => {
-    res.sendFile(path.resolve('static/about.html'));
-  });
 
   app.use('*', (req, res) => {
     res.status(404).json({error: 'Route Not found'});

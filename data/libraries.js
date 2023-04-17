@@ -96,6 +96,25 @@ const exportedMethods = {
       { $push: { comments: newComment } }
     );
   },
+  async likeComment(userId, commentId) {
+    // ejinks
+    userId = validation.checkValidId(userId, "User ID");
+    commentId = validation.checkValidId(commentId, "Comment ID");
+
+    const libraryCollection = await libraries();
+    const library = await libraryCollection.findOne(
+        {'comments._id': new ObjectId(commentId)},
+        {projection: {_id: 1}}
+    );
+    if (library === null) throw "Error: No library found with given ID.";
+
+    const libraryId = library._id;
+
+    await libraryCollection.updateOne(
+        {_id: libraryId},
+        {$push: {'comments.likes': userId}}
+    );
+},
   // getNumLikes
   // getNumFavorites
   // addLiketoComment
