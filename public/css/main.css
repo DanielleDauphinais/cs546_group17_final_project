@@ -151,3 +151,44 @@ margin-bottom: 10px;
 .restaurant button {
 margin-right: 10px;
 }
+
+.login-page {
+	background-color: #252b31 !important;
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+
+    color: white;
+
+	height: 100%;
+	width: 100%;
+}
+
+.login-page form {
+	padding: 20px;
+
+	border-radius: 20px;
+
+	text-align: center;
+    background-color: #323741;
+}
+
+.login-page input[type="submit"] {
+    display: block;
+    margin: 10px auto -40px auto;
+    background-color: #0373ff;
+    color: white;
+    border: 0;
+    border-radius: 25px;
+    padding: 5px;
+    width: 150px;
+    height: 40px;
+
+    cursor: pointer;
+}
+
+.login-page input[type="submit"]:focus-visible {
+    outline: 1px white;
+}
