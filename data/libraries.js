@@ -72,7 +72,7 @@ const exportedMethods = {
       { _id: new ObjectId(id) },
       { _id: 0, comments: 1 }
     );
-    if (commentsList == null) throw "Error: No library found with given ID.";
+    if (commentsList === null) throw "Error: No library found with given ID.";
     return commentsList;
   },
   async createComment(libraryId, userId, text) {

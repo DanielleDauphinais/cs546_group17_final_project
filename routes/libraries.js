@@ -134,7 +134,7 @@ router.route("/:id").post(async (req, res) => {
     );
     res.json(updatedLibrary);
   } catch (e) {
-    res.status(500).json({ error: e });
+    res.status(500).render('error', {errorCode: 500, title: "Error Page"});
   }
 });
 
