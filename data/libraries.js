@@ -1,6 +1,6 @@
 import { libraries } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
-import validation from "../validation.js";
+import validation from "../public/js/validators/validation.js";
 
 const exportedMethods = {
   /** This function creates a library and adds it to the collection

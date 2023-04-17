@@ -1,6 +1,6 @@
 import {users} from '../config/mongoCollections.js';
 import {ObjectId} from 'mongodb';
-import validation from '../validation.js';
+import validation from '../public/js/validators/validation.js';
 
 let exportedMethods = {
     async getAllUsers() {
