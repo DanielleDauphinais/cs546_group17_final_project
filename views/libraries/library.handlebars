@@ -25,6 +25,7 @@
                 <div id="likes">
                     <p>{{comments.numLikes}}</p>
                     <form action="/libraries/comments/like/{{library._id}}" method="POST">
+                    {{!-- change to a tag --}}
                         <button type="submit" name="addCommentLike" value="{{comments._id}}">Like</button>
                     </form>
                 </div>
