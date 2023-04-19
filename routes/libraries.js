@@ -1,7 +1,7 @@
 import { Router } from "express";
 const router = Router();
 import { libraryData } from "../data/index.js";
-import validation from "../validation.js";
+import validation from "../public/js/validators/validation.js";
 
 router
   .route('/')
