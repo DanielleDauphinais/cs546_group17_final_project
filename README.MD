@@ -25,5 +25,6 @@ npm i
 export jwtSigningKey="JWT_SECRET"
 # if you would like to use the cloud mongo instead of local
 export DB_URL="PUT_THE_CLOUD_MONGO_URL_HERE"
+# and finally run the server
 npm start
 ```
