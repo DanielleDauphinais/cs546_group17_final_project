@@ -8,10 +8,19 @@ import { getAuthToken } from '../services/auth.js';
 
 const router = Router();
 
+/** 
+ * @name http://localhost:3000/auth/login
+ */
 router.get("/login", async (req, res) => res.render('auth/login'));
 
+/** 
+ * @name http://localhost:3000/auth/signup
+ */
 router.get("/signup", async (req, res) => res.render('auth/signup'));
 
+/** 
+ * @name http://localhost:3000/auth/login
+ */
 router.post("/login", async (req, res) => {
     try {
         validationsForLogin(req.body);
@@ -32,6 +41,9 @@ router.post("/login", async (req, res) => {
     }
 });
 
+/** 
+ * @name http://localhost:3000/auth/signup
+ */
 router.post("/signup", async (req, res) => {
     try {
         validationsForSignUp(req.body);
