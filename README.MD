@@ -15,3 +15,16 @@ This application is a website that connects users to Little free libraries in Ho
 https://trello.com/b/HdvCPcRe/feature-delegation
 
 ## 
+
+
+## How to run?
+```sh
+# Install the node_modules
+npm i
+# this is the signing key used to generate and validate the session tokens
+export jwtSigningKey="JWT_SECRET"
+# if you would like to use the cloud mongo instead of local
+export DB_URL="PUT_THE_CLOUD_MONGO_URL_HERE"
+# and finally run the server
+npm start
+```
