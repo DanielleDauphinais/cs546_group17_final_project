@@ -27,6 +27,7 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
 
 app.use('/public', staticDir);
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static('public'));
 
