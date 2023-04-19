@@ -2,6 +2,8 @@ import { Router } from "express";
 const router = Router();
 import { libraryData } from "../data/index.js";
 import validation from "../public/js/validators/validation.js";
+import { upload } from "./image.js";
+
 
 router
   .route('/')
@@ -13,75 +15,112 @@ router
       res.status(500).json({ error: e });
     }
   })
-  .post(async (req, res) => { // Currently creates libary and sends json of created library
-    const newLibraryData = req.body;
-    let errors = [];
-    // TODO: NEED TO UNDATE FOR LOCATION AND IMAGE
-    try {
-      newLibraryData.title = validation.checkString(
-        newLibraryData.title,
-        "Name"
-      );
-    } catch (e) {
-      errors.push(e);
+  ;
+router.post("/", (req, res, next) => {
+  try {
+    console.log(req.body)
+    validation.checkImageFileString(req.body.image, "Libarys Image");
+    console.log("PASSED THIS AND MOVING TO FILE UPLOAD")
+    next();
+  } catch (e) {
+    // TODO: make it rerender!!!
+    return res.status(400).send(`${e} Error: Invalid file type`);
+  }
+}, (req, res, next) => {
+  // For testing
+  console.log("inside the next middleware :)")
+  next();
+}, upload.single("image"), async (req, res) => { // Currently creates libary and sends json of created library
+  const newLibraryData = req.body;
+  let errors = [];
+  try {
+    newLibraryData.name = validation.checkString(
+      newLibraryData.name,
+      "Name"
+    );
+  } catch (e) {
+    errors.push(e);
+  }
+  try {
+    newLibraryData.lat = parseInt(newLibraryData.lat);
+    newLibraryData.lat = validation.isValidNumber(
+      newLibraryData.lat,
+      "Librarys Latitude"
+    );
+  } catch (error) {
+    errors.push(e);
+  }
+  try {
+    newLibraryData.lng = parseInt(newLibraryData.lng);
+    newLibraryData.lng = validation.isValidNumber(
+      newLibraryData.lng,
+      "Librarys Longitude"
+    );
+  } catch (error) {
+    errors.push(e);
+  }
+  // TODO: Uncomment! Was commented out for testing
+  // try {
+  //   req.user._id= validation.checkValidId(
+  //     req.user._id,
+  //     "Library Owner ID"
+  //   );
+  // } catch (e) {
+  //   errors.push(e);
+  // }
+  try {
+    // TODO: THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
+    newLibraryData.fullness = parseInt(newLibraryData.fullness);
+    newLibraryData.fullness = validation.isValidNumber(
+      newLibraryData.fullness,
+      "Fullness Rating"
+    );
+    if (0 > newLibraryData.fullness || newLibraryData.fullness > 5) {
+      throw "Fullness rating must be between 0-5";
     }
-    try {
-      newLibraryData.ownerID = validation.checkValidId(
-        newLibraryData.ownerID,
-        "Library Owner ID"
-      );
-    } catch (e) {
-      errors.push(e);
-    }
-    try {
-      // TODO: THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
-      newLibraryData.fullness = parseInt(newLibraryData.fullness);
-      newLibraryData.fullness = validation.isValidNumber(
-        newLibraryData.fullness,
-        "Fullness Rating"
-      );
-      if (0 > newLibraryData.fullness || newLibraryData.fullness > 5) {
-        throw "Fullness rating must be between 0-5";
-      }
-    } catch (e) {
-      errors.push(e);
-    }
-    try {
-      // TODO:THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
-      newLibraryData.genres = validation.checkStringArray(
-        newLibraryData.genres,
-        "Genres Available"
-      );
-    } catch (e) {
-      errors.push(e);
-    }
-    if (errors.length > 0) {
-      res.render("libraries/new", {
-        errors: errors,
-        hasErrors: true,
-        library: newLibraryData,
-        title: "Creating a Library",
-        id: "NEED TO FIX",
-      });
-      return;
-    }
-    try {
-      const { name, ownerID, fullnessRating, genres } = newLibraryData;
-      const newLibrary = await libraryData.create(
-        name,
-        location,
-        image,
-        ownerID,
-        fullnessRating,
-        genres
-      );
-      res.json(newLibrary); // TODO: will probably be to the library's page
-    } catch (e) {
-      res
-        .status(500)
-        .render({ errorCode: 500, title: "error", id: "NEED TO FIX" });
-    }
-  });
+  } catch (e) {
+    errors.push(e);
+  }
+  // TODO: Uncomment! Was commented out for testing
+  // try {
+  //   // TODO:THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
+  //   newLibraryData.genres = validation.checkStringArray(
+  //     newLibraryData.genres,
+  //     "Genres Available"
+  //   );
+  // } catch (e) {
+  //   errors.push(e);
+  // }
+  if (errors.length > 0) {
+    res.render("libraries/new", {
+      errors: errors,
+      hasErrors: true,
+      library: newLibraryData,
+      title: "Creating a Library",
+      id: "NEED TO FIX -> req.user._id",
+    });
+    return;
+  }
+  console.log(req.file)
+  console.log(process.env.domain+req.file.path)
+  try {
+    const { name, lat, lng, image, fullness } = newLibraryData;
+    const newLibrary = await libraryData.create(
+      name,
+      lat, 
+      lng,
+      process.env.domain+req.file.path,
+      req.user._id,
+      fullness,
+      genres // TODO:Need to be updated
+    );
+    res.json(newLibrary); // TODO: will probably be to the library's page
+  } catch (e) {
+    res
+      .status(500)
+      .render({ errorCode: 500, title: "error", id: "NEED TO FIX" });
+  }
+})
 
 router.route("/new").get(async (req, res) => {
   // need to come back and fix the ID with cookie stuff

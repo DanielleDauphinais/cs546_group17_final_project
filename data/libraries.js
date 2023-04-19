@@ -8,7 +8,8 @@ const exportedMethods = {
    */
   async create(
     name,
-    location, // Vish will help!! possibly using the API?
+    lat, 
+    lng,
     image, // Vish will help!!
     ownerID,
     fullnessRating,
@@ -30,6 +31,8 @@ const exportedMethods = {
       hour: "2-digit",
       minute: "2-digit",
     });
+    // TODO: ADD "path": "public/uploads/1681934019520.png", information 
+    // TODO: ADD Stuff to check city using Google maps API using lat, lng,
     let newLibrary = {
       name: name,
       location: location,

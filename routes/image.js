@@ -12,6 +12,7 @@ const storage = multer.diskStorage({
 
         if (!extension) extension = "";
         else extension = "." + extension;
+        console.log("INSIDE MULTER STORAGE")
         
         return cb(null, `${Date.now()}${extension}`);
     }
@@ -33,10 +34,11 @@ const upload = multer({ storage });
  */
 router.post("/upload", upload.single('image'), async (req, res) => {
     try {
+        console.log(req.body);
         return res.send(req.file);
     } catch (err) {
         return res.status(500).send({ status: "Error", message: "Uh, Oh! Something wrong went on our side, we will fix it soon!" });
     }
 });
 
-export default router;
+export {router,upload};

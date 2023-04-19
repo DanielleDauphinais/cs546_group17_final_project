@@ -3,23 +3,26 @@
   <h1>Create a Library</h1>
   <form action="/libraries" method="POST" class="new-Library-form">
     <label>
-      Library Title
-      <input type="text" name="title" placeholder="Library Title" value="{{library.title}}" class="full-width-input" />
+      Library Name
+      <input type="text" name="name" placeholder="Library Name" value="{{library.title}}" class="full-width-input" />
     </label>
 
-    {{!-- TODO: need to fix to be using the maps API --}}
     <label for="library-address">
-      Library Body
+      Library Location Data
     </label>
-    <textarea id="library-body" name="address" rows="4" placeholder="library address"
-      class="full-width-input">{{library.title}}</textarea>
+    <input type="number" name="lat" placeholder="Librarys Latitude" value="{{library.lat}}" class="full-width-input" />
+    <input type="number" name="lng" placeholder="Librarys Longitude" value="{{library.lng}}" class="full-width-input" />
+
 
     <label for="library-image">
       Library image
     </label>
-    {{!-- Vish will update this when figuring out photo input  --}}
-    <input type="text" id="library-image" name="image" placeholder="Library image" value="{{library.image}}" class="full-width-input" />
-    
+    {{!-- Vish will update this when figuring out photo input THIS IS BROKEN RN  --}}
+    <form action="/image" method="post" enctype="multipart/form-data">
+      {{!-- <input type="file" name="image" /> --}}
+    <input type="file" id="library-image" name="image" placeholder="Library image" value="{{library.image}}" class="full-width-input" />
+    </form>
+    {{!-- <input type="file" id="library-image" name="image" placeholder="Library image" value="{{library.image}}" class="full-width-input" /> --}}
     {{!-- This is to get data on the fullness --}}
     <label for="fullness">
       Please select how full the library is, 0 being empty and 5 being full
@@ -50,11 +53,7 @@
         <label for="Mystery">
           <input type="checkbox" id="mystery" />Mystery</label>
         <label for="Graphic novel">
-<<<<<<< HEAD
-          <input type="checkbox" id="graphicNovel" />Graphic novel</label>
-=======
           <input type="checkbox" id="graphicNovel" />Graphic Novel</label>
->>>>>>> main
         <label for="Chapter Book">
           <input type="checkbox" id="chapterBooks" />Chapter Book</label>
       </div>
