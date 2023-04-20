@@ -201,6 +201,28 @@ let exportedMethods = {
 
     return updateInfo.value;
   },
+  async unLikeComment(libraryId, userId, commentId) {
+    // ejinks
+    libraryId = validation.checkValidId(libraryId, "Library ID");
+    userId = validation.checkValidId(userId, "User ID");
+    commentId = validation.checkValidId(commentId, "Comment ID");
+
+    const originalComment = this.getComment(libraryId, commentId);
+    if (userId === originalComment.userId) throw "Error: User does not have permission to like this comment.";
+
+    if (!originalComment.likes.includes(userId)) throw "Error: User has not liked this comment.";
+
+    const libraryCollection = await libraries();
+    const updateInfo = await libraryCollection.findOneAndUpdate(
+      {_id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId)},
+      {$pull: {"comments.$.likes": userId}},
+      {returnDocument: 'after'}
+    );
+
+    if (updateInfo.lastErrorObject.n === 0) throw "Error: Like failed";
+
+    return updateInfo.value;
+  },
   /** This function gets an array of Libaries by ownerID*/
   async getLibrariesByOwnerID(ownerId) {
     ownerId = validation.checkId(ownerId);
