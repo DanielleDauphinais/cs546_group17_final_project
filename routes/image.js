@@ -34,6 +34,7 @@ const upload = multer({ storage });
  */
 router.post("/upload", upload.single('image'), async (req, res) => {
     try {
+        console.log("req.body")
         console.log(req.body);
         return res.send(req.file);
     } catch (err) {

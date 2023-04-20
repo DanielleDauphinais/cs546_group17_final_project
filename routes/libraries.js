@@ -2,8 +2,26 @@ import { Router } from "express";
 const router = Router();
 import { libraryData } from "../data/index.js";
 import validation from "../public/js/validators/validation.js";
-import { upload } from "./image.js";
+//import { upload } from "./image.js";
+import multer from "multer";
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'public/uploads/'),
+  filename: (req, file, cb) => {
+      let extension = file.originalname.split('.')[1];
+      console.log(`${extension} - is the extension`)
+      if(extension!= "jpeg" && extension!= "jpg" && extension!= "png" && extension!= "pdf"){
+        throw `VError: photo input must have the extention .jpeg, .jpg, .png or .pdf`
+      }
+      if (!extension) extension = "";
+      else extension = "." + extension;
+      console.log("INSIDE MULTER STORAGE")
+      
+      return cb(null, `${Date.now()}${extension}`);
+  }
+});
+
+const upload = multer({ storage });
 
 router
   .route('/')
@@ -19,18 +37,34 @@ router
 router.post("/", (req, res, next) => {
   try {
     console.log(req.body)
-    validation.checkImageFileString(req.body.image, "Libarys Image");
+    // validation.checkImageFileString(req.body.image, "Libarys Image");
     console.log("PASSED THIS AND MOVING TO FILE UPLOAD")
     next();
   } catch (e) {
     // TODO: make it rerender!!!
     return res.status(400).send(`${e} Error: Invalid file type`);
   }
-}, (req, res, next) => {
+}, async (req, res, next) => {
   // For testing
   console.log("inside the next middleware :)")
+  try {
+    req.body = upload.single("image") /// WHY DOES THIS NOT WORK???
+  }catch(e){
+    if(e.startsWith("VError")){
+      return res.status(400).send(err.substr(1))
+    }
+    else{
+      return res.status(500).send("Something went wrong on our end!")
+    }
+  }
+
   next();
-}, upload.single("image"), async (req, res) => { // Currently creates libary and sends json of created library
+}, async (req, res) => { // Currently creates libary and sends json of created library
+  if(!req.file){ // Something went wrong saving the image
+    // TODO: make it rerender!!!
+    return res.status(500).send({ status: "Error", message: "Uh, Oh! Something wrong went on our side, we will fix it soon!" });
+  }
+  console.log(req.body)
   const newLibraryData = req.body;
   let errors = [];
   try {
@@ -102,20 +136,23 @@ router.post("/", (req, res, next) => {
     return;
   }
   console.log(req.file)
-  console.log(process.env.domain+req.file.path)
+  console.log(process.env.DOMAIN+req.file.path)
   try {
     const { name, lat, lng, image, fullness } = newLibraryData;
     const newLibrary = await libraryData.create(
       name,
       lat, 
       lng,
-      process.env.domain+req.file.path,
+      process.env.DOMAIN+req.file.path,
       req.user._id,
       fullness,
       genres // TODO:Need to be updated
     );
+    console.log(newLibrary)
     res.json(newLibrary); // TODO: will probably be to the library's page
   } catch (e) {
+    console.log("errors!!")
+    console.log(e)
     res
       .status(500)
       .render({ errorCode: 500, title: "error", id: "NEED TO FIX" });
