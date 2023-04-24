@@ -2,7 +2,6 @@ import { Router } from "express";
 const router = Router();
 import { libraryData } from "../data/index.js";
 import validation from "../public/js/validators/validation.js";
-//import { upload } from "./image.js";
 import multer from "multer";
 
 const storage = multer.diskStorage({
@@ -10,9 +9,9 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
       let extension = file.originalname.split('.')[1];
       console.log(`${extension} - is the extension`)
-      if(extension!= "jpeg" && extension!= "jpg" && extension!= "png" && extension!= "pdf"){
-        throw `VError: photo input must have the extention .jpeg, .jpg, .png or .pdf`
-      }
+      // if(extension!= "jpeg" && extension!= "jpg" && extension!= "png" && extension!= "pdf"){
+      //   throw `VError: photo input must have the extention .jpeg, .jpg, .png or .pdf`
+      // }
       if (!extension) extension = "";
       else extension = "." + extension;
       console.log("INSIDE MULTER STORAGE")
@@ -38,28 +37,12 @@ router.post("/", (req, res, next) => {
   try {
     console.log(req.body)
     // validation.checkImageFileString(req.body.image, "Libarys Image");
-    console.log("PASSED THIS AND MOVING TO FILE UPLOAD")
     next();
   } catch (e) {
     // TODO: make it rerender!!!
     return res.status(400).send(`${e} Error: Invalid file type`);
   }
-}, async (req, res, next) => {
-  // For testing
-  console.log("inside the next middleware :)")
-  try {
-    req.body = upload.single("image") /// WHY DOES THIS NOT WORK???
-  }catch(e){
-    if(e.startsWith("VError")){
-      return res.status(400).send(err.substr(1))
-    }
-    else{
-      return res.status(500).send("Something went wrong on our end!")
-    }
-  }
-
-  next();
-}, async (req, res) => { // Currently creates libary and sends json of created library
+}, upload.single('image'), async (req, res) => { // Currently creates libary and sends json of created library
   if(!req.file){ // Something went wrong saving the image
     // TODO: make it rerender!!!
     return res.status(500).send({ status: "Error", message: "Uh, Oh! Something wrong went on our side, we will fix it soon!" });
@@ -93,15 +76,14 @@ router.post("/", (req, res, next) => {
   } catch (error) {
     errors.push(e);
   }
-  // TODO: Uncomment! Was commented out for testing
-  // try {
-  //   req.user._id= validation.checkValidId(
-  //     req.user._id,
-  //     "Library Owner ID"
-  //   );
-  // } catch (e) {
-  //   errors.push(e);
-  // }
+  try {
+    req.user._id= validation.checkValidId(
+      req.user._id,
+      "Library Owner ID"
+    );
+  } catch (e) {
+    errors.push(e);
+  }
   try {
     // TODO: THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
     newLibraryData.fullness = parseInt(newLibraryData.fullness);
@@ -115,16 +97,16 @@ router.post("/", (req, res, next) => {
   } catch (e) {
     errors.push(e);
   }
-  // TODO: Uncomment! Was commented out for testing
-  // try {
-  //   // TODO:THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
-  //   newLibraryData.genres = validation.checkStringArray(
-  //     newLibraryData.genres,
-  //     "Genres Available"
-  //   );
-  // } catch (e) {
-  //   errors.push(e);
-  // }
+  try {
+    // TODO:THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
+    newLibraryData.genres = validation.checkStringArray(
+      newLibraryData.genres,
+      "Genres Available"
+    );
+  } catch (e) {
+    errors.push(e);
+  }
+  // TODO: Need to add validation of req.file.path 
   if (errors.length > 0) {
     res.render("libraries/new", {
       errors: errors,
