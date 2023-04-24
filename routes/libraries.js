@@ -14,7 +14,6 @@ const storage = multer.diskStorage({
       // }
       if (!extension) extension = "";
       else extension = "." + extension;
-      console.log("INSIDE MULTER STORAGE")
       
       return cb(null, `${Date.now()}${extension}`);
   }
@@ -47,7 +46,6 @@ router.post("/", (req, res, next) => {
     // TODO: make it rerender!!!
     return res.status(500).send({ status: "Error", message: "Uh, Oh! Something wrong went on our side, we will fix it soon!" });
   }
-  console.log(req.body)
   const newLibraryData = req.body;
   let errors = [];
   try {
@@ -117,10 +115,10 @@ router.post("/", (req, res, next) => {
     });
     return;
   }
-  console.log(req.file)
-  console.log(process.env.DOMAIN+req.file.path)
+
   try {
     const { name, lat, lng, image, fullness } = newLibraryData;
+    if (!process.env.DOMAIN) throw "Error: Env file not provided.";
     const newLibrary = await libraryData.create(
       name,
       lat, 
@@ -130,10 +128,8 @@ router.post("/", (req, res, next) => {
       fullness,
       genres // TODO:Need to be updated
     );
-    console.log(newLibrary)
     res.json(newLibrary); // TODO: will probably be to the library's page
   } catch (e) {
-    console.log("errors!!")
     console.log(e)
     res
       .status(500)

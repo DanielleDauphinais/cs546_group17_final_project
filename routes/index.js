@@ -16,7 +16,7 @@ const constructorMethod = (app) => {
    * and whatever routes you put below this has to go through authorization, so
    * you gotta login to access the resources under this
    */
-  //app.use(validate);
+  app.use(validate);
 
   app.use('/libraries', librariesRoutes);
   

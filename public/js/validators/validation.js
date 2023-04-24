@@ -48,7 +48,7 @@ const validationFunctions = {
           throw `Error: ${strName} is not of the correct form.`
         }
         console.log(myArray)
-        if(myArray[1]!= "jpeg" && myArray[1]!= "jpg" && myArray[1]!= "png" && myArray[1]!= "pdf"){
+        if(myArray[1]!== "jpeg" && myArray[1]!== "jpg" && myArray[1]!== "png" && myArray[1]!== "pdf"){
           throw `Error: ${strName} must have the extention .jpeg, .jpg, .png or .pdf`
         }
       }
