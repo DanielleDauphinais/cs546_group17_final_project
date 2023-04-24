@@ -103,18 +103,18 @@ const exportedMethods = {
 
     const libraryCollection = await libraries();
     const library = await libraryCollection.findOne(
-        {'comments._id': new ObjectId(commentId)},
-        {projection: {_id: 1}}
+      { "comments._id": new ObjectId(commentId) },
+      { projection: { _id: 1 } }
     );
     if (library === null) throw "Error: No library found with given ID.";
 
     const libraryId = library._id;
 
     await libraryCollection.updateOne(
-        {_id: libraryId},
-        {$push: {'comments.likes': userId}}
+      { _id: libraryId },
+      { $push: { "comments.likes": userId } }
     );
-},
+  },
   // getNumLikes
   // getNumFavorites
   // addLiketoComment
@@ -161,7 +161,6 @@ const exportedMethods = {
       fullnessRating: fullnessRating,
       genres: genres,
     };
-    const library = getLibraryById(libraryId);
     const librariesCollection = await libraries();
     const updateInfo = await librariesCollection.findOneAndUpdate(
       { _id: new ObjectId(libraryId) },
