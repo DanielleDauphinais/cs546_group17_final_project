@@ -7,6 +7,53 @@ let exportedMethods = {
   /** This function creates a library and adds it to the collection
    *  Return value: return the information of the library created
    */
+  async create(
+    name,
+    lat, 
+    lng,
+    image, // Vish will help!!
+    ownerID,
+    fullnessRating,
+    genres
+  ) {
+    name = validation.checkString(name, "Library Name");
+    ownerID = validation.checkId(ownerID, "Library Owner ID");
+    fullnessRating = validation.isValidNumber(
+      fullnessRating,
+      "Fullness Rating"
+    );
+    genres = validation.checkStringArray(genres, "Genres Available");
+    const currentDate = new Date();
+    const lastServayed = currentDate.toLocaleString(undefined, {
+      // should be in form "7/22/2016, 04:21 AM"
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    // TODO: ADD "path": "public/uploads/1681934019520.png", information 
+    // TODO: ADD Stuff to check city using Google maps API using lat, lng,
+    let newLibrary = {
+      name: name,
+      location: location,
+      image: image,
+      ownerID: ownerID,
+      fullnessRating: fullnessRating,
+      lastServayed: lastServayed,
+      genres: genres,
+      favorites: [],
+      comments: [],
+    };
+    const librariesCollection = await libraries();
+    const insertInfo = await librariesCollection.insertOne(newLibrary);
+    if (!insertInfo.acknowledged || !insertInfo.insertedId) {
+      throw "Error: Could not add Library";
+    }
+    insertInfo.insertedId = insertInfo.insertedId.toString();
+    let res = await this.getLibraryById(insertInfo["insertedId"].toString());
+    return res;
+  },
   /** This function gets all the libraries and returns the json data in an array*/
   async getAllLibraries() {
     const librariesCollection = await libraries();
