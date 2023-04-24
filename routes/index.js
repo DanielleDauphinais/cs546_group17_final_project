@@ -1,6 +1,6 @@
 import librariesRoutes from './libraries.js';
 import userRoutes from './users.js';
-import imageRouter from './image.js';
+import {router as imageRouter} from './image.js';
 import path from 'path';
 import { validate } from '../services/auth.js';
 import authRouter from './auth.js';
