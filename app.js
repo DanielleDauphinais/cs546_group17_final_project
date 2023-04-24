@@ -7,6 +7,10 @@ import {dirname} from 'path';
 import exphbs from 'express-handlebars';
 import cookieParser from "cookie-parser";
 
+
+import dotenv from "dotenv"
+const result = dotenv.config(); // Can now access GOOGLE_MAPS_API_KEY using process.env.GOOGLE_MAPS_API_KEY
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -38,7 +42,7 @@ app.use(express.static('public'));
 app.use(morgan("dev"));
 app.use(express.urlencoded({extended: true}));
 app.use(rewriteUnsupportedBrowserMethods);
-
+app.use(express.urlencoded({ extended: true }));
 app.engine('handlebars', exphbs.engine({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 

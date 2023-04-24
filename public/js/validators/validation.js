@@ -40,6 +40,18 @@ const validationFunctions = {
       }
       return arr;
     },
+    checkImageFileString(str, strName){
+      str = this.checkString(str, strName);
+      str = str.toLowerCase();
+      let myArray = str.split(".");
+      if(myArray.length != 2){
+        throw `Error: ${strName} is not of the correct form.`
+      }
+      console.log(myArray)
+      if(myArray[1]!== "jpeg" && myArray[1]!== "jpg" && myArray[1]!== "png" && myArray[1]!== "pdf"){
+        throw `Error: ${strName} must have the extention .jpeg, .jpg, .png or .pdf`
+      }
+    },
     checkEmail(x){
       if (!x) throw "Error: Email address does not exist.";
       if (typeof x !== 'string') throw "Error: Email address is not a string";
