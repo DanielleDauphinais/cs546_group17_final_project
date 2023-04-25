@@ -30,6 +30,9 @@ const constructorMethod = (app) => {
   
   app.use('/image', imageRouter);
 
+  /** Since there is no root in our project, we gotta redirect to home page on / */
+  app.get("/", (req, res) => (!req.session || !req.session.user) ? res.redirect("/users/login") : res.redirect("/home"));
+
   app.use('*', (req, res) => {
     res.status(404).json({error: 'Route Not found'});
   });
