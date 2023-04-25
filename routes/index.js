@@ -16,11 +16,9 @@ const constructorMethod = (app) => {
 
   app.use((req, res, next) => publicRoutes.includes(req.url) ? next() : preventAccess(req, res, next));
 
-  app.get('/about', (req, res) => {
-    res.sendFile(path.resolve('static/about.html'));
-  });
+  app.get('/about', (req, res) => res.render('about', { title: "About Us" }));
 
-  app.get("/home", (req, res) => res.render("home", { isLoggedIn: true }));
+  app.get("/home", (req, res) => res.render("home", { isLoggedIn: true, title: 'Home' }));
 
   app.get('/gmaps', (req, res) => res.sendFile(path.resolve("views/gmaps.html")));
 
