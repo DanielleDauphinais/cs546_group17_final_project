@@ -22,6 +22,8 @@ const constructorMethod = (app) => {
 
   app.get("/home", (req, res) => res.render("home", { isLoggedIn: true }));
 
+  app.get('/gmaps', (req, res) => res.sendFile(path.resolve("views/gmaps.html")));
+
   app.use('/libraries', librariesRoutes);
   
   app.use('/users', userRoutes);
