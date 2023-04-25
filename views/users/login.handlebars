@@ -1,0 +1,13 @@
+<div class="login-page">
+    <h1>Login</h1>
+    <form action="/users/login" method="post" id="login-form">
+        <label for="emailAddressInput">Email Address</label>
+        <input type="email" name="emailAddressInput" id="emailAddressInput" placeholder="email" required>
+        <label for="passwordInput">Password</label>
+        <input type="password" name="passwordInput" id="passwordInput" placeholder="password" required>
+        <span id="error" class="error">{{{error}}}</span>
+        <a href="/users/signup">Sign Up</a>
+        <input type="submit" value="Submit">
+    </form>
+    <script src="/public/js/login.js" type="module"></script>
+</div>

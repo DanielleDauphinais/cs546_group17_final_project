@@ -2,21 +2,25 @@ import librariesRoutes from './libraries.js';
 import userRoutes from './users.js';
 import {router as imageRouter} from './image.js';
 import path from 'path';
-import { validate } from '../services/auth.js';
-import authRouter from './auth.js';
+
+const preventLogin = (req, res, next) => (!req.session || !req.session.user) ? next() : res.redirect("/home");
+
+const publicRoutes = ["/users/login", "/users/signup", "/about"];
+
+const preventAccess = (req, res, next) => (!req.session || !req.session.user) ? res.redirect("/users/login") : next();
 
 const constructorMethod = (app) => {
+  app.get("/users/login", preventLogin);
+
+  app.get("/users/signup", preventLogin);
+
+  app.use((req, res, next) => publicRoutes.includes(req.url) ? next() : preventAccess(req, res, next));
+
   app.get('/about', (req, res) => {
     res.sendFile(path.resolve('static/about.html'));
   });
-  app.use("/auth", authRouter);
-  
-  /** 
-   * Whatever routes you put above this will not be validated for authorization
-   * and whatever routes you put below this has to go through authorization, so
-   * you gotta login to access the resources under this
-   */
-  app.use(validate);
+
+  app.get("/home", (req, res) => res.render("home", { isLoggedIn: true }));
 
   app.use('/libraries', librariesRoutes);
   

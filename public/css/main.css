@@ -56,33 +56,31 @@ margin-right: 10px;
 }
 
 .login-page {
-	background-color: #252b31 !important;
-
     display: flex;
     align-items: center;
     flex-direction: column;
     justify-content: center;
-
-    color: white;
 
 	height: 100%;
 	width: 100%;
 }
 
 .login-page form {
-	padding: 20px;
-
 	border-radius: 20px;
 
 	text-align: center;
-    background-color: #323741;
+
+	display: flex;
+	flex-direction: column;
+
+	background-color: #DAF5FF;
+
+	padding: 25px;
 }
 
 .login-page input[type="submit"] {
     display: block;
-    margin: 10px auto -40px auto;
-    background-color: #0373ff;
-    color: white;
+    margin: 10px auto -43px auto;
     border: 0;
     border-radius: 25px;
     padding: 5px;
@@ -90,12 +88,57 @@ margin-right: 10px;
     height: 40px;
 
     cursor: pointer;
+
+	color: #5dbbc7;
+	background-color: #B9E9FC;
+}
+
+.login-page h1 {
+	color: #5dbbc7;
+}
+
+.login-page input, .login-page select {
+	margin: 10px;
+}
+
+.login-page a {
+	color: #5dbbc7;
+	text-decoration: underline;
+
+	margin-bottom: 5px;
+}
+
+.login-page input:not([type="submit"]), .login-page select {
+	border: 0;
+	background-color: #B9E9FC;
+	color: #5dbbc7;
+	border-radius: 25px;
+	padding: 10px 15px 10px 15px;
+}
+
+.login-page{
+	color: #5dbbc7;
+}
+
+.login-page h1 {
+	margin-top: 0;
 }
 
 .login-page input[type="submit"]:focus-visible {
     outline: 1px white;
 }
 
+.login-page .error {
+	color: red;
+	font-weight: bold;
+}
+
 footer {
 	border-top: 1px dotted #4d4d4d;
+}
+
+.center-inner-div {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }

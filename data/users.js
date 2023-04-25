@@ -4,6 +4,9 @@ import {ObjectId} from 'mongodb';
 import validation from '../public/js/validators/validation.js';
 import libraryFunctions from './libraries.js';
 import bcrypt from 'bcrypt';
+import { validationsForCheckUser, validationsForCreateUser } from '../public/js/validators/user.js';
+
+const usersCollection = await users();
 
 let exportedMethods = {
   async getAllUsers() {
@@ -17,58 +20,6 @@ let exportedMethods = {
     const user = await userCollection.findOne({_id: ObjectId(id)});
     if (!user) throw 'Error: User not found';
     return user;
-  },
-  async createUser(
-    firstName,
-    lastName,
-    email,
-    age,
-    username,
-    password
-  ) {
-    firstName = validation.checkName(firstName);
-    lastName = validation.checkName(lastName);
-    email = validation.checkEmail(email);
-    age = validation.isValidNumber(age, "Age");
-    username = validation.checkString(username);
-    password = validation.checkPassword(password);
-
-    // Check if user already exists
-    const userCollection = await users();
-    const existingUser = await userCollection.findOne({email: email});
-    if (existingUser !== null) throw "A user already exists with the given email address.";
-    
-    // Password Hashing
-    const saltRounds = 16;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    let newUser = {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      age: age,
-      username: username,
-      password: hashedPassword,
-      dateCreated: new Date().toLocaleDateString(),
-      favLibraries: [],
-      ownedLibraries: []
-    }
-
-    // Add the user
-    const userInfo = await userCollection.insertOne(newUser);
-    if (!userInfo.acknowledged || !userInfo.insertedId) throw "Error: Could not add user.";
-  },
-  async checkUser(email, password) {
-    // Checks the user's credentials when logging in
-    email = validation.checkEmail(email);
-    password = validation.checkPassword(password);
-
-    const userCollection = await users();
-    const existingUser = await userCollection.findOne({email: email});
-    if (existingUser === null) throw "Either the email address or password is invalid";
-
-    const compare = await bcrypt.compare(password, existingUser.password);
-    if (!compare) throw "Either the email address or password is invalid";
   },
   async favoriteLibrary(userId, libraryId) {
     userId = validation.checkValidId(userId);
@@ -131,6 +82,69 @@ let exportedMethods = {
     );
     if (favorites === null) throw "Error: No user found with given ID.";
     return favorites;
+  },
+
+  /**
+   * This function will create a new user for the given details
+   * @param {string} firstName 
+   * @param {string} lastName 
+   * @param {string} emailAddress 
+   * @param {string} password 
+   * @param {Number} age 
+   * @param {string} userName 
+   */
+  async createUser(firstName, lastName, emailAddress, password, age, userName) {
+    validationsForCreateUser(firstName.trim(), lastName.trim(), emailAddress.trim(), password, Number(age), userName);
+  
+    firstName = firstName.trim();
+    lastName = lastName.trim();
+    emailAddress = emailAddress.trim();
+    emailAddress = emailAddress.toLowerCase();
+  
+    let userFromDB = await usersCollection.findOne({ emailAddress });
+  
+    if (userFromDB) throw "VError: User already exists with this email address";
+  
+    password = await bcrypt.hash(password, (await bcrypt.genSalt(10)));
+  
+    let newUser = { 
+      firstName, 
+      lastName, 
+      emailAddress,
+      password,
+      age,
+      userName,
+      dateCreated: new Date().toLocaleDateString(),
+      favLibraries: [],
+      ownedLibraries: [] 
+    };
+  
+    const { acknowledged, insertedId } = await usersCollection.insertOne(newUser);
+  
+    if (!acknowledged || !insertedId) throw "VError: Couldn't add user";
+    return { insertedUser: true };
+  },
+
+  /**
+   * This function will validate the given user credentials
+   * @param {string} emailAddress 
+   * @param {string} password 
+   */
+  async checkUser(emailAddress, password) {
+    validationsForCheckUser(emailAddress.trim(), password);
+    emailAddress = emailAddress.trim();
+    emailAddress = emailAddress.toLowerCase();
+    
+    let userFromDB = await usersCollection.findOne({ emailAddress });
+  
+    if (!userFromDB) throw "Either the email address or password is invalid";
+  
+    let { firstName, lastName, emailAddress: email, role } = userFromDB;
+  
+    let isValid = await bcrypt.compare(password, userFromDB.password);
+  
+    if (isValid) return { firstName, lastName, emailAddress: email, role };
+    throw "Either the email address or password is invalid";
   }
 };
 
