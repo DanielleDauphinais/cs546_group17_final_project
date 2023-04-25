@@ -21,8 +21,8 @@ https://trello.com/b/HdvCPcRe/feature-delegation
 ```sh
 # Install the node_modules
 npm i
-# this is the signing key used to generate and validate the session tokens
-export jwtSigningKey="JWT_SECRET"
+# this is the authSecret used to generate and validate the session tokens
+export authSecret = "this could be anything and it wouldn't really matter"
 # if you would like to use the cloud mongo instead of local
 export DB_URL="PUT_THE_CLOUD_MONGO_URL_HERE"
 # and finally run the server
