@@ -4,15 +4,12 @@ const initMap = async () => {
 
         const tourStops = libraries.map(l => [ { lat: l.coordinates[0], lng: l.coordinates[1] }, l._id ]);
 
-        const map = new google.maps.Map(
-            document.getElementById("map"),
-            {
-                zoom: 12,
-                center: tourStops[0][0],
-            }
-        );
+        /** If there aren't any libraries in the database let's focus our map to Gateway Center */
+        let mapPositioning = { zoom: 12, center: { lat: 40.744, lng: -74.0324 } };
 
-        const infoWindow = new google.maps.InfoWindow();
+        if (tourStops.length > 0) mapPositioning = { zoom: 12, center: tourStops[0][0] };
+        
+        const map = new google.maps.Map(document.getElementById("map"), mapPositioning);
 
         tourStops.forEach(([position, title], i) => {
             console.log(position, title)
