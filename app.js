@@ -8,6 +8,7 @@ import {fileURLToPath} from 'url';
 import {dirname} from 'path';
 import exphbs from 'express-handlebars';
 import cookieParser from "cookie-parser";
+import session from 'express-session';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,8 +30,19 @@ const rewriteUnsupportedBrowserMethods = (req, res, next) => {
 
 app.use('/public', staticDir);
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static('public'));
+
+app.use(
+	session({
+		name: 'AuthCookie',
+		secret: process.env.authSecret,
+		saveUninitialized: false,
+		resave: false,
+		cookie: { maxAge: 6000000 }
+	})
+);
 
 /** 
  * This is a small middleware which will give output the 
@@ -38,6 +50,7 @@ app.use(express.static('public'));
  * what's happening. TLDR; It is a logger
  */
 app.use(morgan("dev"));
+
 app.use(express.urlencoded({extended: true}));
 app.use(rewriteUnsupportedBrowserMethods);
 app.use(express.urlencoded({ extended: true }));

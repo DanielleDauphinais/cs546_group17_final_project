@@ -38,7 +38,107 @@ a:hover{
 	justify-content: center;
 }
 
-/* This will create a seperation between main connent and footer */
+/* Style for the restaurant name */
+.restaurant h2 {
+margin-top: 0;
+margin-bottom: 5px;
+}
+
+/* Style for the restaurant description */
+.restaurant p {
+margin-top: 0;
+margin-bottom: 10px;
+}
+
+/* Style for the unfollow and expand buttons */
+.restaurant button {
+margin-right: 10px;
+}
+
+.login-page {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+
+	height: 100%;
+	width: 100%;
+}
+
+.login-page form {
+	border-radius: 20px;
+
+	text-align: center;
+
+	display: flex;
+	flex-direction: column;
+
+	background-color: #DAF5FF;
+
+	padding: 25px;
+}
+
+.login-page input[type="submit"] {
+    display: block;
+    margin: 10px auto -43px auto;
+    border: 0;
+    border-radius: 25px;
+    padding: 5px;
+    width: 150px;
+    height: 40px;
+
+    cursor: pointer;
+
+	color: #5dbbc7;
+	background-color: #B9E9FC;
+}
+
+.login-page h1 {
+	color: #5dbbc7;
+}
+
+.login-page input, .login-page select {
+	margin: 10px;
+}
+
+.login-page a {
+	color: #5dbbc7;
+	text-decoration: underline;
+
+	margin-bottom: 5px;
+}
+
+.login-page input:not([type="submit"]), .login-page select {
+	border: 0;
+	background-color: #B9E9FC;
+	color: #5dbbc7;
+	border-radius: 25px;
+	padding: 10px 15px 10px 15px;
+}
+
+.login-page{
+	color: #5dbbc7;
+}
+
+.login-page h1 {
+	margin-top: 0;
+}
+
+.login-page input[type="submit"]:focus-visible {
+    outline: 1px white;
+}
+
+.login-page .error {
+	color: red;
+	font-weight: bold;
+}
+
 footer {
 	border-top: 1px dotted #4d4d4d;
+}
+
+.center-inner-div {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
