@@ -159,3 +159,7 @@ footer {
 .nav-element {
 	padding: 10px;
 }
+
+html {
+    font-family: 'Inter', sans-serif;
+}
