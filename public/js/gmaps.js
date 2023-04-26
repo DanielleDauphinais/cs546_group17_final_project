@@ -1,5 +1,5 @@
 const initMap = async () => {
-    window.jQuery.ajax({ method: 'GET', url: '/libraries/' }).done((data, status) => {
+    $.ajax({ method: 'GET', url: '/libraries/' }).done((data, status) => {
         const libraries = data;
 
         const tourStops = libraries.map(l => [ { lat: l.coordinates[0], lng: l.coordinates[1] }, l._id ]);
