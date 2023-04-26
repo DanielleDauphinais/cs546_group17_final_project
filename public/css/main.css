@@ -8,7 +8,7 @@
 /* used throughout app for links */
 a:link { 
 	text-decoration: none;
-	color: #5dbbc7;
+	color: #00838e;
 }
 a:hover{
 	font-style: normal;
@@ -89,12 +89,16 @@ margin-right: 10px;
 
     cursor: pointer;
 
-	color: #5dbbc7;
+	color: #007984;
 	background-color: #B9E9FC;
 }
 
 .login-page h1 {
-	color: #5dbbc7;
+	color: #00a4b2;
+}
+
+.login-page label {
+	color: #007984;
 }
 
 .login-page input, .login-page select {
@@ -102,7 +106,7 @@ margin-right: 10px;
 }
 
 .login-page a {
-	color: #5dbbc7;
+	color: #007984;
 	text-decoration: underline;
 
 	margin-bottom: 5px;
