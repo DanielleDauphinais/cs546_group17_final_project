@@ -1,7 +1,7 @@
 {{!-- need to connect to the backend and check using front end JS --}}
 <article>
   <h1>Create a Library</h1>
-  <form action="/libraries" method="POST" class="new-Library-form" enctype="multipart/form-data">
+  <form action="/libraries/new" method="POST" class="new-Library-form" enctype="multipart/form-data">
     <label>
       Library Name
       <input type="text" name="name" placeholder="Library Name" value="{{library.title}}" class="full-width-input" />

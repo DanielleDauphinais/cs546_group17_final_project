@@ -16,6 +16,7 @@
         <p>{{library.numFavorites}}</p>
     </div>
     <br>
+    <h2>Comments Section</h2>
     <div id="comments">
         {{#each library.comments}}
             <article class="comment">
@@ -32,7 +33,7 @@
             </article>
         {{/each}}
         <div id="createComment">
-            <form action="/libraries/comments/create/{{library._id}}" method="POST">
+            <form id="newComment" action="/libraries/comments/create/{{library._id}}" method="POST">
                 <label for="text_input">
                     <textarea name="text" id="text_input"></textarea>
                     <button type="submit">Post Comment</button>
