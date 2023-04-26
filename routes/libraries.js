@@ -189,12 +189,19 @@ router.route("/:id").post(async (req, res) => {
     res.status(500).render('error', {errorCode: 500, title: "Error Page"});
   }
 }).get(async (req, res) => {
-  let id = req.params.id;
+  let id;
   
-  id = validation.checkValidId(id);
+  // If the library ID is not valid, render the error page with a status code of 400
+  try {
+    id = req.params.id;
+    id = validation.checkValidId(id);
+  } catch (e) {
+    res.status(400).render('error', {errorCode: 400, searchValue: "Library"});
+  }
 
   let library;
 
+  // If the library is not found, render the error page with a status code of 404
   try {
     library = await libraryData.get(id);
   } catch (e) {
