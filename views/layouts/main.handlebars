@@ -15,18 +15,22 @@
     <header class="d-flex">
         <img src="/public/images/LFLL.jpeg" alt="Little Free Libary Connections: Hoboken logo" id="LFLC-logo">
         <nav class="ml-auto d-flex">
-            <div class="nav-element">
+            <div class="nav-element" id="nav-home">
                 {{!-- This will take user back to the list of libraries --}}
-                <a href=" /home/">Home</a>
+                <a href=" /home">Home</a>
             </div>
-            <div class="nav-element">
+            <div class="nav-element" id="nav-about-us">
+                {{!-- This will take user back to the list of libraries --}}
+                <a href=" /about">About Us</a>
+            </div>
+            <div class="nav-element" id="nav-profile">
                 {{!-- id will the the users id, since they will be logged on to get to this point--}}
                 <a href="/users/{{id}}">{{id.userName}} Profile</a>
             </div>
             {{#if isLoggedIn}}
-            <div class="nav-element">
-                <a href="/users/logout">Logout</a>
-            </div>
+                <div class="nav-element" id="nav-logout">
+                    <a href="/users/logout">Logout</a>
+                </div>
             {{/if}}
         </nav>
     </header>
