@@ -163,3 +163,19 @@ footer {
 html {
     font-family: 'Inter', sans-serif;
 }
+
+.justify-content-space-between {
+	justify-content: space-between;
+}
+
+.mt-auto {
+	margin-top: auto;
+}
+
+.pl-25 {
+	padding-left: 25px;
+}
+
+.pr-25 {
+	padding-right: 25px;
+}
