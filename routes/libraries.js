@@ -202,7 +202,7 @@ router.route("/:id").post(async (req, res) => {
   }
 
   try {
-    res.render('libraries/library', {title: library.name, library: library});
+    res.render('libraries/library', { title: library.name, library: library, isLoggedIn: true });
   } catch (e) {
     res.status(500).send(e);
   }

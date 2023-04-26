@@ -16,17 +16,20 @@ const constructorMethod = (app) => {
 
   app.use((req, res, next) => publicRoutes.includes(req.url) ? next() : preventAccess(req, res, next));
 
-  app.get('/about', (req, res) => {
-    res.sendFile(path.resolve('static/about.html'));
-  });
+  app.get('/about', (req, res) => res.render('about', { title: "About Us" }));
 
-  app.get("/home", (req, res) => res.render("home", { isLoggedIn: true }));
+  app.get("/home", (req, res) => res.render("home", { isLoggedIn: true, title: 'Home' }));
+
+  app.get('/gmaps', (req, res) => res.sendFile(path.resolve("views/gmaps.html")));
 
   app.use('/libraries', librariesRoutes);
   
   app.use('/users', userRoutes);
   
   app.use('/image', imageRouter);
+
+  /** Since there is no root in our project, we gotta redirect to home page on / */
+  app.get("/", (req, res) => (!req.session || !req.session.user) ? res.redirect("/users/login") : res.redirect("/home"));
 
   app.use('*', (req, res) => {
     res.status(404).json({error: 'Route Not found'});
