@@ -1,33 +1,32 @@
 <article>
-    <h1>{{library.name}}</h1>
-    <img alt="{{library.name}}" src="{{library.imageURL}}">
-    <p>Created by: {{library.ownerID}}</p>
-    <h2>Fullness: {{library.fullness}}</h2>
-    <p>Last Rated On: {{library.lastRating}}</p>
+    <h1>{{name}}</h1>
+    <img alt="{{name}}" src="{{imageURL}}">
+    <address>{{address}}</address>
+    <p>Created by: {{ownerID}}</p>
+    <h2>Fullness: {{fullness}}</h2>
+    <p>Last Rated On: {{lastRating}}</p>
     <ul>
-        {{#each library.genres}}
+        {{#each genres}}
             <li>
                 <p>{{genre}}</p>
             </li>
         {{/each}}
     </ul>
     <div id="favorites">
-        <p>{{library.numFavorites}}</p>
+        <p>{{numFavorites}}</p>
     </div>
     <br>
     <h2>Comments Section</h2>
     <div id="comments">
-        {{#each library.comments}}
+        {{#each comments}}
             {{> comment }}
         {{/each}}
     </div>
     <div id="createComment">
-        <form id="newComment" {{!-- action="/libraries/comments/create/{{library._id}}" method="POST" --}}>
+        <form id="newComment">
             <label for="text_input">
-                <textarea name="text" id="text_input"></textarea>
+                <textarea name="text_input" id="text_input"></textarea>
             </label>
-            <input type="hidden" name="userid" value="{{userid}}"/>
-            <input type="hidden" name="libraryid" value="{{library._id}}"/>
             <button type="submit">Post Comment</button>
         </form>
     </div>

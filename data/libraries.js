@@ -103,32 +103,41 @@ let exportedMethods = {
     commentId = validation.checkValidId(commentId);
 
     const libraryCollection = await libraries();
-    let commentsList = await libraryCollection.findOne(
-      { _id: new ObjectId(id) },
-      { _id: 0, comments: 1 }
-    );
-    if (commentsList === null) throw "Error: No library found with given ID.";
+    // let commentsList = await libraryCollection.findOne(
+    //   { _id: new ObjectId(id) },
+    //   { _id: 0, comments: 1 }
+    // );
+    // if (commentsList === null) throw "Error: No library found with given ID.";
 
-    commentsList.forEach(x => {
-      if (x._id.toString() === commentId) {
-        return x;
-      }
-    });
-    throw "Error: No comment found with given comment ID in given library.";
+    // commentsList.forEach(x => {
+    //   if (x._id.toString() === commentId) {
+    //     return x;
+    //   }
+    // });
+    // throw "Error: No comment found with given comment ID in given library.";
+
+    let comment = await libraryCollection.findOne(
+      {_id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId)},
+    );
+    if (comment === null) throw "Error: No library found with given ID.";
+    comment._id = comment._id.toString();
+    return comment;
   },
-  async createComment(libraryId, userId, text) {
+  async createComment(libraryId, userId, userName, text) {
     // ejinks
     libraryId = validation.checkValidId(libraryId, "Library ID");
     userId = validation.checkValidId(userId, "User ID");
+    userName = validation.checkString(userName, "Username");
 
     text = validation.checkString(text, "Comment Body");
 
     let newComment = {
       _id: new ObjectId(),
       userId: userId,
+      userName: userName,
       dateCreated: new Date().toLocaleDateString(),
       text: text,
-      likes: [],
+      likes: []
     };
 
     const libraryCollection = await libraries();
@@ -136,6 +145,9 @@ let exportedMethods = {
       { _id: new ObjectId(libraryId) },
       { $push: { comments: newComment } }
     );
+    
+    newComment._id = newComment._id.toString();
+    return newComment;
   },
   async editComment(libraryId, userId, commentId, text) {
     libraryId = validation.checkValidId(libraryId, "Library ID");

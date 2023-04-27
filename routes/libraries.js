@@ -1,6 +1,6 @@
 import { Router } from "express";
 const router = Router();
-import { libraryData } from "../data/index.js";
+import { libraryData, userData } from "../data/index.js";
 import validation from "../public/js/validators/validation.js";
 import multer from "multer";
 import xss from 'xss';
@@ -175,7 +175,8 @@ router.route('/:id')
     }
 
     try {
-      res.render('libraries/library', { title: library.name, library: library, isLoggedIn: true, script_partial: 'comment', userid: req.session.user._id});
+      let user = req.session.user;
+      res.render('libraries/library', { title: library.name, isLoggedIn: true, script_partial: 'comment', userid: user._id, ...library});
     } catch (e) {
       res.status(500).render('error', {errorCode: 500});
     }
@@ -297,9 +298,9 @@ router.route('/:id/comments')
     }
 
     try {
-      let userid = req.session.user._id.toString();
-      let createComment = await libraryData.createComment(id, userid, text);
-      res.redirect(`libraries/library/${id}`);
+      let user = req.session.user;
+      let createComment = await libraryData.createComment(id, user._id, user.userName, text);
+      res.render('partials/comment', {layout: null, library, ...createComment});
     } catch (e) {
       res.status(500).render('error', {errorCode: 500, title: "Error Page"});
     }
