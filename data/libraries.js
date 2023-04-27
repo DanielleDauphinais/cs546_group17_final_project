@@ -67,8 +67,65 @@ let exportedMethods = {
     library._id = library._id.toString();
     return library;
   },
-  async editLibrary() {
-    // Needs to be implemented
+  /**
+   * @name editLibrary
+   * @author Mostly ejinks code, re-used and edited by jcarr2
+   * @param {String} libraryID
+   * @param {String} name
+   * @param {[Number, Number]} coordinates
+   * @param {String} image
+   * @param {Number} fullnessRating
+   * @param {Array<String>} genres
+   * @returns {{id: String, name: String, coordinates: [Number, Number], image: String, ownerId: string,
+   *  fullnessRating: number, lastServayed: string, genres: Array<String>, favorites: Array, comments: Array}}
+   */
+  async editLibrary(
+    libraryId,
+    name,
+    coordinates,
+    image,
+    fullnessRating,
+    genres
+  ) {
+    /* Pretty much just use the validation code form Create */
+    libraryId = validation.checkValidId(libraryId, "Library ID");
+    name = validation.checkString(name, "Library Name");
+    fullnessRating = validation.isValidNumber(
+      fullnessRating,
+      "Fullness Rating"
+    );
+    genres = validation.checkStringArray(genres, "Genres Available");
+    const currentDate = new Date();
+    const lastServayed = currentDate.toLocaleString(undefined, {
+      // should be in form "7/22/2016, 04:21 AM"
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    // TODO: ADD "path": "public/uploads/1681934019520.png", information
+    // TODO: ADD Stuff to check city using Google maps API using lat, lng,
+    let editedLibrary = {
+      name: name,
+      coordinates: coordinates,
+      image: image,
+      fullnessRating: fullnessRating,
+      lastServayed: lastServayed,
+      genres: genres,
+    };
+    /* Pretty much the same code from the FormUpdate */
+    const librariesCollection = await libraries();
+    const updateInfo = await librariesCollection.findOneAndUpdate(
+      { _id: new ObjectId(libraryId) },
+      { $set: editedLibrary },
+      { returnDocument: "after" }
+    );
+    if (updateInfo.lastErrorObject.n === 0) {
+      throw `Error: Could not update library with id of ${libraryId}`;
+    }
+    updateInfo.value._id = updateInfo.value._id.toString();
+    return updateInfo.value;
   },
   /** This function will remove a library if the userId is equal to the ownerId*/
   async removeLibrary(libraryId, userId) {
@@ -239,12 +296,13 @@ let exportedMethods = {
     return await librariesCollection.find({ ownerId: ownerId }).toArray();
   },
   /**
-   * jcarr2
    * @name formUpdate
+   * @author jcarr2
    * @param {String} libraryId - The ID of the library to change
    * @param {Number} fullnessRating
    * @param {Array<String>} genres
-   * @returns {Object} The updated object of the library
+   * @returns {{id: String, name: String, coordinates: [Number, Number], image: String, ownerId: string,
+   *  fullnessRating: number, lastServayed: string, genres: Array<String>, favorites: Array, comments: Array}} The updated object of the library
    */
   async formUpdate(libraryId, fullnessRating, genres) {
     // Input checking - Maybe consider changing the name of isValidNumber to checkNumber to be uniform?
@@ -252,9 +310,18 @@ let exportedMethods = {
     fullnessRating = validation.isValidNumber(fullnessRating);
     genres = validation.checkStringArray(genres);
     // The actual update
+    const lastServayed = currentDate.toLocaleString(undefined, {
+      // should be in form "7/22/2016, 04:21 AM"
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
     let formData = {
       fullnessRating: fullnessRating,
       genres: genres,
+      lastServayed: lastServayed,
     };
     const librariesCollection = await libraries();
     const updateInfo = await librariesCollection.findOneAndUpdate(
