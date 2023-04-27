@@ -3,6 +3,7 @@ const router = Router();
 import { libraryData } from "../data/index.js";
 import validation from "../public/js/validators/validation.js";
 import multer from "multer";
+import xss from 'xss';
 
 
 
@@ -166,7 +167,7 @@ router.route('/:id')
     }
 
     try {
-      res.render('libraries/library', { title: library.name, library: library, isLoggedIn: true });
+      res.render('libraries/library', { title: library.name, library: library, isLoggedIn: true, script_partial: 'comment'});
     } catch (e) {
       res.status(500).render('error', {errorCode: 500});
     }
@@ -257,9 +258,6 @@ router.route('/:id/survey')
   });
 
 router.route('/:id/comments')
-  .get(async (req, res) => {
-    // Renders the comments section
-  })
   .post(async (req, res) => {
     // Creates a new comment
     let id;
