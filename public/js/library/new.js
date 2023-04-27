@@ -13,7 +13,6 @@ function removeElementsByClass(className){      // source: https://stackoverflow
 // need to do the fullness test
 if(newLibraryForm){
     newLibraryForm.addEventListener('submit', (event) => {
-        event.preventDefault()
         let name = document.getElementById("libraryName");
         let lat =  document.getElementById("lat");
         let lng =  document.getElementById("lng");
@@ -22,7 +21,7 @@ if(newLibraryForm){
         errorList.innerHTML = "" 
         errorList.hidden = true
         try {
-            name.value = validationsForStrings("Library Name", name.value, false, {min: 3, max:40})
+            validationsForStrings("Library Name", name.value, false, {min: 3, max:40})
         } catch (e) {
             if ((typeof e === "string") && e.startsWith("VError")) {
                 e = e.substr(1);
@@ -54,10 +53,11 @@ if(newLibraryForm){
         }
         if(errorList.innerHTML !== ""){
             errorList.hidden = false;
+            event.preventDefault()
         }
         console.log(lat.value)
         console.log(lng.value)
-        geocodeLatLng(geocoder)
+        //geocodeLatLng(geocoder)
     })
 }
 

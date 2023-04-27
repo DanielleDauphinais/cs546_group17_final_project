@@ -3,6 +3,7 @@ const router = Router();
 import { libraryData } from "../data/index.js";
 import validation from "../public/js/validators/validation.js";
 import multer from "multer";
+import axios from 'axios';
 import xss from 'xss';
 
 
@@ -11,10 +12,6 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'public/uploads/'),
   filename: (req, file, cb) => {
       let extension = file.originalname.split('.')[1];
-      console.log(`${extension} - is the extension`)
-      // if(extension!= "jpeg" && extension!= "jpg" && extension!= "png" && extension!= "pdf"){
-      //   throw `VError: photo input must have the extention .jpeg, .jpg, .png or .pdf`
-      // }
       if (!extension) extension = "";
       else extension = "." + extension;
       
@@ -36,28 +33,16 @@ router.route('/')
 
 router.route('/new')
   .get(async (req, res) => {
-    // Render the new library form page
-
-    // need to come back and fix the ID with cookie stuff
     try {
       res.render("libraries/new", { title: "Creating a Library", id: "NEED TO FIX" });
     } catch (error) {
-      
+      // need to cause an error page renderd
     }
     
   })
-  .post(async (req, res, next) => {
-    // Submit the new library form page
-    try {
-      console.log(req.body)
-      // validation.checkImageFileString(req.body.image, "Libarys Image");
-      next();
-    } catch (e) {
-      // TODO: make it rerender!!!
-      return res.status(400).send(`${e} Error: Invalid file type`);
-    }
-  },
-  upload.single('image'), async (req, res) => { // Currently creates libary and sends json of created library
+  .post(upload.single('image'), 
+  async (req, res) => { // Currently creates libary and sends json of created library
+    console.log(req.body)
     if(!req.file){ // Something went wrong saving the image
       // TODO: make it rerender!!!
       return res.status(500).send({ status: "Error", message: "Uh, Oh! Something wrong went on our side, we will fix it soon!" });
@@ -73,7 +58,7 @@ router.route('/new')
       errors.push(e);
     }
     try {
-      newLibraryData.lat = parseInt(newLibraryData.lat);
+      newLibraryData.lat = Number(newLibraryData.lat);
       newLibraryData.lat = validation.isValidNumber(
         newLibraryData.lat,
         "Librarys Latitude"
@@ -82,7 +67,7 @@ router.route('/new')
       errors.push(e);
     }
     try {
-      newLibraryData.lng = parseInt(newLibraryData.lng);
+      newLibraryData.lng = Number(newLibraryData.lng);
       newLibraryData.lng = validation.isValidNumber(
         newLibraryData.lng,
         "Librarys Longitude"
@@ -91,15 +76,38 @@ router.route('/new')
       errors.push(e);
     }
     try {
-      req.user._id= validation.checkValidId(
-        req.user._id,
+      req.session.user._id= validation.checkValidId(
+        req.session.user._id,
         "Library Owner ID"
       );
     } catch (e) {
       errors.push(e);
     }
+    // Getting the address of the library
+    let data = '' 
+    let city = ''
+    let address = ''
+    try{
+      data = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${newLibraryData.lat},${newLibraryData.lng}&key=AIzaSyAPxSPvWssw3gI4W1qJaFk9xlBqBicI3iY`);
+      city = data.data.results[0].address_components[2].long_name
+      address = data.data.results[1].formatted_address
+      console.log(city)
+      console.log(address)
+    }
+    catch(e){
+      return res.status(400).render('error', {errorNum: 400, searchValue: "Error on our side getting address data ", title: "Error"})
+    }
+    if(city !== "Hoboken") {
+      newLibraryData.lat = ''
+      newLibraryData.lng = ''
+      errors.push("The location of the little free library must be in Hoboken");
+    }
+    if(address === ''){
+      // TODO: what should this error be???
+      return res.status(400).render('error', {errorNum: 400, searchValue: "Error on our side getting address data ", title: "Error"})
+    }
+    // TODO: THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
     try {
-      // TODO: THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
       newLibraryData.fullness = parseInt(newLibraryData.fullness);
       newLibraryData.fullness = validation.isValidNumber(
         newLibraryData.fullness,
@@ -127,7 +135,7 @@ router.route('/new')
         hasErrors: true,
         library: newLibraryData,
         title: "Creating a Library",
-        id: "NEED TO FIX -> req.user._id",
+        id: req.session.user._id,
       });
       return;
     }
@@ -137,8 +145,8 @@ router.route('/new')
       if (!process.env.DOMAIN) throw "Error: Env file not provided.";
       const newLibrary = await libraryData.create(
         name,
-        lat, 
-        lng,
+        [lat, lng],
+        address,
         process.env.DOMAIN+req.file.path,
         req.user._id,
         fullness,

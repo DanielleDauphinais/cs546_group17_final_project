@@ -10,6 +10,7 @@ let exportedMethods = {
   async create(
     name,
     coordinates,
+    address,
     image, // Vish will help!!
     ownerID,
     fullnessRating,
