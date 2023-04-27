@@ -24,7 +24,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-
+router.route('/')
+  .get(async (req, res) => {
+    try {
+      let libraries = await libraryData.getAllLibraries();
+      res.send(libraries);
+    } catch (e) {
+      res.status(500).render('error', {errorCode: 500});
+    }
+  });
 
 router.route('/new')
   .get(async (req, res) => {
