@@ -16,6 +16,7 @@ import {validationsForStrings} from './validators/util.js';
 
     let currentLink = $(this);
     libraryid = currentLink.data('id');
+    console.log(libraryid);
 
     let text;
     let dateCreated = new Date().toLocaleDateString();
