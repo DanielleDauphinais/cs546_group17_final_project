@@ -45,6 +45,8 @@ let exportedMethods = {
       comments: [],
     };
     const librariesCollection = await libraries();
+    const lib = await librariesCollection.findOne({name : name})
+    if (lib !== null) throw "VError: There already exists a library with the given name"
     const insertInfo = await librariesCollection.insertOne(newLibrary);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
       throw "Error: Could not add Library";

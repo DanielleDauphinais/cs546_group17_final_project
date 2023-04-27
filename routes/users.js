@@ -98,6 +98,7 @@ router
     try {
       var user = await userData.getUserById(id)
     } catch (error) {
+      console.log(error)
       return res.status(404).render('error',
       { searchValue:"user", 
         errorCode:"404"
@@ -105,9 +106,9 @@ router
     }
 
     try {
-      var favLibs = user.favLibraries.map(lib => libraryData.get(lib))
-      var ownedLibs = user.ownedLibraries.map(lib => libraryData.get(lib))
-      return res.status(200).render('user-profile',
+      var favLibs = await user.favLibraries.map(async lib => await libraryData.get(lib))
+      var ownedLibs = await user.ownedLibraries.map(async lib => await libraryData.get(lib))
+      return res.status(200).render('users/user-profile',
       { favLibs: favLibs,
         ownedLibs: ownedLibs 
       })

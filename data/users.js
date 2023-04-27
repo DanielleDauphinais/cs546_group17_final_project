@@ -17,7 +17,7 @@ let exportedMethods = {
   async getUserById(id) {
     id = validation.checkValidId(id,"user_id");
     const userCollection = await users();
-    const user = await userCollection.findOne({_id: ObjectId(id)});
+    const user = await userCollection.findOne({_id: new ObjectId(id)});
     if (!user) throw 'Error: User not found';
     return user;
   },
@@ -132,13 +132,13 @@ let exportedMethods = {
     return { insertedUser: true };
   },
   async addOwnedLibrary(userId,libraryId){
-    
+
     libraryId = validation.checkValidId(libraryId, "Library ID")
     userId = validation.checkValidId(userId, "User ID")
     const userCollection = await users();
 
     const user = await userCollection.findOne({ _id: new ObjectId(userId) });
-    if (user === null) throw "Error: No user found with given ID.";
+    if (user === null) throw "VError: No user found with given ID.";
     
     // If the user has already favorited this 
     if (user.ownedLibraries.includes(libraryId)) throw "VError: User has already owns this library"

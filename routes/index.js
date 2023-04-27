@@ -18,7 +18,7 @@ const constructorMethod = (app) => {
 
   app.get('/about', (req, res) => res.render('about', { title: "About Us", isLoggedIn: !(!req.session || !req.session.user) }));
 
-  app.get("/home", (req, res) => res.render("home", { isLoggedIn: true, title: 'Home' }));
+  app.get("/home", (req, res) => res.render("home", { isLoggedIn: true, title: 'Home', id: req.session.user._id }));
 
   app.get('/gmaps', (req, res) => res.sendFile(path.resolve("views/gmaps.html")));
 
