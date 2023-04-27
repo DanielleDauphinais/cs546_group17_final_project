@@ -62,13 +62,11 @@ router
       if (!req.file) {
         // Something went wrong saving the image
         // TODO: make it rerender!!!
-        return res
-          .status(500)
-          .send({
-            status: "Error",
-            message:
-              "Uh, Oh! Something wrong went on our side, we will fix it soon!",
-          });
+        return res.status(500).send({
+          status: "Error",
+          message:
+            "Uh, Oh! Something wrong went on our side, we will fix it soon!",
+        });
       }
       const newLibraryData = req.body;
       let errors = [];
@@ -214,10 +212,8 @@ router
   .route("/:id/survey")
   .get(async (req, res) => {
     // Renders the survey page to rate fullness and input genres
-
-    let id;
-
     // If the library ID is not valid, render the error page with a status code of 400
+    let id;
     try {
       id = req.params.id;
       id = validation.checkValidId(id);
@@ -226,7 +222,6 @@ router
         .status(400)
         .render("error", { errorCode: 400, searchValue: "Library" });
     }
-
     try {
       res.render("libraries/fullness", { id: id });
     } catch (e) {
@@ -235,10 +230,8 @@ router
   })
   .post(async (req, res) => {
     // Posts the users survey form submission
-
-    let id;
-
     // If the library ID is not valid, render the error page with a status code of 400
+    let id;
     try {
       id = req.params.id;
       id = validation.checkValidId(id);
@@ -247,7 +240,6 @@ router
         .status(400)
         .render("error", { errorCode: 400, searchValue: "Library" });
     }
-
     // Grab the form data
     let updateData = req.body;
     // Using the similar data checking function as above. Maybe this should be made into a checker function?
@@ -264,53 +256,47 @@ router
      * }
      * This is using the error checking from before, using the helper functions for uniformity.
      */
-
-    /** Genres Input Conversion */
-    let genresForm = [
-      "pictureBooks",
-      "youngAdultFiction",
-      "fantasyFiction",
-      "fairyTale",
-      "boardBook",
-      "nonFiction",
-      "mystery",
-      "graphicNovel",
-      "chapterBooks",
-    ];
-    const genresInput = [
-      res.body.pictureBooks,
-      res.body.youngAdultFiction,
-      res.body.fantasyFiction,
-      res.body.fairyTale,
-      res.body.boardBook,
-      res.body.nonFiction,
-      res.body.mystery,
-      res.body.graphicNovel,
-      res.body.chapterBooks,
+    // Grab all of the inputs from the request body.
+    let genresInput = [
+      req.body.pictureBooks,
+      req.body.youngAdultFiction,
+      req.body.fantasyFiction,
+      req.body.fairyTale,
+      req.body.boardBook,
+      req.body.nonFiction,
+      req.body.mystery,
+      req.body.graphicNovel,
+      req.body.chapterBooks,
     ];
 
-    genresInput.forEach((val, ind) => {
-      if (!val) {
-        genresForm.splice(ind, 1);
-      }
+    // For every value, if it does not exist, then the checkbox was not selected.
+    genresInput = genresInput.filter((genre) => {
+      return typeof genre === "string";
     });
 
     try {
       updateData.fullness = validation.isValidNumber(
-        updateData.fullness,
+        parseInt(updateData.fullness),
         "Fullness Rating"
       );
-      genresForm = validation.checkStringArray(genresForm, "Genres Available");
+      genresInput = validation.checkStringArray(
+        genresInput,
+        "Genres Available"
+      );
+      if (genresInput.length === 0 && updateData.fullness !== 0) {
+        throw "Must specify at least one genre for a non-empty library.";
+      }
     } catch (e) {
-      return res.status(400).json({ error: e });
+      return res
+        .status(500)
+        .render("error", { errorCode: 500, title: "Error Page" });
     }
     // At this point, assume the form data is completely valid.
     try {
-      const { fullness, genres } = updateData;
       const updatedLibrary = await libraryData.formUpdate(
-        libraryId,
-        fullness,
-        genres
+        id,
+        updateData.fullness,
+        genresInput
       );
       res.json(updatedLibrary);
     } catch (e) {

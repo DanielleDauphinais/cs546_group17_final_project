@@ -248,7 +248,7 @@ let exportedMethods = {
    */
   async formUpdate(libraryId, fullnessRating, genres) {
     // Input checking - Maybe consider changing the name of isValidNumber to checkNumber to be uniform?
-    libraryId = validation.checkId(libraryId);
+    libraryId = validation.checkValidId(libraryId);
     fullnessRating = validation.isValidNumber(fullnessRating);
     genres = validation.checkStringArray(genres);
     // The actual update
