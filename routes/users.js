@@ -84,6 +84,9 @@ router.get('/logout', async (req, res) => {
 	return res.render('users/logout', { title: "logout" });
 });
 
+/**
+ * @name http://localhost:3000/users/:id
+ */
 router
   .route('/:id').get(async (req,res) => {
     try {
@@ -106,8 +109,8 @@ router
     }
 
     try {
-      var favLibs = await user.favLibraries.map(async lib => await libraryData.get(lib))
-      var ownedLibs = await user.ownedLibraries.map(async lib => await libraryData.get(lib))
+      var favLibs = await Promise.all(user.favLibraries.map(async lib => await libraryData.get(lib)))
+      var ownedLibs = await Promise.all(user.ownedLibraries.map(async lib => await libraryData.get(lib)))
       return res.status(200).render('users/user-profile',
       { favLibs: favLibs,
         ownedLibs: ownedLibs 
