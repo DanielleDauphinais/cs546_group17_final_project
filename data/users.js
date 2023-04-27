@@ -21,6 +21,13 @@ let exportedMethods = {
     if (!user) throw 'Error: User not found';
     return user;
   },
+  async getUserByEmail(email) {
+    email = validation.checkEmail(validation.checkString(email))
+    const userCollection = await users();
+    const user = await userCollection.findOne({emailAddress: email});
+    if (!user) throw 'Error: User not found';
+    return user;
+  },
   async favoriteLibrary(userId, libraryId) {
     userId = validation.checkValidId(userId);
     libraryId = validation.checkValidId(libraryId);
@@ -35,16 +42,16 @@ let exportedMethods = {
     // Add libraryId to user's favorited libraries
     const userCollection = await users();
 
-    const user = userCollection.findOne({ _id: new ObjectId(userId) });
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
     if (user === null) throw "Error: No user found with given ID.";
-    
     // If the user has not already favorited this library
-    if (!user.favLibraries.includes(libraryId)) {
-      await userCollection.updateOne(
-        { _id: new ObjectId(userId) },
-        { $push: {favLibraries: libraryId} }
+    if (user.favLibraries.includes(libraryId)) throw "VError: User has already favorited this library"
+    
+    await userCollection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $push: {favLibraries: libraryId} }
       );
-    }
+
   },
   async unFavoriteLibrary(userId, libraryId) {
     userId = validation.checkValidId(userId);
@@ -60,16 +67,16 @@ let exportedMethods = {
     // Add libraryId to user's favorited libraries
     const userCollection = await users();
 
-    const user = userCollection.findOne({ _id: new ObjectId(userId) });
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
     if (user === null) throw "Error: No user found with given ID.";
     
-    // If the user has already favorited this library
-    if (user.favLibraries.includes(libraryId)) {
-      await userCollection.updateOne(
-        { _id: new ObjectId(userId) },
-        { $pull: {favLibraries: libraryId} }
-      );
-    }
+    // If the user has already favorited this 
+    if (!user.favLibraries.includes(libraryId)) throw "VError: User cannot unfavorite a library that was not favorited"
+    
+    await userCollection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $pull: {favLibraries: libraryId} }
+    );
   },
   async getAllFavoritedLibraries(userId) {
     userId = validation.checkValidId(userId);
