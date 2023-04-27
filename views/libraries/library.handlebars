@@ -16,29 +16,21 @@
         <p>{{library.numFavorites}}</p>
     </div>
     <br>
+    <h2>Comments Section</h2>
     <div id="comments">
         {{#each library.comments}}
-            <article class="comment">
-                <h2>{{comments.user}}</h2>
-                <p>{{comments.dateCreated}}</p>
-                <p>{{comments.text}}</p>
-                <div id="likes">
-                    <p>{{comments.numLikes}}</p>
-                    <form action="/libraries/comments/like/{{library._id}}" method="POST">
-                    {{!-- change to a tag --}}
-                        <button type="submit" name="addCommentLike" value="{{comments._id}}">Like</button>
-                    </form>
-                </div>
-            </article>
+            {{> comment }}
         {{/each}}
-        <div id="createComment">
-            <form action="/libraries/comments/create/{{library._id}}" method="POST">
-                <label for="text_input">
-                    <textarea name="text" id="text_input"></textarea>
-                    <button type="submit">Post Comment</button>
-                </label>
-            </form>
-        </div>
+    </div>
+    <div id="createComment">
+        <form id="newComment" {{!-- action="/libraries/comments/create/{{library._id}}" method="POST" --}}>
+            <label for="text_input">
+                <textarea name="text" id="text_input"></textarea>
+            </label>
+            <input type="hidden" name="userid" value="{{userid}}"/>
+            <input type="hidden" name="libraryid" value="{{library._id}}"/>
+            <button type="submit">Post Comment</button>
+        </form>
     </div>
     {{#if hasErrors}}
     <ul class="error-list">
@@ -50,3 +42,5 @@
     </ul>
     {{/if}}
 </article>
+<script type="module" src="../../public/js/comments.js"></script>
+<script type="module" src="../../public/js/validators/util.js"></script>
