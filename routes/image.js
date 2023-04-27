@@ -30,13 +30,21 @@ const upload = multer({ storage });
  * <form action="/profile" method="post" enctype="multipart/form-data">
  *    <input type="file" name="image" />
  * </form>
+ * 
+ * @example this example shows for both json and multipart form data
+ * <form action="http://localhost:3000/image/upload" method="post" enctype="multipart/form-data">
+ *   <input type="file" name="image" />
+ *   <input type="text" name="username">
+ *   <input type="submit" value="submit">
+ * </form>
  */
 router.post("/upload", upload.single('image'), async (req, res) => {
     try {
+        console.log(req.body);
         return res.send(req.file);
     } catch (err) {
         return res.status(500).send({ status: "Error", message: "Uh, Oh! Something wrong went on our side, we will fix it soon!" });
     }
 });
 
-export default router;
+export {router,upload};

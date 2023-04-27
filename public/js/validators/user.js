@@ -1,56 +1,69 @@
 /** @fileoverview This file will contain all the required validations for signup and login */
-
-import { validationsForStrings, isNumber } from "./util.js";
+import { validationsForStrings, isEmail, hasNumbers, isNumber } from "./util.js";
 
 /**
- * This function will validate all the fields required for signup process
- * 
- * @param {{ 
- * 	firstName: String, 
- * 	lastName: String, 
- * 	email: String, 
- * 	age: Number, 
- *  username: String, 
- *  password: String 
- * }} user 
- * 
+ * This is the validation function for create user
+ * @param {string} firstName 
+ * @param {string} lastName 
+ * @param {string} emailAddress 
+ * @param {string} password 
+ * @param {Number} age
+ * @param {string} userName
  */
-const validationsForSignUp = user => {
-    if (!user) throw "VError: Enter your details.";
+const validationsForCreateUser = (firstName, lastName, emailAddress, password, age, userName) => {
+    validationsForStrings("firstName", firstName, false, { min: 2, max: 25 });
 
-    if (!user.firstName) throw "VError: firstName field is required";
+    if (hasNumbers(firstName)) throw "VError: firstName cannot contain numbers";
 
-    if (!user.lastName) throw "VError: lastName field is required";
+    validationsForStrings("lastName", lastName, false, { min: 2, max: 25 });
 
-    if (!user.email) throw "VError: email field is required";
+    if (hasNumbers(lastName)) throw "VError: lastName cannot contain numbers";
 
-    if (!user.age) throw "VError: age field is required";
+    validationsForStrings("emailAddress", emailAddress, false);
 
-    if (!user.username) throw "VError: username field is required";
-
-    if (!user.password) throw "VError: password field is required";
-
-    let { firstName, lastName, email, age, username, password } = user;
-
-    validationsForStrings("firstName", firstName)
-    validationsForStrings("lastName", lastName)
-    validationsForStrings("email", email)
-    validationsForStrings("username", username)
-    validationsForStrings("password", password)
+    if (!isEmail(emailAddress)) throw "VError: emailAddress is invalid";
 
     /** 100 years is a reasonable maximum age for human I guess */
-    if(!isNumber(age) || age < 13 || age > 100) throw "VError: age is not valid";
-}
+    if(!isNumber(age) || age < 13 || age > 100) throw "VError: Age is not valid";
 
-const validationsForLogin = user => {
-    if (!user) throw "VError: Username and password are required";
+    validationsForStrings("userName", userName, false);
 
-    if (!user.email) throw "VError: email field is required";
+    validationsForStrings("password", password, false, { min: 8, max: Infinity });
 
-    if (!user.password) throw "VError: password field is required";
+    if (password.includes(" ")) throw "VError: Password must not contain any spaces.";
 
-    validationsForStrings("email", user.email)
-    validationsForStrings("password", user.password)
-}
+    if (password.toLowerCase() === password) throw "VError: Atleast one letter should be capital";
 
-export { validationsForSignUp, validationsForLogin };
+    let specialCharsRegex = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    let numbersRegex = /[0-9]/;
+
+    if (!password.match(numbersRegex)) throw "VError: Password must contain atleast one number";
+
+    if (!password.match(specialCharsRegex)) throw "VError: Password must contain atleast one special char";
+};
+
+/**
+ * This is the validation function for login / check user
+ * @param {string} emailAddress 
+ * @param {string} password 
+ */
+const validationsForCheckUser = (emailAddress, password) => {
+    validationsForStrings("emailAddress", emailAddress, false);
+
+    if (!isEmail(emailAddress)) throw "VError: emailAddress is invalid";
+    
+    validationsForStrings("password", password, false, { min: 8, max: Infinity });
+
+    if (password.includes(" ")) throw "VError: Password must not contain any spaces.";
+
+    if (password.toLowerCase() === password) throw "VError: Atleast one letter should be capital";
+
+    let specialCharsRegex = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    let numbersRegex = /[0-9]/;
+
+    if (!password.match(numbersRegex)) throw "VError: Password must contain atleast one number";
+
+    if (!password.match(specialCharsRegex)) throw "VError: Password must contain atleast one special char";
+};
+
+export { validationsForCreateUser, validationsForCheckUser };

@@ -1,0 +1,31 @@
+{{!-- I know that I should have used the signup class but it would duplicate the code in CSS --}}
+<div class="login-page">
+    <h1>Sign Up</h1>
+    <form action="/users/signup" method="post" id="registration-form">
+        <label for="firstNameInput">First Name</label>
+        <input type="text" name="firstNameInput" id="firstNameInput">
+
+        <label for="lastNameInput">Last Name</label>
+        <input type="text" name="lastNameInput" id="lastNameInput">
+
+        <label for="emailAddressInput">Email Address</label>
+        <input type="email" name="emailAddressInput" id="emailAddressInput">
+
+        <label for="ageInput">Age</label>
+        <input type="number" name="ageInput" id="ageInput">
+
+        <label for="userNameInput">Username</label>
+        <input type="text" name="userNameInput" id="userNameInput">
+
+        <label for="passwordInput">Password</label>
+        <input type="password" name="passwordInput" id="passwordInput">
+
+        <label for="confirmPasswordInput">Confirm Password</label>
+        <input type="password" name="confirmPasswordInput" id="confirmPasswordInput">
+
+        <span id="error" class="error">{{{error}}}</span>
+        <a href="/users/login">Log In</a>
+        <input type="submit" value="Submit">
+    </form>
+    <script src="/public/js/login.js" type="module"></script>
+</div>
