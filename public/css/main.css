@@ -163,3 +163,21 @@ footer {
 html {
     font-family: 'Inter', sans-serif;
 }
+
+.newLibrary #rightSide{
+	position: relative;
+	float:right;
+	right:18px;
+
+}
+.newLibrary #leftSide{
+	position: relative;
+	float:left;
+	width:950px;
+}
+.newLibrary  .half-width-input {
+	display: block;
+	min-height: 3em;
+	margin: 10px 0;
+	width: 70%;
+}

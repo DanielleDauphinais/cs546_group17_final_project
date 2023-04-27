@@ -1,28 +1,36 @@
 {{!-- need to connect to the backend and check using front end JS --}}
+<div class="newLibrary">
+  <div id="leftSide">
 <article>
   <h1>Create a Library</h1>
-  <form action="/libraries" method="POST" class="new-Library-form" enctype="multipart/form-data">
+  <form action="/libraries" method="POST" id="new-Library-form" class="new-Library-form" enctype="multipart/form-data">
     <label>
       Library Name
-      <input type="text" name="name" placeholder="Library Name" value="{{library.title}}" class="full-width-input" />
+      <input type="text" id="libraryName" name="name" placeholder="Library Name" value="{{library.title}}" class="half-width-input" />
     </label>
 
-    <label for="library-address">
-      Library Location Data
+    <p class="bold">Please use the map on the left to select a location for your Little Free Library!</p>
+    {{!-- These location data are text input because it gets mad about not integers  --}}
+    <label for="lat">
+      Library Latitude
     </label>
-    <input type="number" name="lat" placeholder="Librarys Latitude" value="{{library.lat}}" class="full-width-input" />
-    <input type="number" name="lng" placeholder="Librarys Longitude" value="{{library.lng}}" class="full-width-input" />
-
+    <input type="text" id="lat" name="lat" placeholder="Librarys Latitude" value="{{library.lat}}" class="half-width-input" />
+    
+    <label for="lng">
+      Library Longitude
+    </label>
+    <input type="text" id="lng" name="lng" placeholder="Librarys Longitude" value="{{library.lng}}" class="half-width-input" />
 
     <label for="library-image">
       Library image
     </label>
-    <input type="file" id="library-image" name="image" placeholder="Library image" value="{{library.image}}" class="full-width-input" />
+    <input type="file" id="library-image" name="image" placeholder="Library image" value="{{library.image}}" class="half-width-input" />
+        
     {{!-- This is to get data on the fullness --}}
     <label for="fullness">
       Please select how full the library is, 0 being empty and 5 being full
     </label>
-    <select class="full-width-input" name="fullness">
+    <select class="half-width-input" name="fullness">
       <option value="">Fullness is...</option>
       <option value="0">0</option>
       <option value="1">1</option>
@@ -55,8 +63,10 @@
 
     <button type="submit">Create New Post</button>
     <button type="reset">Clear Form</button>
-
   </form>
+  {{!-- front end js error --}}
+  <ul id="error" class="error" hidden></ul>
+  {{!-- backend js errors --}}
   {{#if hasErrors}}
   <ul class="error-list">
     {{#each errors}}
@@ -67,4 +77,13 @@
   </ul>
   {{/if}}
 
+</div>
+  {{!-- This part shits itself --}}
+  <div id="rightSide">
+    <iframe src="/selectLocation" frameborder="0" class="gmaps"></iframe>
+  </div>
+  <script src="/public/js/library/new.js" type="module"></script>
+
+
 </article>
+</div>
