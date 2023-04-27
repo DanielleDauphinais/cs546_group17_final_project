@@ -9,15 +9,14 @@ let exportedMethods = {
    */
   async create(
     name,
-    lat, 
-    lng,
+    coordinates,
     image, // Vish will help!!
     ownerID,
     fullnessRating,
     genres
   ) {
     name = validation.checkString(name, "Library Name");
-    ownerID = validation.checkId(ownerID, "Library Owner ID");
+    ownerID = validation.checkValidId(ownerID, "Library Owner ID");
     fullnessRating = validation.isValidNumber(
       fullnessRating,
       "Fullness Rating"
@@ -36,7 +35,7 @@ let exportedMethods = {
     // TODO: ADD Stuff to check city using Google maps API using lat, lng,
     let newLibrary = {
       name: name,
-      location: location,
+      coordinates: coordinates,
       image: image,
       ownerID: ownerID,
       fullnessRating: fullnessRating,
@@ -51,7 +50,7 @@ let exportedMethods = {
       throw "Error: Could not add Library";
     }
     insertInfo.insertedId = insertInfo.insertedId.toString();
-    let res = await this.getLibraryById(insertInfo["insertedId"].toString());
+    let res = await this.get(insertInfo["insertedId"].toString());
     return res;
   },
   /** This function gets all the libraries and returns the json data in an array*/
