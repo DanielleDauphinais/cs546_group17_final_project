@@ -9,8 +9,7 @@ let exportedMethods = {
    */
   async create(
     name,
-    lat, 
-    lng,
+    coordinates,
     image, // Vish will help!!
     ownerID,
     fullnessRating,
@@ -36,8 +35,7 @@ let exportedMethods = {
     // TODO: ADD Stuff to check city using Google maps API using lat, lng,
     let newLibrary = {
       name: name,
-      lat: lat,
-      lng: lng,
+      coordinates: coordinates,
       image: image,
       ownerID: ownerID,
       fullnessRating: fullnessRating,
@@ -68,50 +66,6 @@ let exportedMethods = {
     if (library === null) throw "Error: No library found with given ID.";
     library._id = library._id.toString();
     return library;
-  },
-  async createLibrary(
-    name,
-    location, // Vish will help!! possibly using the API?
-    image, // Vish will help!!
-    ownerId,
-    fullnessRating,
-    genres
-  ) {
-    name = validation.checkString(name, "Library Name");
-    ownerId = validation.checkId(ownerId, "Library Owner ID");
-    fullnessRating = validation.isValidNumber(
-      fullnessRating,
-      "Fullness Rating"
-    );
-    genres = validation.checkStringArray(genres, "Genres Available");
-    const currentDate = new Date();
-    const lastSurveyed = currentDate.toLocaleString(undefined, {
-      // should be in form "7/22/2016, 04:21 AM"
-      day: "numeric",
-      month: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    let newLibrary = {
-      name: name,
-      location: location,
-      image: image,
-      ownerId: ownerId,
-      fullnessRating: fullnessRating,
-      lastSurveyed: lastSurveyed,
-      genres: genres,
-      favorites: [],
-      comments: [],
-    };
-    const librariesCollection = await libraries();
-    const insertInfo = await librariesCollection.insertOne(newLibrary);
-    if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-      throw "Error: Could not add Library";
-    }
-    insertInfo.insertedId = insertInfo.insertedId.toString();
-    let res = await this.getLibraryById(insertInfo["insertedId"].toString());
-    return res;
   },
   async editLibrary(){
     // Needs to be implemented

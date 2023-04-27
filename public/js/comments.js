@@ -6,10 +6,7 @@ import {validationsForStrings} from './validators/util.js';
   let text = $('#text_input');
   let commentSection = $('#comments');
   let userid = $('#userid');
-  let libraryid;// = $('libraryid');
   let error = $('#error');
-  //let userid = req.session.user._id;
-  //let libraryid;
 
   newCommentForm.submit(function (event) {
     event.preventDefault();
@@ -17,6 +14,7 @@ import {validationsForStrings} from './validators/util.js';
     let currentLink = $(this);
     libraryid = currentLink.data('id');
     console.log(libraryid);
+    console.log(text);
 
     let text;
     let dateCreated = new Date().toLocaleDateString();

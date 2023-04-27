@@ -1,11 +1,11 @@
 <article class="comment">
-    <h2>{{user}}</h2>
+    <h2>{{userName}}</h2>
     <p>{{dateCreated}}</p>
     <p>{{text}}</p>
     <div id="likes">
         <p>{{numLikes}}</p>
         <form action="/libraries/{{library._id}}/comments/{{_id}}" method="POST">
-        {{!-- change to a tag --}}
+            {{!-- change to a tag --}}
             <button type="submit" name="addCommentLike" value="{{_id}}">Like</button>
         </form>
     </div>

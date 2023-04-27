@@ -16,7 +16,7 @@ allUsers.forEach(x => {
   }
 });
 
-let library1 = await libraries.create("Evan's Library", 40.1111, -70.2142, "tempimage", user1Id, 3, ['horror']);
+let library1 = await libraries.create("Evan's Library", [40.7440, 74.0324], "tempimage", user1Id, 3, ['horror']);
 
 
 console.log("Done seeding the database")
