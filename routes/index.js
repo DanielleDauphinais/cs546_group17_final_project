@@ -16,7 +16,7 @@ const constructorMethod = (app) => {
 
   app.use((req, res, next) => publicRoutes.includes(req.url) ? next() : preventAccess(req, res, next));
 
-  app.get('/about', (req, res) => res.render('about', { title: "About Us" }));
+  app.get('/about', (req, res) => res.render('about', { title: "About Us", isLoggedIn: !(!req.session || !req.session.user) }));
 
   app.get("/home", (req, res) => res.render("home", { isLoggedIn: true, title: 'Home' }));
 

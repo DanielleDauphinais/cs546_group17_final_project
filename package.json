@@ -5,6 +5,7 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
+    "seed": "node ./tasks/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js"
   },
@@ -29,6 +30,7 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^2.0.22",
-    "validator": "^13.9.0"
+    "validator": "^13.9.0",
+    "xss": "^1.0.14"
   }
 }

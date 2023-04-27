@@ -112,7 +112,7 @@ let exportedMethods = {
       lastName, 
       emailAddress,
       password,
-      age,
+      age: Number(age),
       userName,
       dateCreated: new Date().toLocaleDateString(),
       favLibraries: [],
@@ -139,11 +139,11 @@ let exportedMethods = {
   
     if (!userFromDB) throw "Either the email address or password is invalid";
   
-    let { firstName, lastName, emailAddress: email, role } = userFromDB;
+    let { firstName, lastName, emailAddress: email, _id, userName } = userFromDB;
   
     let isValid = await bcrypt.compare(password, userFromDB.password);
   
-    if (isValid) return { firstName, lastName, emailAddress: email, role };
+    if (isValid) return { firstName, lastName, emailAddress: email, _id: _id.toString(), userName };
     throw "Either the email address or password is invalid";
   }
 };

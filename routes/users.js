@@ -9,7 +9,7 @@ const { createUser, checkUser } = userData;
 /** 
  * @name http://localhost:3000/users/login
  */
-router.get("/login", async (req, res) => res.render('users/login'));
+router.get("/login", async (req, res) => res.render('users/login', { title: "Login" }));
 
 router.post("/login", async (req, res) => {
   try {
@@ -37,7 +37,7 @@ router.post("/login", async (req, res) => {
 /** 
  * @name http://localhost:3000/users/signup
  */
-router.get("/signup", async (req, res) => res.render('users/signup'));
+router.get("/signup", async (req, res) => res.render('users/signup', { title: "Sign Up" }));
 
 /** 
  * @name http://localhost:3000/users/signup
