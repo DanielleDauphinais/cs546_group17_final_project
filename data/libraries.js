@@ -50,6 +50,7 @@ let exportedMethods = {
       throw "Error: Could not add Library";
     }
     insertInfo.insertedId = insertInfo.insertedId.toString();
+    userFunctions.addOwnedLibrary(ownerID,insertInfo["insertedId"].toString())
     let res = await this.get(insertInfo["insertedId"].toString());
     return res;
   },
@@ -58,7 +59,7 @@ let exportedMethods = {
     const librariesCollection = await libraries();
     return await librariesCollection.find({}).toArray();
   },
-  async getLibraryById(id) {
+  async get(id) {
     // ejinks - reconfiged to export all
     id = validation.checkValidId(id, "Library ID");
     const libraryCollection = await libraries();
@@ -66,52 +67,6 @@ let exportedMethods = {
     if (library === null) throw "Error: No library found with given ID.";
     library._id = library._id.toString();
     return library;
-  },
-  async createLibrary(
-    name,
-    location, // Vish will help!! possibly using the API?
-    image, // Vish will help!!
-    ownerId,
-    fullnessRating,
-    genres
-  ) {
-    name = validation.checkString(name, "Library Name");
-    ownerId = validation.checkValidId(ownerId, "Library Owner ID");
-    fullnessRating = validation.isValidNumber(
-      fullnessRating,
-      "Fullness Rating"
-    );
-    genres = validation.checkStringArray(genres, "Genres Available");
-    const currentDate = new Date();
-    const lastSurveyed = currentDate.toLocaleString(undefined, {
-      // should be in form "7/22/2016, 04:21 AM"
-      day: "numeric",
-      month: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    let newLibrary = {
-      name: name,
-      location: location,
-      image: image,
-      ownerId: ownerId,
-      fullnessRating: fullnessRating,
-      lastSurveyed: lastSurveyed,
-      genres: genres,
-      favorites: [],
-      comments: [],
-    };
-    const librariesCollection = await libraries();
-    const lib = await librariesCollection.findOne({name: name});
-    if (lib !== null) throw "VError: There already exists a library with the given name";
-    const insertInfo = await librariesCollection.insertOne(newLibrary);
-    if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-      throw "VError: Could not add Library";
-    }
-    insertInfo.insertedId = insertInfo.insertedId.toString();
-    let res = await this.getLibraryById(insertInfo["insertedId"].toString());
-    return res;
   },
   async getLibraryByName(name) {
     name = validation.checkString(name)

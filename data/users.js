@@ -131,6 +131,23 @@ let exportedMethods = {
     if (!acknowledged || !insertedId) throw "VError: Couldn't add user";
     return { insertedUser: true };
   },
+  async addOwnedLibrary(userId,libraryId){
+    
+    libraryId = validation.checkValidId(libraryId, "Library ID")
+    userId = validation.checkValidId(userId, "User ID")
+    const userCollection = await users();
+
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+    if (user === null) throw "Error: No user found with given ID.";
+    
+    // If the user has already favorited this 
+    if (user.ownedLibraries.includes(libraryId)) throw "VError: User has already owns this library"
+    
+    await userCollection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $push: {ownedLibraries: libraryId} }
+      );
+  },
 
   /**
    * This function will validate the given user credentials
