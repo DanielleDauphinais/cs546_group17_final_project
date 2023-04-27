@@ -23,11 +23,13 @@
         {{/each}}
     </div>
     <div id="createComment">
-        <form id="newComment" action="/libraries/comments/create/{{library._id}}" method="POST">
+        <form id="newComment" {{!-- action="/libraries/comments/create/{{library._id}}" method="POST" --}}>
             <label for="text_input">
                 <textarea name="text" id="text_input"></textarea>
-                <button type="submit">Post Comment</button>
             </label>
+            <input type="hidden" name="userid" value="{{userid}}"/>
+            <input type="hidden" name="libraryid" value="{{library._id}}"/>
+            <button type="submit">Post Comment</button>
         </form>
     </div>
     {{#if hasErrors}}

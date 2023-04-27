@@ -1,20 +1,34 @@
+import {validationsForStrings} from './validators/util.js';
+
 (function ($) {
 
   let newCommentForm = $('#newComment');
   let text = $('#text_input');
   let commentSection = $('#comments');
-  let userid = req.session.user._id;
-  let libraryid;
+  let userid = $('#userid');
+  let libraryid;// = $('libraryid');
+  let error = $('#error');
+  //let userid = req.session.user._id;
+  //let libraryid;
 
   newCommentForm.submit(function (event) {
     event.preventDefault();
 
-    let text = text.val();
-    //INPUT VALIDATION TODO
+    let currentLink = $(this);
+    libraryid = currentLink.data('id');
+
+    let text;
     let dateCreated = new Date().toLocaleDateString();
+    
+    try {
+      text = text.val();
+      validationsForStrings("Comment body", text);
+    } catch (e) {
+      error.hidden = false;
+      error.innerHTML = e;
+    }
 
     if (text && dateCreated) {
-      
       let requestConfig = {
         method: 'POST',
         url: `/${libraryid}/comments`,
@@ -29,11 +43,9 @@
       
       $.ajax(requestConfig).then(function (responseMessage) {
         let newElement = $(responseMessage);
-        bindEventsToTodoItem(newElement);//Needs more work
         commentSection.append(newElement);
-        newNameInput.val('');
-        newDecriptionArea.val('');
-        newNameInput.focus();
+        text.val('');
+        commentSection.focus();
       });
     }
   });

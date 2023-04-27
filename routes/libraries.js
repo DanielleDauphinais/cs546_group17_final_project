@@ -167,7 +167,7 @@ router.route('/:id')
     }
 
     try {
-      res.render('libraries/library', { title: library.name, library: library, isLoggedIn: true, script_partial: 'comment'});
+      res.render('libraries/library', { title: library.name, library: library, isLoggedIn: true, script_partial: 'comment', userid: req.session.user._id});
     } catch (e) {
       res.status(500).render('error', {errorCode: 500});
     }
