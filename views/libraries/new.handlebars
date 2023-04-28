@@ -30,7 +30,7 @@
     <label for="fullness">
       Please select how full the library is, 0 being empty and 5 being full
     </label>
-    <select class="half-width-input" name="fullness">
+    <select class="half-width-input" name="fullness" id="fullness">
       <option value="">Fullness is...</option>
       <option value="0">0</option>
       <option value="1">1</option>
@@ -40,28 +40,28 @@
       <option value="5">5</option>
     </select>
     <p>Please select the genres of books currently present in the library</p>
-      <div>
-        <label for="Picture Books">
-          <input type="checkbox" id="pictureBooks" />Picture Books</label>
-        <label for="Young Adult Fiction">
-          <input type="checkbox" id="youngAdultFiction" />Young Adult Fiction</label>
-        <label for="Fantasy Fiction">
-          <input type="checkbox" id="fantasyFiction" />Fantasy Fiction</label>
-        <label for="Fairy tale">
-          <input type="checkbox" id="fairyTale" />Fairy Tale</label>
-        <label for="Board book">
-          <input type="checkbox" id="boardBook" />Board Book</label>
-        <label for="Non-fiction">
-          <input type="checkbox" id="nonFiction" />Non-fiction</label>
-        <label for="Mystery">
-          <input type="checkbox" id="mystery" />Mystery</label>
-        <label for="Graphic novel">
-          <input type="checkbox" id="graphicNovel" />Graphic Novel</label>
-        <label for="Chapter Book">
-          <input type="checkbox" id="chapterBooks" />Chapter Book</label>
-      </div>
+    <div>
+      <label for="pictureBooks">
+        <input type="checkbox" name="pictureBooks" id="pictureBooks" value="pictureBooks">Picture Books</label>
+      <label for="youngAdultFiction">
+        <input type="checkbox" name="youngAdultFiction" id="youngAdultFiction" value="youngAdultFiction">Young Adult Fiction</label>
+      <label for="fantasyFiction">
+        <input type="checkbox" name="fantasyFiction" id="fantasyFiction" value="fantasyFiction">Fantasy Fiction</label>
+      <label for="fairyTale">
+        <input type="checkbox" name="fairyTale" id="fairyTale" value="fairyTale">Fairy Tale</label>
+      <label for="boardBook">
+        <input type="checkbox" name="boardBook" id="boardBook" value="boardBook">Board Book</label>
+      <label for="nonFiction">
+        <input type="checkbox" name="nonFiction" id="nonFiction" value="nonFiction">Non-fiction</label>
+      <label for="mystery">
+        <input type="checkbox" name="mystery" id="mystery" value="mystery">Mystery</label>
+      <label for="graphicNovel">
+        <input type="checkbox" name="graphicNovel" id="graphicNovel" value="graphicNovel">Graphic Novel</label>
+      <label for="chapterBooks">
+        <input type="checkbox" name="chapterBooks" id="chapterBooks" value="chapterBooks">Chapter Book</label>
+    </div>
 
-    <button type="submit">Create New Post</button>
+    <button type="submit">Create New Library</button>
     <button type="reset">Clear Form</button>
   </form>
   {{!-- front end js error --}}

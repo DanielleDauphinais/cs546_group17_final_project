@@ -2,9 +2,11 @@ import { Router } from "express";
 const router = Router();
 import { libraryData } from "../data/index.js";
 import validation from "../public/js/validators/validation.js";
+import {checkImageFileString} from "../public/js/validators/util.js";
 import multer from "multer";
 import axios from 'axios';
 import xss from 'xss';
+import fs from "fs";
 
 
 
@@ -42,7 +44,6 @@ router.route('/new')
   })
   .post(upload.single('image'), 
   async (req, res) => { // Currently creates libary and sends json of created library
-    console.log(req.body)
     if(!req.file){ // Something went wrong saving the image
       // TODO: make it rerender!!!
       return res.status(500).send({ status: "Error", message: "Uh, Oh! Something wrong went on our side, we will fix it soon!" });
@@ -106,29 +107,60 @@ router.route('/new')
       // TODO: what should this error be???
       return res.status(400).render('error', {errorNum: 400, searchValue: "Error on our side getting address data ", title: "Error"})
     }
-    // TODO: THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
+    // TODO: data from Juilien
+    // Grab all of the inputs from the request body.
+    let genresInput = [
+      newLibraryData.pictureBooks,
+      newLibraryData.youngAdultFiction,
+      newLibraryData.fantasyFiction,
+      newLibraryData.fairyTale,
+      newLibraryData.boardBook,
+      newLibraryData.nonFiction,
+      newLibraryData.mystery,
+      newLibraryData.graphicNovel,
+      newLibraryData.chapterBooks,
+    ];
+
+    // For every value, if it does not exist, then the checkbox was not selected.
+    genresInput = genresInput.filter((genre) => {
+      return typeof genre === "string";
+    });
+
     try {
-      newLibraryData.fullness = parseInt(newLibraryData.fullness);
       newLibraryData.fullness = validation.isValidNumber(
-        newLibraryData.fullness,
+        parseInt(newLibraryData.fullness),
         "Fullness Rating"
       );
       if (0 > newLibraryData.fullness || newLibraryData.fullness > 5) {
-        throw "Fullness rating must be between 0-5";
+        errors.push("Fullness rating must be between 0-5");
       }
-    } catch (e) {
-      errors.push(e);
-    }
-    try {
-      // TODO:THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
-      newLibraryData.genres = validation.checkStringArray(
-        newLibraryData.genres,
+      genresInput = validation.checkStringArray(
+        genresInput,
         "Genres Available"
       );
+      if (genresInput.length === 0 && newLibraryData.fullness !== 0) {
+        errors.push("Must specify at least one genre for a non-empty library.");
+      }
+
     } catch (e) {
-      errors.push(e);
+      // TODO: Why is this the error type
+      return res
+        .status(500)
+        .render("error", { errorCode: 500, title: "Error Page" });
     }
-    // TODO: Need to add validation of req.file.path 
+    try {
+      checkImageFileString(req.file.path, "Image upload")
+    } catch (e) {
+      // This can be used to remove file from data
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          return res
+            .status(500)
+            .render("error", { errorCode: 500, title: "Error Page" });
+        }})
+      errors.push(e)
+    }
+
     if (errors.length > 0) {
       res.render("libraries/new", {
         errors: errors,
@@ -144,12 +176,12 @@ router.route('/new')
       const { name, lat, lng, image, fullness } = newLibraryData;
       if (!process.env.DOMAIN) throw "Error: Env file not provided.";
       const newLibrary = await libraryData.create(
-        name,
-        [lat, lng],
+        newLibraryData.name,
+        [newLibraryData.lat, newLibraryData.lng],
         address,
         process.env.DOMAIN+req.file.path,
-        req.user._id,
-        fullness,
+        req.session.user._id,
+        newLibraryData.fullness,
         genres // TODO:Need to be updated
       );
       res.json(newLibrary); // TODO: will probably be to the library's page
