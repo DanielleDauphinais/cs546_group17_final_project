@@ -174,15 +174,60 @@ router.route('/:id')
       return res.status(404).render('error', {errorCode: 404, searchValue: "Library"});
     }
 
+    // let owner;
+
+    // try {
+    //   owner = await userData.getUserById(library.ownerID);
+    //   console.log(owner);
+    // } catch (e) {
+    //   return res.status(404).render('error', {errorCode: 404, searchValue: "User"});
+    // }
+    // console.log(owner);
+
     try {
       let user = req.session.user;
-      res.render('libraries/library', { title: library.name, isLoggedIn: true, script_partial: 'comment', userid: user._id, ...library});
+      let numFavorites = library.favorites.length;
+      res.render('libraries/library', { 
+        title: library.name, 
+        isLoggedIn: true, 
+        script_partial: 'comment', 
+        userid: user._id, 
+        //owner: owner.userName,
+        numFavorites: numFavorites,
+        ...library
+      });
     } catch (e) {
       res.status(500).render('error', {errorCode: 500});
     }
   })
   .post(async (req, res) => {
     // Allows a user to favorite/unfavorite a library
+    let id;
+    let user = req.session.user;
+    
+    // If the library ID is not valid, render the error page with a status code of 400
+    try {
+      id = req.params.id;
+      id = validation.checkValidId(id);
+    } catch (e) {
+      return res.status(400).render('error', {errorCode: 400, searchValue: "Library"});
+    }
+
+    let library;
+
+    // If the library is not found, render the error page with a status code of 404
+    try {
+      library = await libraryData.get(id);
+    } catch (e) {
+      return res.status(404).render('error', {errorCode: 404, searchValue: "Library"});
+    }
+
+    try {
+      let favorite = await userData.favoriteLibrary(user._id, library._id);
+      res.redirect(`/libraries/${library._id}`);
+    } catch (e) {
+      res.status(500).render('error', {errorCode: 500});
+    }
   })
   .put(async (req, res) => {
     // Allows a user to edit their library

@@ -2,18 +2,20 @@
     <h1>{{name}}</h1>
     <img alt="{{name}}" src="{{imageURL}}">
     <address>{{address}}</address>
-    <p>Created by: {{ownerID}}</p>
-    <h2>Fullness: {{fullness}}</h2>
-    <p>Last Rated On: {{lastRating}}</p>
+    <p>Created by: {{owner}}</p>
+    <h2>Fullness: {{fullnessRating}}</h2>
+    <p>Last Rated On: {{lastServayed}}</p>
     <ul>
         {{#each genres}}
             <li>
-                <p>{{genre}}</p>
+                <p>{{this}}</p>
             </li>
         {{/each}}
     </ul>
     <div id="favorites">
-        <p>{{numFavorites}}</p>
+        <form action="/libraries/{{_id}}" method="POST">
+            <button type="submit">{{numFavorites}}</button>
+        </form>
     </div>
     <br>
     <h2>Comments Section</h2>
@@ -30,6 +32,7 @@
             <button type="submit">Post Comment</button>
         </form>
     </div>
+    <div id="commentError" hidden></div>
     {{#if hasErrors}}
     <ul class="error-list">
         {{#each errors}}

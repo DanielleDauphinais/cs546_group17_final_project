@@ -35,7 +35,7 @@ let exportedMethods = {
     // Add libraryId to user's favorited libraries
     const userCollection = await users();
 
-    const user = userCollection.findOne({ _id: new ObjectId(userId) });
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
     if (user === null) throw "Error: No user found with given ID.";
     
     // If the user has not already favorited this library
@@ -44,30 +44,22 @@ let exportedMethods = {
         { _id: new ObjectId(userId) },
         { $push: {favLibraries: libraryId} }
       );
+
+      await libraryCollection.updateOne(
+        { _id: new ObjectId(libraryId) },
+        { $push: {favorites: userId} }
+      );
     }
-  },
-  async unFavoriteLibrary(userId, libraryId) {
-    userId = validation.checkValidId(userId);
-    libraryId = validation.checkValidId(libraryId);
-
-    // Check if library exists
-    const libraryCollection = await libraries();
-    const library = await libraryCollection.findOne(
-        {_id: new ObjectId(libraryId)},
-    );
-    if (library === null) throw "Error: No library found with given ID.";
-
-    // Add libraryId to user's favorited libraries
-    const userCollection = await users();
-
-    const user = userCollection.findOne({ _id: new ObjectId(userId) });
-    if (user === null) throw "Error: No user found with given ID.";
-    
     // If the user has already favorited this library
-    if (user.favLibraries.includes(libraryId)) {
+    else{
       await userCollection.updateOne(
         { _id: new ObjectId(userId) },
         { $pull: {favLibraries: libraryId} }
+      );
+
+      await libraryCollection.updateOne(
+        { _id: new ObjectId(libraryId) },
+        { $pull: {favorites: userId} }
       );
     }
   },
