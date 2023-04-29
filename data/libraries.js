@@ -45,11 +45,15 @@ let exportedMethods = {
       comments: [],
     };
     const librariesCollection = await libraries();
+    const lib = await librariesCollection.findOne({ name: name });
+    if (lib !== null)
+      throw "VError: There already exists a library with the given name";
     const insertInfo = await librariesCollection.insertOne(newLibrary);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
       throw "Error: Could not add Library";
     }
     insertInfo.insertedId = insertInfo.insertedId.toString();
+    userFunctions.addOwnedLibrary(ownerID, insertInfo["insertedId"].toString());
     let res = await this.get(insertInfo["insertedId"].toString());
     return res;
   },
@@ -66,6 +70,13 @@ let exportedMethods = {
     if (library === null) throw "Error: No library found with given ID.";
     library._id = library._id.toString();
     return library;
+  },
+  async getLibraryByName(name) {
+    name = validation.checkString(name);
+    const librariesCollection = await libraries();
+    const lib = await librariesCollection.findOne({ name: name });
+    if (!lib) throw "VError: There is no libraries with the given name";
+    return lib;
   },
   /**
    * @name editLibrary
@@ -129,8 +140,8 @@ let exportedMethods = {
   },
   /** This function will remove a library if the userId is equal to the ownerId*/
   async removeLibrary(libraryId, userId) {
-    libraryId = validation.checkId(libraryId);
-    userId = validation.checkId(userId);
+    libraryId = validation.checkValidId(libraryId);
+    userId = validation.checkValidId(userId);
     const libary = getLibraryById(libraryId); // This is misspelt. Did you mean this?
     if (userId === libary.ownerId) {
       const librariesCollection = await libraries();
