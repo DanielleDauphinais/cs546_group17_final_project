@@ -57,36 +57,5 @@ if(newLibraryForm){
         }
         console.log(lat.value)
         console.log(lng.value)
-        //geocodeLatLng(geocoder)
     })
 }
-
-// document.getElementById("submit").addEventListener("click", () => {
-    
-//     geocodeLatLng(geocoder, map, infowindow);
-
-// });
-
-
-// function geocodeLatLng(geocoder) {
-// //     const input = document.getElementById("latlng").value;
-// //     const latlngStr = input.split(",", 2);
-//     let lat =  document.getElementById("lat");
-//     let lng =  document.getElementById("lng");
-//     const latlng = {
-//       lat: parseFloat(lat.value),
-//       lng: parseFloat(lng.value),
-//     };
-//     console.log(latlng)
-  
-//     geocoder
-//       .geocode({ location: latlng })
-//       .then((response) => {
-//         if (response.results[0]) {
-//             console.log(response.results[0])
-//         } else {
-//           console.log("No results found");
-//         }
-//       })
-//       .catch((e) =>  console.log("Geocoder failed due to: " + e));
-// }

@@ -29,32 +29,26 @@ router.route('/')
       let libraries = await libraryData.getAllLibraries();
       res.send(libraries);
     } catch (e) {
-      res.status(500).render('error', {errorCode: 500});
+      res.status(500).render('error', {title: "Error", errorCode: 500});
     }
   });
 
 router.route('/new')
   .get(async (req, res) => {
-    try {
-      res.render("libraries/new", { title: "Creating a Library", id: "NEED TO FIX" });
-    } catch (error) {
-      // need to cause an error page renderd
-    }
-    
+      res.render("libraries/new", { title: "Creating a Library", editOrCreate: "Create", id: req.session.user._id, username: req.session.user.userName});
   })
   .post(upload.single('image'), 
-  async (req, res) => { // Currently creates libary and sends json of created library
+    async (req, res) => { 
     if(!req.file){ // Something went wrong saving the image
-      // TODO: make it rerender!!!
-      return res.status(500).send({ status: "Error", message: "Uh, Oh! Something wrong went on our side, we will fix it soon!" });
+      return res.status(500).render('error', { title: "Error", errorCode:500 });
     }
     const newLibraryData = req.body;
     let errors = [];
     try {
       newLibraryData.name = validation.checkString(
         newLibraryData.name,
-        "Name"
-      );
+        "Library name"
+      ); 
     } catch (e) {
       errors.push(e);
     }
@@ -76,6 +70,26 @@ router.route('/new')
     } catch (error) {
       errors.push(e);
     }
+    // Getting the address of the library
+    let city = ''
+    let address = ''
+    try{
+      // This axios request does reverse geocatching to get the address of the library
+      let data = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${newLibraryData.lat},${newLibraryData.lng}&key=AIzaSyAPxSPvWssw3gI4W1qJaFk9xlBqBicI3iY`);
+      city = data.data.results[0].address_components[2].long_name
+      address = data.data.results[1].formatted_address
+    }
+    catch(e){
+      return res.status(500).render('error', {errorNum: 500, title: "Error"})
+    }
+    if(city !== "Hoboken") {
+      newLibraryData.lat = ''
+      newLibraryData.lng = ''
+      errors.push("The location of the little free library must be in Hoboken");
+    }
+    if(address === ''){
+      return res.status(500).render('error', {errorNum: 500, title: "Error"})
+    }
     try {
       req.session.user._id= validation.checkValidId(
         req.session.user._id,
@@ -84,30 +98,7 @@ router.route('/new')
     } catch (e) {
       errors.push(e);
     }
-    // Getting the address of the library
-    let data = '' 
-    let city = ''
-    let address = ''
-    try{
-      data = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${newLibraryData.lat},${newLibraryData.lng}&key=AIzaSyAPxSPvWssw3gI4W1qJaFk9xlBqBicI3iY`);
-      city = data.data.results[0].address_components[2].long_name
-      address = data.data.results[1].formatted_address
-      console.log(city)
-      console.log(address)
-    }
-    catch(e){
-      return res.status(400).render('error', {errorNum: 400, searchValue: "Error on our side getting address data ", title: "Error"})
-    }
-    if(city !== "Hoboken") {
-      newLibraryData.lat = ''
-      newLibraryData.lng = ''
-      errors.push("The location of the little free library must be in Hoboken");
-    }
-    if(address === ''){
-      // TODO: what should this error be???
-      return res.status(400).render('error', {errorNum: 400, searchValue: "Error on our side getting address data ", title: "Error"})
-    }
-    // TODO: data from Juilien
+
     // Grab all of the inputs from the request body.
     let genresInput = [
       newLibraryData.pictureBooks,
@@ -143,10 +134,9 @@ router.route('/new')
       }
 
     } catch (e) {
-      // TODO: Why is this the error type
       return res
         .status(500)
-        .render("error", { errorCode: 500, title: "Error Page" });
+        .render("error", { errorCode: 500, title: "Error" });
     }
     try {
       checkImageFileString(req.file.path, "Image upload")
@@ -156,11 +146,12 @@ router.route('/new')
         if (err) {
           return res
             .status(500)
-            .render("error", { errorCode: 500, title: "Error Page" });
+            .render("error", { errorCode: 500, title: "Error" });
         }})
       errors.push(e)
     }
 
+    // If there are errors found on the routes rerender the pages with errors!
     if (errors.length > 0) {
       res.render("libraries/new", {
         errors: errors,
@@ -168,6 +159,8 @@ router.route('/new')
         library: newLibraryData,
         title: "Creating a Library",
         id: req.session.user._id,
+        editOrCreate: "Create", 
+        username: req.session.user.userName
       });
       return;
     }
@@ -182,14 +175,15 @@ router.route('/new')
         process.env.DOMAIN+req.file.path,
         req.session.user._id,
         newLibraryData.fullness,
-        genres // TODO:Need to be updated
+        genresInput // TODO:Need to be updated
       );
-      res.json(newLibrary); // TODO: will probably be to the library's page
+      // TODO: will need to figure out where it will sent
+      res.send(newLibrary); // TODO: will probably be to the library's page
     } catch (e) {
       console.log(e)
       res
         .status(500)
-        .render({ errorCode: 500, title: "error", id: "NEED TO FIX" });
+        .render("error", { errorCode: 500, title: "error", id: req.session.user._id});
     }
   });
 
@@ -343,63 +337,6 @@ router.route('/:id/comments')
     } catch (e) {
       res.status(500).render('error', {errorCode: 500, title: "Error Page"});
     }
-
-    // try {
-    //   newLibraryData.ownerID = validation.checkValidId(
-    //     newLibraryData.ownerID,
-    //     "Library Owner ID"
-    //   );
-    // } catch (e) {
-    //   errors.push(e);
-    // }
-    // try {
-    //   // TODO: THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
-    //   newLibraryData.fullness = parseInt(newLibraryData.fullness);
-    //   newLibraryData.fullness = validation.isValidNumber(
-    //     newLibraryData.fullness,
-    //     "Fullness Rating"
-    //   );
-    //   if (0 > newLibraryData.fullness || newLibraryData.fullness > 5) {
-    //     throw "Fullness rating must be between 0-5";
-    //   }
-    // } catch (e) {
-    //   errors.push(e);
-    // }
-    // try {
-    //   // TODO:THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
-    //   newLibraryData.genres = validation.checkStringArray(
-    //     newLibraryData.genres,
-    //     "Genres Available"
-    //   );
-    // } catch (e) {
-    //   errors.push(e);
-    // }
-    // if (errors.length > 0) {
-    //   res.render("libraries/new", {
-    //     errors: errors,
-    //     hasErrors: true,
-    //     library: newLibraryData,
-    //     title: "Creating a Library",
-    //     id: "NEED TO FIX",
-    //   });
-    //   return;
-    // }
-    // try {
-    //   const { name, ownerID, fullnessRating, genres } = newLibraryData;
-    //   const newLibrary = await libraryData.create(
-    //     name,
-    //     location,
-    //     image,
-    //     ownerID,
-    //     fullnessRating,
-    //     genres
-    //   );
-    //   res.json(newLibrary); // TODO: will probably be to the library's page
-    // } catch (e) {
-    //   res
-    //     .status(500)
-    //     .render({ errorCode: 500, title: "error", id: "NEED TO FIX" });
-    // }
   });
 
 router.route('/:id/comments/:commentid')

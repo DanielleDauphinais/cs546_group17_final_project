@@ -11,17 +11,14 @@ let exportedMethods = {
     name,
     coordinates,
     address,
-    image, // Vish will help!!
+    image, 
     ownerID,
     fullnessRating,
     genres
   ) {
     name = validation.checkString(name, "Library Name");
     ownerID = validation.checkValidId(ownerID, "Library Owner ID");
-    fullnessRating = validation.isValidNumber(
-      fullnessRating,
-      "Fullness Rating"
-    );
+    fullnessRating = validation.isValidNumber(fullnessRating, "Fullness Rating");
     genres = validation.checkStringArray(genres, "Genres Available");
     const currentDate = new Date();
     const lastServayed = currentDate.toLocaleString(undefined, {
@@ -32,11 +29,12 @@ let exportedMethods = {
       hour: "2-digit",
       minute: "2-digit",
     });
-    // TODO: ADD "path": "public/uploads/1681934019520.png", information 
-    // TODO: ADD Stuff to check city using Google maps API using lat, lng,
+    // TODO: Need to make it so can only have library with one name and one location
+    // TODO: Need to add function to update user with this library as something it owns 
     let newLibrary = {
       name: name,
       coordinates: coordinates,
+      address: address,
       image: image,
       ownerID: ownerID,
       fullnessRating: fullnessRating,
