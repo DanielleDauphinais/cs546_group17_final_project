@@ -23,10 +23,12 @@
                 {{!-- This will take user back to the list of libraries --}}
                 <a href=" /about">About Us</a>
             </div>
-            <div class="nav-element" id="nav-profile">
-                {{!-- id will the the users id, since they will be logged on to get to this point--}}
-                <a href="/users/{{user._id}}">{{user.userName}} Profile</a>
-            </div>
+            {{#if isLoggedIn}}
+                <div class="nav-element" id="nav-profile">
+                    {{!-- id will the the users id, since they will be logged on to get to this point--}}
+                    <a href="/users/{{user._id}}">{{user.userName}} Profile</a>
+                </div>
+            {{/if}}
             {{#if isLoggedIn}}
                 <div class="nav-element" id="nav-logout">
                     <a href="/users/logout">Logout</a>
