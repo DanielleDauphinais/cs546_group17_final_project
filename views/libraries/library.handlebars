@@ -4,7 +4,7 @@
     <img alt="{{name}}" src="{{imageURL}}">
     <address>{{address}}</address>
     <p>Created by: {{owner}}</p>
-    <h2>Fullness: {{fullnessRating}}</h2>
+    <h2>Fullness: {{fullnessRating}}/5</h2>
     <p>Last Rated On: {{lastServayed}}</p>
     <ul>
         {{#each genres}}
@@ -13,6 +13,9 @@
             </li>
         {{/each}}
     </ul>
+    <form action="/libraries/{{_id}}/survey" method="GET">
+        <button type="submit">Rate Fullness / Add Genres</button>
+    </form>
     <div id="favorites">
         <form action="/libraries/{{_id}}" method="POST">
             <button type="submit">{{numFavorites}}</button>
@@ -26,6 +29,7 @@
         {{/each}}
     </div>
     <div id="createComment">
+        <h2>Post a Comment</h2>
         <form id="newComment">
             <label for="text_input">
                 <textarea name="text_input" id="text_input"></textarea>
@@ -33,16 +37,7 @@
             <button type="submit">Post Comment</button>
         </form>
     </div>
-    <div id="commentError" hidden></div>
-    {{#if hasErrors}}
-    <ul class="error-list">
-        {{#each errors}}
-        <li>
-        {{this}}
-        </li>
-        {{/each}}
-    </ul>
-    {{/if}}
+    <div id="commentCreateError" hidden></div>
 </article>
 <script type="module" src="../../public/js/comments.js"></script>
 <script type="module" src="../../public/js/validators/util.js"></script>

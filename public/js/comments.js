@@ -5,7 +5,7 @@ import {validationsForStrings} from './validators/util.js';
   let newCommentForm = $('#newComment');
   let textArea = $('#text_input');
   let commentSection = $('#comments');
-  let error = $('#commentError');
+  let error = $('#commentCreateError');
 
   let url = window.location.pathname;
   let libraryId = url.split('/')[2];
@@ -18,11 +18,10 @@ import {validationsForStrings} from './validators/util.js';
     try {
       text = textArea.val();
       validationsForStrings("Comment body", text);
+      $(error).attr("hidden", true);
     } catch (e) {
-      console.log(e);
-      console.log(error);
-      error.hidden = false;
-      error.innerHTML = e;
+      $(error).attr("hidden", false);
+      $(error).attr("innerHTML", e); // Not sure why this isn't rendering???
     }
 
     if (text) {
@@ -42,5 +41,5 @@ import {validationsForStrings} from './validators/util.js';
         commentSection.focus();
       });
     }
-  }).fail();// ADD HERE
+  });
 })(window.jQuery);
