@@ -203,6 +203,7 @@ router
   })
   .put(async (req, res) => {
     // Allows a user to edit their library
+    /* Render Create Form with Update Params */
   })
   .delete(async (req, res) => {
     // Allows a user to delete their library
@@ -229,8 +230,15 @@ router
     }
   })
   .post(async (req, res) => {
-    // Posts the users survey form submission
-    // If the library ID is not valid, render the error page with a status code of 400
+    /**
+     * @name libraries/:id/survey
+     * @author jcarr2
+     * @description Allows a user to edit the fullness rating and currently held genres of a library
+     */
+
+    /* Rehashed Data Validation from Above */
+
+    // Check validity of id
     let id;
     try {
       id = req.params.id;
@@ -240,14 +248,15 @@ router
         .status(400)
         .render("error", { errorCode: 400, searchValue: "Library" });
     }
-    // Grab the form data
+
+    // Check validity of the form data (Still uses json, would check to make sure that this isn't just a debug throw).
     let updateData = req.body;
-    // Using the similar data checking function as above. Maybe this should be made into a checker function?
     if (!updateData || Object.keys(updateData).length === 0) {
       return res
         .status(400)
         .json({ error: "There are no fields in the request body" });
     }
+
     /**
      * Assumed Form data is of type:
      * {
@@ -256,51 +265,101 @@ router
      * }
      * This is using the error checking from before, using the helper functions for uniformity.
      */
-    // Grab all of the inputs from the request body.
-    let genresInput = [
-      req.body.pictureBooks,
-      req.body.youngAdultFiction,
-      req.body.fantasyFiction,
-      req.body.fairyTale,
-      req.body.boardBook,
-      req.body.nonFiction,
-      req.body.mystery,
-      req.body.graphicNovel,
-      req.body.chapterBooks,
-    ];
-
-    // For every value, if it does not exist, then the checkbox was not selected.
-    genresInput = genresInput.filter((genre) => {
-      return typeof genre === "string";
-    });
 
     try {
+      /* Fullness Validation */
+      // Parse Fullness into an Number, xss Validation
       updateData.fullness = validation.isValidNumber(
-        parseInt(updateData.fullness),
+        parseInt(xss(updateData.fullness)),
         "Fullness Rating"
       );
-      genresInput = validation.checkStringArray(
-        genresInput,
-        "Genres Available"
-      );
-      if (genresInput.length === 0 && updateData.fullness !== 0) {
-        throw "Must specify at least one genre for a non-empty library.";
+
+      // Check that fullness is of proper range
+      if (updateData.fullness < 0 || updateData.fullness > 5) {
+        throw "Error: Improper Range on Fullness!";
       }
-    } catch (e) {
-      return res
-        .status(500)
-        .render("error", { errorCode: 500, title: "Error Page" });
-    }
-    // At this point, assume the form data is completely valid.
-    try {
+
+      /* Genre Validation */
+      // Grab all of the inputs from the request body.
+      let genresInput = [
+        req.body.pictureBooks,
+        req.body.youngAdultFiction,
+        req.body.fantasyFiction,
+        req.body.fairyTale,
+        req.body.boardBook,
+        req.body.nonFiction,
+        req.body.mystery,
+        req.body.graphicNovel,
+        req.body.chapterBooks,
+      ];
+
+      // For every value, if it does not exist, then the checkbox was not selected.
+      genresInput = genresInput.filter((genre) => {
+        return typeof genre === "string";
+      });
+
+      // Scrub with xss to prevent xss on non-undefined values.
+      genresInput = genresInput.map((genre) => {
+        return xss(genre);
+      });
+
+      // List of Genre Strings
+      let genres = [
+        "pictureBooks",
+        "youngAdultFiction",
+        "fantasyFiction",
+        "fairyTale",
+        "boardBook",
+        "nonFiction",
+        "mystery",
+        "graphicNovel",
+        "chapterBooks",
+      ];
+
+      // Check that each non-undefined value is a valid genre in proper format (camelcase).
+      genresInput.forEach((genre) => {
+        if (!genres.includes(genre)) {
+          throw "Error: Invalid genre string data!";
+        }
+      });
+
+      // Remove duplicates (Using set inherent properties to remove duplicates).
+      genresInput = [...new Set(genresInput)];
+
+      // If the value is non-empty for fullness, there must be at least one genre.
+      if (genresInput.length === 0 && updateData.fullness !== 0) {
+        return res.render("libraries/fullness", {
+          id: id,
+          error:
+            "You must select at least one genre if the library is non-empty!",
+        });
+      }
+
+      // If the library is empty, there must not be any genres.
+      if (genresInput.length > 0 && updateData.fullness === 0) {
+        return res.render("libraries/fullness", {
+          id: id,
+          error: "An empty library cannot have any genres specified!",
+        });
+      }
+
+      /* Update Library */
+      // Run update function
       const updatedLibrary = await libraryData.formUpdate(
         id,
         updateData.fullness,
         genresInput
       );
-      res.json(updatedLibrary);
+
+      // Debug output
+      // res.json(updatedLibrary);
+
+      // Actual output
+      res.redirect(`/libraries/${id}`);
     } catch (e) {
-      res.status(500).render("error", { errorCode: 500, title: "Error Page" });
+      return res
+        .status(500)
+        .render("error", { errorCode: 500, title: "Error Page" });
     }
   });
 

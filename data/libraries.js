@@ -309,7 +309,45 @@ let exportedMethods = {
     libraryId = validation.checkValidId(libraryId);
     fullnessRating = validation.isValidNumber(fullnessRating);
     genres = validation.checkStringArray(genres);
+
+    // Input validation
+    if (fullnessRating < 0 || fullnessRating > 5) {
+      throw "Error: Improper Range on Fullness!";
+    }
+
+    // List of Genre Strings
+    let genresStrings = [
+      "pictureBooks",
+      "youngAdultFiction",
+      "fantasyFiction",
+      "fairyTale",
+      "boardBook",
+      "nonFiction",
+      "mystery",
+      "graphicNovel",
+      "chapterBooks",
+    ];
+
+    // Check that each non-undefined value is a valid genre in proper format (camelcase).
+    genres.forEach((gen) => {
+      if (!genresStrings.includes(gen)) {
+        throw "Error: Invalid genre string data!";
+      }
+    });
+
+    // Remove duplicates (Using set inherent properties to remove duplicates).
+    genres = [...new Set(genres)];
+
+    // Genre Library Check
+    if (genres.length === 0 && fullnessRating !== 0) {
+      throw "Error: You must specify at least one genre for a non-empty library!";
+    }
+    if (genres.length > 0 && fullnessRating === 0) {
+      throw "Error: An empty library cannot have any genres specified!";
+    }
+
     // The actual update
+    const currentDate = new Date();
     const lastServayed = currentDate.toLocaleString(undefined, {
       // should be in form "7/22/2016, 04:21 AM"
       day: "numeric",

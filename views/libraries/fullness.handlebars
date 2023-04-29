@@ -1,6 +1,7 @@
 <article>
     <h1>Library Update Form</h1>
-    <form action="/libraries/{{id}}/survey" method="POST" class="fullness-form">
+    <h2 id="error" class="error">{{{error}}}</h2>
+    <form action="/libraries/{{id}}/survey" method="POST" class="fullness-form" id="fullness-form">
      {{!-- This Code is from Danielle's branch's new --}}
      {{!-- This is to get data on the fullness --}}
       <label for="fullness">
@@ -16,7 +17,7 @@
         <option value="5">5</option>
       </select>
       <p>Please select the genres of books currently present in the library</p>
-      <div>
+      <div id="genres">
         <label for="pictureBooks">
           <input type="checkbox" name="pictureBooks" id="pictureBooks" value="pictureBooks">Picture Books</label>
         <label for="youngAdultFiction">
@@ -39,13 +40,5 @@
       <button type="submit">Update Library</button>
       <button type="reset">Clear Form</button>
     </form>
-  {{#if hasErrors}}
-  <ul class="error-list">
-    {{#each errors}}
-    <li>
-      {{this}}
-    </li>
-    {{/each}}
-  </ul>
-  {{/if}}
 </article>
+<script src="/public/js/fullness.js" type="module"></script>
