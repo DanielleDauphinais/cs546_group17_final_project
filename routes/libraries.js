@@ -340,6 +340,7 @@ router
         return res.render("libraries/fullness", {
           id: id,
           error: "An empty library cannot have any genres specified!",
+          title: "Fullness Form",
         });
       }
 
