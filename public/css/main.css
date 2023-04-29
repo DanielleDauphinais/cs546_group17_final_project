@@ -165,7 +165,6 @@ footer {
 html {
     font-family: 'Inter', sans-serif;
 }
-
 .justify-content-space-between {
 	justify-content: space-between;
 }
@@ -181,7 +180,25 @@ html {
 .pr-25 {
 	padding-right: 25px;
 }
-
+  
 .nav-element a {
 	color: inherit;
+}
+
+.newLibrary #rightSide{
+	position: relative;
+	float:right;
+	right:18px;
+
+}
+.newLibrary #leftSide{
+	position: relative;
+	float:left;
+	width:950px;
+}
+.newLibrary  .half-width-input {
+	display: block;
+	min-height: 3em;
+	margin: 10px 0;
+	width: 70%;
 }

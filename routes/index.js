@@ -28,6 +28,8 @@ const constructorMethod = (app) => {
   app.get('/gmaps', (req, res) => res.sendFile(path.resolve("views/gmaps.html")));
 
   app.use('/libraries', librariesRoutes);
+
+  app.get('/selectLocation', (req, res) => res.sendFile(path.resolve("views/libraries/selectLocation.html")));
   
   app.use('/users', userRoutes);
   
