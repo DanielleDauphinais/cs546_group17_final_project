@@ -15,5 +15,8 @@ This page renders if the user searches either a library or user that does not ex
     {{/if}}
     <p>Don't worry, you can try searching again or head back to our homepage.</p>
     <button onclick="window.history.back();">Go Back</button>
-    <button onclick='/'>Go to Homepage</button>
+    <br>
+    <form action="/home" method="GET">
+        <button type="submit">Go to Homepage</button>
+    </form>
 </div>

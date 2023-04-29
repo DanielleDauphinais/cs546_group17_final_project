@@ -3,47 +3,41 @@ import {validationsForStrings} from './validators/util.js';
 (function ($) {
 
   let newCommentForm = $('#newComment');
-  let text = $('#text_input');
+  let textArea = $('#text_input');
   let commentSection = $('#comments');
-  let userid = $('#userid');
-  let error = $('#error');
+  let error = $('#commentCreateError');
+
+  let url = window.location.pathname;
+  let libraryId = url.split('/')[2];
 
   newCommentForm.submit(function (event) {
     event.preventDefault();
-
-    let currentLink = $(this);
-    libraryid = currentLink.data('id');
-    console.log(libraryid);
-    console.log(text);
-
-    let text;
-    let dateCreated = new Date().toLocaleDateString();
     
+    let text;
+
     try {
-      text = text.val();
+      text = textArea.val();
       validationsForStrings("Comment body", text);
+      $(error).attr("hidden", true);
     } catch (e) {
-      error.hidden = false;
-      error.innerHTML = e;
+      $(error).attr("hidden", false);
+      $(error).attr("innerHTML", e); // Not sure why this isn't rendering???
     }
 
-    if (text && dateCreated) {
+    if (text) {
       let requestConfig = {
         method: 'POST',
-        url: `/${libraryid}/comments`,
+        url: `/libraries/${libraryId}/comments`,
         contentType: 'application/json',
         data: JSON.stringify({
-          userId: userid,
-          dateCreated: dateCreated,
-          text: text,
-          likes: []
+          text: text
         })
       };
       
       $.ajax(requestConfig).then(function (responseMessage) {
         let newElement = $(responseMessage);
         commentSection.append(newElement);
-        text.val('');
+        textArea.val('');
         commentSection.focus();
       });
     }
