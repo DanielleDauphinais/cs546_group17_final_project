@@ -81,9 +81,13 @@ router.post("/signup", async (req, res) => {
  */
 router.get('/logout', async (req, res) => {
 	req.session.destroy();
+  delete req.app.locals.user;
 	return res.render('users/logout', { title: "logout" });
 });
 
+/**
+ * @name http://localhost:3000/users/:id
+ */
 router
   .route('/:id').get(async (req,res) => {
     try {
@@ -105,9 +109,9 @@ router
     }
 
     try {
-      var favLibs = user.favLibraries.map(lib => libraryData.get(lib))
-      var ownedLibs = user.ownedLibraries.map(lib => libraryData.get(lib))
-      return res.status(200).render('user-profile',
+      var favLibs = await Promise.all(user.favLibraries.map(async lib => await libraryData.get(lib)))
+      var ownedLibs = await Promise.all(user.ownedLibraries.map(async lib => await libraryData.get(lib)))
+      return res.status(200).render('users/user-profile',
       { favLibs: favLibs,
         ownedLibs: ownedLibs 
       })

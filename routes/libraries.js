@@ -11,7 +11,7 @@ import fs from "fs";
 
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'public/uploads/'),
+  destination: (req, file, cb) => cb(null, "public/uploads/"),
   filename: (req, file, cb) => {
       let extension = file.originalname.split('.')[1];
       if (!extension) extension = "";
@@ -23,17 +23,17 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.route('/')
-  .get(async (req, res) => {
-    try {
-      let libraries = await libraryData.getAllLibraries();
-      res.send(libraries);
-    } catch (e) {
-      res.status(500).render('error', {title: "Error", errorCode: 500});
-    }
-  });
+router.route("/").get(async (req, res) => {
+  try {
+    let libraries = await libraryData.getAllLibraries();
+    res.send(libraries);
+  } catch (e) {
+    res.status(500).render("error", { errorCode: 500 });
+  }
+});
 
-router.route('/new')
+router
+  .route("/new")
   .get(async (req, res) => {
       res.render("libraries/new", { title: "Creating a Library", editOrCreate: "Create", user: req.session.user});
   })
@@ -71,18 +71,25 @@ router.route('/new')
       errors.push(e);
     }
     // Getting the address of the library
+    let city2 = ''
     let city = ''
     let address = ''
     try{
       // This axios request does reverse geocatching to get the address of the library
       let data = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${newLibraryData.lat},${newLibraryData.lng}&key=AIzaSyAPxSPvWssw3gI4W1qJaFk9xlBqBicI3iY`);
       city = data.data.results[0].address_components[2].long_name
-      address = data.data.results[1].formatted_address
+      city2 =data.data.results[4].formatted_address
+      if(city!== "Hoboken" && city2 === "Hoboken, NJ, USA"){
+        address = data.data.results[0].formatted_address
+      }
+      else{
+        address = data.data.results[1].formatted_address
+      }
     }
     catch(e){
       return res.status(500).render('error', {errorNum: 500, title: "Error"})
     }
-    if(city !== "Hoboken") {
+    if(city !== "Hoboken" && city2 !== "Hoboken, NJ, USA" && city2 !== "Hoboken, NJ 07030, USA") {
       newLibraryData.lat = ''
       newLibraryData.lng = ''
       errors.push("The location of the little free library must be in Hoboken");
@@ -153,17 +160,22 @@ router.route('/new')
 
     // If there are errors found on the routes rerender the pages with errors!
     if (errors.length > 0) {
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          return res
+            .status(500)
+            .render("error", { errorCode: 500, title: "Error" });
+        }})
       res.render("libraries/new", {
-        errors: errors,
-        hasErrors: true,
-        library: newLibraryData,
         title: "Creating a Library",
         user: req.session.user,
         editOrCreate: "Create", 
+        errors: errors,
+        hasErrors: true,
+        library: newLibraryData
       });
       return;
     }
-
     try {
       const { name, lat, lng, image, fullness } = newLibraryData;
       if (!process.env.DOMAIN) throw "Error: Env file not provided.";
@@ -179,23 +191,40 @@ router.route('/new')
       // TODO: will need to figure out where it will sent
       res.send(newLibrary); // TODO: will probably be to the library's page
     } catch (e) {
-      console.log(e)
-      res
+      if (e.startsWith("VError")) {
+        errors.push(e.substr(1))
+        res.status(400).render(
+          "libraries/new", {
+            title: "Creating a Library",
+            user: req.session.user,
+            editOrCreate: "Create", 
+            errors: errors,
+            hasErrors: true,
+            library: newLibraryData
+          })
+          
+      }
+      else{
+        res
         .status(500)
         .render("error", { errorCode: 500, title: "error", id: req.session.user._id});
+      }
     }
   });
 
-router.route('/:id')
+router
+  .route("/:id")
   .get(async (req, res) => {
     let id;
-    
+
     // If the library ID is not valid, render the error page with a status code of 400
     try {
       id = req.params.id;
       id = validation.checkValidId(id);
     } catch (e) {
-      return res.status(400).render('error', {errorCode: 400, searchValue: "Library"});
+      return res
+        .status(400)
+        .render("error", { errorCode: 400, searchValue: "Library" });
     }
 
     let library;
@@ -204,13 +233,21 @@ router.route('/:id')
     try {
       library = await libraryData.get(id);
     } catch (e) {
-      return res.status(404).render('error', {errorCode: 404, searchValue: "Library"});
+      return res
+        .status(404)
+        .render("error", { errorCode: 404, searchValue: "Library" });
     }
 
     try {
-      res.render('libraries/library', { title: library.name, library: library, isLoggedIn: true, script_partial: 'comment', userid: req.session.user._id});
+      res.render("libraries/library", {
+        title: library.name,
+        library: library,
+        isLoggedIn: true,
+        script_partial: "comment",
+        userid: req.session.user._id,
+      });
     } catch (e) {
-      res.status(500).render('error', {errorCode: 500});
+      res.status(500).render("error", { errorCode: 500 });
     }
   })
   .post(async (req, res) => {
@@ -218,52 +255,68 @@ router.route('/:id')
   })
   .put(async (req, res) => {
     // Allows a user to edit their library
+    /* Render Create Form with Update Params */
   })
   .delete(async (req, res) => {
     // Allows a user to delete their library
   });
 
-router.route('/:id/survey')
+router
+  .route("/:id/survey")
   .get(async (req, res) => {
     // Renders the survey page to rate fullness and input genres
-
-    let id;
-
     // If the library ID is not valid, render the error page with a status code of 400
+    let id;
     try {
       id = req.params.id;
       id = validation.checkValidId(id);
     } catch (e) {
-      return res.status(400).render('error', {errorCode: 400, searchValue: "Library"});
+      return res
+        .status(400)
+        .render("error", {
+          errorCode: 400,
+          searchValue: "Library",
+          title: "Error Page",
+        });
     }
-
     try {
-      res.render('libraries/fullness', { id: id });
+      res.render("libraries/fullness", { id: id });
     } catch (e) {
-      res.status(500).render('error', {errorCode: 500});
+      res.status(500).render("error", { errorCode: 500, title: "Error Page" });
     }
   })
   .post(async (req, res) => {
-    // Posts the users survey form submission
+    /**
+     * @name libraries/:id/survey
+     * @author jcarr2
+     * @description Allows a user to edit the fullness rating and currently held genres of a library
+     */
 
+    /* Rehashed Data Validation from Above */
+
+    // Check validity of id
     let id;
-
-    // If the library ID is not valid, render the error page with a status code of 400
     try {
       id = req.params.id;
       id = validation.checkValidId(id);
     } catch (e) {
-      return res.status(400).render('error', {errorCode: 400, searchValue: "Library"});
+      return res
+        .status(400)
+        .render("error", {
+          errorCode: 400,
+          searchValue: "Library",
+          title: "Error Page",
+        });
     }
 
-    // Grab the form data
+    // Check validity of the form data (Still uses json, would check to make sure that this isn't just a debug throw).
     let updateData = req.body;
-    // Using the similar data checking function as above. Maybe this should be made into a checker function?
     if (!updateData || Object.keys(updateData).length === 0) {
       return res
         .status(400)
         .json({ error: "There are no fields in the request body" });
     }
+
     /**
      * Assumed Form data is of type:
      * {
@@ -272,62 +325,119 @@ router.route('/:id/survey')
      * }
      * This is using the error checking from before, using the helper functions for uniformity.
      */
+
     try {
+      /* Fullness Validation */
+      // Parse Fullness into an Number, xss Validation
       updateData.fullness = validation.isValidNumber(
-        updateData.fullness,
+        parseInt(xss(updateData.fullness)),
         "Fullness Rating"
       );
-      updateData.genres = validation.checkStringArray(
-        updateData.genres,
-        "Genres Available"
-      );
-    } catch (e) {
-      return res.status(400).json({ error: e });
-    }
-    // At this point, assume the form data is completely valid.
-    try {
-      const { fullness, genres } = updateData;
+
+      // Check that fullness is of proper range
+      if (updateData.fullness < 0 || updateData.fullness > 5) {
+        throw "Error: Improper Range on Fullness!";
+      }
+
+      /* Genre Validation */
+      // Grab all of the inputs from the request body.
+      let genresInput = [
+        req.body.pictureBooks,
+        req.body.youngAdultFiction,
+        req.body.fantasyFiction,
+        req.body.fairyTale,
+        req.body.boardBook,
+        req.body.nonFiction,
+        req.body.mystery,
+        req.body.graphicNovel,
+        req.body.chapterBooks,
+      ];
+
+      // For every value, if it does not exist, then the checkbox was not selected.
+      genresInput = genresInput.filter((genre) => {
+        return typeof genre === "string";
+      });
+
+      // Scrub with xss to prevent xss on non-undefined values.
+      genresInput = genresInput.map((genre) => {
+        return xss(genre);
+      });
+
+      // List of Genre Strings
+      let genres = [
+        "pictureBooks",
+        "youngAdultFiction",
+        "fantasyFiction",
+        "fairyTale",
+        "boardBook",
+        "nonFiction",
+        "mystery",
+        "graphicNovel",
+        "chapterBooks",
+      ];
+
+      // Check that each non-undefined value is a valid genre in proper format (camelcase).
+      genresInput.forEach((genre) => {
+        if (!genres.includes(genre)) {
+          throw "Error: Invalid genre string data!";
+        }
+      });
+
+      // Remove duplicates (Using set inherent properties to remove duplicates).
+      genresInput = [...new Set(genresInput)];
+
+      // If the value is non-empty for fullness, there must be at least one genre.
+      if (genresInput.length === 0 && updateData.fullness !== 0) {
+        return res.render("libraries/fullness", {
+          id: id,
+          error:
+            "You must select at least one genre if the library is non-empty!",
+          title: "Fullness Form",
+        });
+      }
+
+      // If the library is empty, there must not be any genres.
+      if (genresInput.length > 0 && updateData.fullness === 0) {
+        return res.render("libraries/fullness", {
+          id: id,
+          error: "An empty library cannot have any genres specified!",
+          title: "Fullness Form",
+        });
+      }
+
+      /* Update Library */
+      // Run update function
       const updatedLibrary = await libraryData.formUpdate(
-        libraryId,
-        fullness,
-        genres
+        id,
+        updateData.fullness,
+        genresInput
       );
-      res.json(updatedLibrary);
+
+      // Debug output
+      // res.json(updatedLibrary);
+
+      // Actual output
+      res.redirect(`/libraries/${id}`);
     } catch (e) {
-      res.status(500).render('error', {errorCode: 500, title: "Error Page"});
+      return res
+        .status(500)
+        .render("error", { errorCode: 500, title: "Error Page" });
     }
   });
 
-router.route('/:id/comments')
-  .post(async (req, res) => {
-    // Creates a new comment
-    let id;
-    
-    // If the library ID is not valid, render the error page with a status code of 400
-    try {
-      id = req.params.id;
-      id = validation.checkValidId(id);
-    } catch (e) {
-      res.status(400).render('error', {errorCode: 400, searchValue: "Library"});
-    }
+router.route("/:id/comments").post(async (req, res) => {
+  // Creates a new comment
+  let id;
 
-    let text;
-    
-    try {
-      text = req.body.text;
-      text = validation.checkString(text);
-    } catch (e) {
-      res.status(400).render('libraries/library', {errorCode: 400, searchValue: "Library"}); // RENDER ERROR MESSAGE ON CREATE COMMENTS SECTION
-    }
-    
-    let library;
+  // If the library ID is not valid, render the error page with a status code of 400
+  try {
+    id = req.params.id;
+    id = validation.checkValidId(id);
+  } catch (e) {
+    res.status(400).render("error", { errorCode: 400, searchValue: "Library" });
+  }
 
-    // If the library is not found, render the error page with a status code of 404
-    try {
-      library = await libraryData.get(id);
-    } catch (e) {
-      return res.status(404).render('error', {errorCode: 404, searchValue: "Library"});
-    }
+  let text;
 
     try {
       let userid = req.session.user._id.toString();
@@ -336,21 +446,41 @@ router.route('/:id/comments')
     } catch (e) {
       res.status(500).render('error', {errorCode: 500, title: "Error Page"});
     }
-  });
 
-router.route('/:id/comments/:commentid')
+  // If the library is not found, render the error page with a status code of 404
+  try {
+    library = await libraryData.get(id);
+  } catch (e) {
+    return res
+      .status(404)
+      .render("error", { errorCode: 404, searchValue: "Library" });
+  }
+
+  try {
+    let userid = req.session.user._id.toString();
+    let createComment = await libraryData.createComment(id, userid, text);
+    res.redirect(`libraries/library/${id}`);
+  } catch (e) {
+    res.status(500).render("error", { errorCode: 500, title: "Error Page" });
+  }
+});
+
+router
+  .route("/:id/comments/:commentid")
   .post(async (req, res) => {
     // Allows a user to like a comment
 
     let id;
     let commentid;
-    
+
     // If the library ID is not valid, render the error page with a status code of 400
     try {
       id = req.params.id;
       id = validation.checkValidId(id);
     } catch (e) {
-      res.status(400).render('error', {errorCode: 400, searchValue: "Library"});
+      res
+        .status(400)
+        .render("error", { errorCode: 400, searchValue: "Library" });
     }
 
     // If the comment ID is not valid, render the error page with a status code of 400
@@ -358,7 +488,9 @@ router.route('/:id/comments/:commentid')
       commentid = req.params.commentid;
       commentid = validation.checkValidId(commentid);
     } catch (e) {
-      return res.status(400).render('error', {errorCode: 400, searchValue: "Comment"});
+      return res
+        .status(400)
+        .render("error", { errorCode: 400, searchValue: "Comment" });
     }
 
     let library;
@@ -374,7 +506,7 @@ router.route('/:id/comments/:commentid')
       let likeComment = await libraryData.likeComment(userid, commentid);
       res.redirect(`libraries/library/${id}`);
     } catch (e) {
-      res.status(500).render('error', {errorCode: 500, title: "Error Page"});
+      res.status(500).render("error", { errorCode: 500, title: "Error Page" });
     }
   })
   .put(async (req, res) => {
