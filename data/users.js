@@ -25,7 +25,6 @@ let exportedMethods = {
     email = validation.checkEmail(validation.checkString(email))
     const userCollection = await users();
     const user = await userCollection.findOne({emailAddress: email});
-    const user = await userCollection.findOne({_id: new ObjectId(id)});
     if (!user) throw 'Error: User not found';
     return user;
   },
@@ -44,14 +43,12 @@ let exportedMethods = {
     const userCollection = await users();
 
     const user = await userCollection.findOne({ _id: new ObjectId(userId) });
-    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
     if (user === null) throw "Error: No user found with given ID.";
     // If the user has not already favorited this library
-    if (user.favLibraries.includes(libraryId)) throw "VError: User has already favorited this library"
-    
-    await userCollection.updateOne(
-      { _id: new ObjectId(userId) },
-      { $push: {favLibraries: libraryId} }
+    if (user.favLibraries.includes(libraryId)){
+      await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $push: {favLibraries: libraryId} }
       );
 
       await libraryCollection.updateOne(
