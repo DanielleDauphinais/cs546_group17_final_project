@@ -35,7 +35,7 @@ router.route('/')
 
 router.route('/new')
   .get(async (req, res) => {
-      res.render("libraries/new", { title: "Creating a Library", editOrCreate: "Create", id: req.session.user._id, username: req.session.user.userName});
+      res.render("libraries/new", { title: "Creating a Library", editOrCreate: "Create", user: req.session.user});
   })
   .post(upload.single('image'), 
     async (req, res) => { 
@@ -158,9 +158,8 @@ router.route('/new')
         hasErrors: true,
         library: newLibraryData,
         title: "Creating a Library",
-        id: req.session.user._id,
+        user: req.session.user,
         editOrCreate: "Create", 
-        username: req.session.user.userName
       });
       return;
     }

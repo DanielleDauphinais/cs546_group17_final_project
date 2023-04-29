@@ -55,7 +55,5 @@ if(newLibraryForm){
             errorList.hidden = false;
             event.preventDefault()
         }
-        console.log(lat.value)
-        console.log(lng.value)
     })
 }
