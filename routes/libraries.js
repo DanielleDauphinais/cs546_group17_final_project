@@ -289,6 +289,7 @@ router
       let favorite = await userData.favoriteLibrary(user._id, library._id);
       res.redirect(`/libraries/${library._id}`);
     } catch (e) {
+      console.log(e);
       res.status(500).render('error', {errorCode: "500"});
     }
   })
