@@ -221,12 +221,16 @@ router
     } catch (e) {
       return res
         .status(400)
-        .render("error", { errorCode: 400, searchValue: "Library" });
+        .render("error", {
+          errorCode: 400,
+          searchValue: "Library",
+          title: "Error Page",
+        });
     }
     try {
       res.render("libraries/fullness", { id: id });
     } catch (e) {
-      res.status(500).render("error", { errorCode: 500 });
+      res.status(500).render("error", { errorCode: 500, title: "Error Page" });
     }
   })
   .post(async (req, res) => {
@@ -246,7 +250,11 @@ router
     } catch (e) {
       return res
         .status(400)
-        .render("error", { errorCode: 400, searchValue: "Library" });
+        .render("error", {
+          errorCode: 400,
+          searchValue: "Library",
+          title: "Error Page",
+        });
     }
 
     // Check validity of the form data (Still uses json, would check to make sure that this isn't just a debug throw).
@@ -332,6 +340,7 @@ router
           id: id,
           error:
             "You must select at least one genre if the library is non-empty!",
+          title: "Fullness Form",
         });
       }
 
