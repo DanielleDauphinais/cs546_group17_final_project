@@ -2,17 +2,23 @@
     <h2>{{userName}}</h2>
     <p>{{dateCreated}}</p>
     <p>{{text}}</p>
-    <div id="likes">
+    <div id="commentLike">
         <p>{{numLikes}}</p>
-        <form action="/libraries/{{library._id}}/comments/{{_id}}" method="POST">
-            {{!-- change to a tag --}}
+        <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}" method="POST">
             <button type="submit" name="addCommentLike" value="{{_id}}">Like</button>
         </form>
     </div>
-    {{#if commentOwner}}
-        
-    {{/if}}
+    <div id="commentEdit">
+        <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}" method="PUT">
+            <button type="submit">Edit</button>
+        </form>
+    </div>
+    <div id="commentDelete">
+        <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}" method="DELETE">
+            <button type="submit">Delete</button>
+        </form>
+    </div>
     {{#if errors}}
-        <div id="error" /hidden></div>
+        <div id="error"></div>
     {{/if}}
 </article>

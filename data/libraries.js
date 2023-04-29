@@ -103,23 +103,14 @@ let exportedMethods = {
     commentId = validation.checkValidId(commentId);
 
     const libraryCollection = await libraries();
-    // let commentsList = await libraryCollection.findOne(
-    //   { _id: new ObjectId(id) },
-    //   { _id: 0, comments: 1 }
-    // );
-    // if (commentsList === null) throw "Error: No library found with given ID.";
-
-    // commentsList.forEach(x => {
-    //   if (x._id.toString() === commentId) {
-    //     return x;
-    //   }
-    // });
-    // throw "Error: No comment found with given comment ID in given library.";
-
-    let comment = await libraryCollection.findOne(
-      {_id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId)},
+    
+    let library = await libraryCollection.findOne(
+      {"comments._id": new ObjectId(commentId)},
+      {projection: {_id: 0, 'comments.$': 1}}
     );
-    if (comment === null) throw "Error: No library found with given ID.";
+    if (library === null) throw "Error: No library found with given ID.";
+    
+    let comment = library.comments[0];
     comment._id = comment._id.toString();
     return comment;
   },
@@ -135,7 +126,7 @@ let exportedMethods = {
       _id: new ObjectId(),
       userId: userId,
       userName: userName,
-      dateCreated: new Date().toLocaleDateString(),
+      dateCreated: new Date().toLocaleString(),
       text: text,
       likes: []
     };
@@ -160,7 +151,7 @@ let exportedMethods = {
     if (userId !== originalComment.userId) throw "Error: User does not have permission to edit this comment";
 
     let updateComment = {
-      dateCreated: new Date().toLocaleDateString(),
+      dateCreated: new Date().toLocaleString(),
       text: text
     }
 
@@ -199,39 +190,25 @@ let exportedMethods = {
     userId = validation.checkValidId(userId, "User ID");
     commentId = validation.checkValidId(commentId, "Comment ID");
 
-    const originalComment = this.getComment(libraryId, commentId);
+    const originalComment = await this.getComment(libraryId, commentId);
     if (userId === originalComment.userId) throw "Error: User does not have permission to like this comment.";
 
-    if (originalComment.likes.includes(userId)) throw "Error: User has already liked this comment.";
-
     const libraryCollection = await libraries();
-    const updateInfo = await libraryCollection.findOneAndUpdate(
-      {_id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId)},
-      {$push: {"comments.$.likes": userId}},
-      {returnDocument: 'after'}
-    );
-
-    if (updateInfo.lastErrorObject.n === 0) throw "Error: Like failed";
-
-    return updateInfo.value;
-  },
-  async unLikeComment(libraryId, userId, commentId) {
-    // ejinks
-    libraryId = validation.checkValidId(libraryId, "Library ID");
-    userId = validation.checkValidId(userId, "User ID");
-    commentId = validation.checkValidId(commentId, "Comment ID");
-
-    const originalComment = this.getComment(libraryId, commentId);
-    if (userId === originalComment.userId) throw "Error: User does not have permission to like this comment.";
-
-    if (!originalComment.likes.includes(userId)) throw "Error: User has not liked this comment.";
-
-    const libraryCollection = await libraries();
-    const updateInfo = await libraryCollection.findOneAndUpdate(
-      {_id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId)},
-      {$pull: {"comments.$.likes": userId}},
-      {returnDocument: 'after'}
-    );
+    let updateInfo;
+    if (originalComment.likes.includes(userId)) {
+      updateInfo = await libraryCollection.findOneAndUpdate(
+        {_id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId)},
+        {$pull: {"comments.$.likes": userId}},
+        {returnDocument: 'after'}
+      );
+    }
+    else {
+      updateInfo = await libraryCollection.findOneAndUpdate(
+        {_id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId)},
+        {$push: {"comments.$.likes": userId}},
+        {returnDocument: 'after'}
+      );
+    }
 
     if (updateInfo.lastErrorObject.n === 0) throw "Error: Like failed";
 

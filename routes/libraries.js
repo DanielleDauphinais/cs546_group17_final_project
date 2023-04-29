@@ -174,15 +174,13 @@ router.route('/:id')
       return res.status(404).render('error', {errorCode: 404, searchValue: "Library"});
     }
 
-    // let owner;
+    let owner;
 
-    // try {
-    //   owner = await userData.getUserById(library.ownerID);
-    //   console.log(owner);
-    // } catch (e) {
-    //   return res.status(404).render('error', {errorCode: 404, searchValue: "User"});
-    // }
-    // console.log(owner);
+    try {
+      owner = await userData.getUserById(library.ownerID);
+    } catch (e) {
+      return res.status(404).render('error', {errorCode: 404, searchValue: "User"});
+    }
 
     try {
       let user = req.session.user;
@@ -192,7 +190,8 @@ router.route('/:id')
         isLoggedIn: true, 
         script_partial: 'comment', 
         userid: user._id, 
-        //owner: owner.userName,
+        owner: owner.userName,
+        libraryid: library._id,
         numFavorites: numFavorites,
         ...library
       });
@@ -441,9 +440,10 @@ router.route('/:id/comments/:commentid')
 
     try {
       let userid = req.session.user._id.toString();
-      let likeComment = await libraryData.likeComment(userid, commentid);
-      res.redirect(`libraries/library/${id}`);
+      let likeComment = await libraryData.likeComment(id, userid, commentid);
+      res.redirect(`/libraries/${id}`);
     } catch (e) {
+      console.log(e);
       res.status(500).render('error', {errorCode: 500, title: "Error Page"});
     }
   })
