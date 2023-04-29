@@ -21,6 +21,14 @@ let exportedMethods = {
     if (!user) throw 'Error: User not found';
     return user;
   },
+  async getUserByEmail(email) {
+    email = validation.checkEmail(validation.checkString(email))
+    const userCollection = await users();
+    const user = await userCollection.findOne({emailAddress: email});
+    const user = await userCollection.findOne({_id: new ObjectId(id)});
+    if (!user) throw 'Error: User not found';
+    return user;
+  },
   async favoriteLibrary(userId, libraryId) {
     userId = validation.checkValidId(userId);
     libraryId = validation.checkValidId(libraryId);
@@ -36,13 +44,14 @@ let exportedMethods = {
     const userCollection = await users();
 
     const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
     if (user === null) throw "Error: No user found with given ID.";
-    
     // If the user has not already favorited this library
-    if (!user.favLibraries.includes(libraryId)) {
-      await userCollection.updateOne(
-        { _id: new ObjectId(userId) },
-        { $push: {favLibraries: libraryId} }
+    if (user.favLibraries.includes(libraryId)) throw "VError: User has already favorited this library"
+    
+    await userCollection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $push: {favLibraries: libraryId} }
       );
 
       await libraryCollection.updateOne(
@@ -115,6 +124,23 @@ let exportedMethods = {
   
     if (!acknowledged || !insertedId) throw "VError: Couldn't add user";
     return { insertedUser: true };
+  },
+  async addOwnedLibrary(userId,libraryId){
+
+    libraryId = validation.checkValidId(libraryId, "Library ID")
+    userId = validation.checkValidId(userId, "User ID")
+    const userCollection = await users();
+
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+    if (user === null) throw "VError: No user found with given ID.";
+    
+    // If the user has already favorited this 
+    if (user.ownedLibraries.includes(libraryId)) throw "VError: User has already owns this library"
+    
+    await userCollection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $push: {ownedLibraries: libraryId} }
+      );
   },
 
   /**

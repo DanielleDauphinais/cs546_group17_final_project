@@ -25,7 +25,7 @@
             </div>
             <div class="nav-element" id="nav-profile">
                 {{!-- id will the the users id, since they will be logged on to get to this point--}}
-                <a href="/users/{{id}}">{{id.userName}} Profile</a>
+                <a href="/users/{{user._id}}">{{user.userName}} Profile</a>
             </div>
             {{#if isLoggedIn}}
                 <div class="nav-element" id="nav-logout">

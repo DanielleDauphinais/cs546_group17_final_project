@@ -7,8 +7,8 @@ This page renders if the user searches either a library or user that does not ex
     <h1>{{errorCode}} Error: {{capitalize searchValue}} Not Found</h1>
     <p>Oops, it looks like the {{searchValue}} you're looking for doesn't exist.</p>
     {{else if (eq errorCode "400")}}
-    <h1>{{errorCode}} Error: Invalid {{capitalize searchValue}}</h1>
-    <p>Oops, it looks like the {{searchValue}} you have given is not valid.</p>
+    <h1>{{errorCode}} Error: Invalid {{searchValue}}</h1>
+    <p>Oops, it looks like the {{searchValue}} you are searching for is not valid.</p>
     {{else if (eq errorCode "500")}}
     <h1>{{errorCode}} Error: Server Error</h1>
     <p>Oops, it looks like there is problem on our end.</p>

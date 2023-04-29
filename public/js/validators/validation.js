@@ -81,6 +81,12 @@ const validationFunctions = {
       if (!(/[A-Z]/.test(x))) throw "Error: Password must have at least one uppercase character.";
       if (!(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(x))) throw "Error: Password must have at least one special character.";
       return x;
+    },
+    checkEmail(x){
+      let regex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+      x = x.toLowerCase()
+      if (!regex.test(x)) throw "Error: Incorrect format for email"
+      return x
     }
 }
 
