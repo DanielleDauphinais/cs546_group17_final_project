@@ -102,7 +102,6 @@ router
     try {
       var user = await userData.getUserById(id)
     } catch (error) {
-      console.log(error)
       return res.status(404).render('error',
       { searchValue:"user", 
         errorCode:"404"
