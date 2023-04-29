@@ -11,7 +11,13 @@ try {
 } catch (error) {
     console.log(error)
 }
-const lib1 = await libraryData.getLibraryByName("Wash Street Library")
+
+try {
+    const lib1 = await libraryData.getLibraryByName("Wash Street Library")
+} catch (error) {
+    console.log(error)
+}
+
 console.log(user1)
 console.log(lib1)
 
