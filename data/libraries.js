@@ -165,37 +165,36 @@ let exportedMethods = {
     if (commentsList === null) throw "Error: No library found with given ID.";
     return commentsList;
   },
-  async getComment(libraryId, commentId) {
-    libraryId = validation.checkValidId(libraryId);
-    commentId = validation.checkValidId(commentId);
+  async getComment(commentId) {
+    commentId = validation.checkValidId(commentId, "Comment ID");
 
     const libraryCollection = await libraries();
-    let commentsList = await libraryCollection.findOne(
-      { _id: new ObjectId(id) },
-      { _id: 0, comments: 1 }
+    
+    let library = await libraryCollection.findOne(
+      {"comments._id": new ObjectId(commentId)},
+      {projection: {_id: 0, 'comments.$': 1}}
     );
-    if (commentsList === null) throw "Error: No library found with given ID.";
-
-    commentsList.forEach((x) => {
-      if (x._id.toString() === commentId) {
-        return x;
-      }
-    });
-    throw "Error: No comment found with given comment ID in given library.";
+    if (library === null) throw "Error: No library found with given ID.";
+    
+    let comment = library.comments[0];
+    comment._id = comment._id.toString();
+    return comment;
   },
-  async createComment(libraryId, userId, text) {
+  async createComment(libraryId, userId, userName, text) {
     // ejinks
     libraryId = validation.checkValidId(libraryId, "Library ID");
     userId = validation.checkValidId(userId, "User ID");
+    userName = validation.checkString(userName, "Username");
 
     text = validation.checkString(text, "Comment Body");
 
     let newComment = {
       _id: new ObjectId(),
       userId: userId,
-      dateCreated: new Date().toLocaleDateString(),
+      userName: userName,
+      dateCreated: new Date().toLocaleString(),
       text: text,
-      likes: [],
+      likes: []
     };
 
     const libraryCollection = await libraries();
@@ -203,34 +202,40 @@ let exportedMethods = {
       { _id: new ObjectId(libraryId) },
       { $push: { comments: newComment } }
     );
+    
+    newComment._id = newComment._id.toString();
+    return newComment;
   },
-  async editComment(libraryId, userId, commentId, text) {
-    libraryId = validation.checkValidId(libraryId, "Library ID");
+  async editComment(userId, commentId, text) {
     userId = validation.checkValidId(userId, "User ID");
     commentId = validation.checkValidId(commentId, "Commment ID");
 
     text = validation.checkString(text, "Update Comment Body");
 
-    const originalComment = this.getComment(libraryId, commentId);
-    if (userId !== originalComment.userId)
-      throw "Error: User does not have permission to edit this comment";
+    const originalComment = await this.getComment(commentId);
+    
+    if (userId !== originalComment.userId) throw "Error: User does not have permission to edit this comment";
 
     let updateComment = {
-      dateCreated: new Date().toLocaleDateString(),
+      _id: new ObjectId(originalComment._id),
+      userId: originalComment.userId,
+      userName: originalComment.userName,
+      dateCreated: new Date().toLocaleString(),
       text: text,
-    };
+      likes: originalComment.likes
+    }
 
     const libraryCollection = await libraries();
     const updateInfo = await libraryCollection.findOneAndUpdate(
-      { _id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId) },
-      { $set: { "comments.$": updateComment } },
-      { returnDocument: "after" }
+      {"comments._id": new ObjectId(commentId)},
+      {$set: {"comments.$": updateComment}},
+      {returnDocument: 'after'}
     );
 
-    if (updateInfo.lastErrorObject.n === 0)
-      throw "Error: Comment update failed";
-
-    return updateInfo.value;
+    if (updateInfo.lastErrorObject.n === 0) throw "Error: Comment update failed";
+    let comment = updateInfo.value.comments[0];
+    comment._id = comment._id.toString();
+    return comment;
   },
   async deleteComment(libraryId, userId, commentId) {
     // ejinks
@@ -238,9 +243,7 @@ let exportedMethods = {
     userId = validation.checkValidId(userId, "User ID");
     commentId = validation.checkValidId(commentId, "Comment ID");
 
-    text = validation.checkString(text, "Comment Body");
-
-    const originalComment = this.getComment(libraryId, commentId);
+    const originalComment = await this.getComment(commentId);
     const library = this.get(libraryId);
     if (userId !== originalComment.userId && userId !== library.ownerId)
       throw "Error: User does not have permission to delete this comment";
@@ -248,7 +251,7 @@ let exportedMethods = {
     const libraryCollection = await libraries();
     await libraryCollection.updateOne(
       { _id: new ObjectId(libraryId) },
-      { $pull: { comments: originalComment } }
+      { $pull: { comments: {_id: new ObjectId(originalComment._id)} } }
     );
   },
   async likeComment(libraryId, userId, commentId) {
@@ -257,43 +260,25 @@ let exportedMethods = {
     userId = validation.checkValidId(userId, "User ID");
     commentId = validation.checkValidId(commentId, "Comment ID");
 
-    const originalComment = this.getComment(libraryId, commentId);
-    if (userId === originalComment.userId)
-      throw "Error: User does not have permission to like this comment.";
-
-    if (originalComment.likes.includes(userId))
-      throw "Error: User has already liked this comment.";
+    const originalComment = await this.getComment(commentId);
+    if (userId === originalComment.userId) throw "Error: User does not have permission to like this comment.";
 
     const libraryCollection = await libraries();
-    const updateInfo = await libraryCollection.findOneAndUpdate(
-      { _id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId) },
-      { $push: { "comments.$.likes": userId } },
-      { returnDocument: "after" }
-    );
-
-    if (updateInfo.lastErrorObject.n === 0) throw "Error: Like failed";
-
-    return updateInfo.value;
-  },
-  async unLikeComment(libraryId, userId, commentId) {
-    // ejinks
-    libraryId = validation.checkValidId(libraryId, "Library ID");
-    userId = validation.checkValidId(userId, "User ID");
-    commentId = validation.checkValidId(commentId, "Comment ID");
-
-    const originalComment = this.getComment(libraryId, commentId);
-    if (userId === originalComment.userId)
-      throw "Error: User does not have permission to like this comment.";
-
-    if (!originalComment.likes.includes(userId))
-      throw "Error: User has not liked this comment.";
-
-    const libraryCollection = await libraries();
-    const updateInfo = await libraryCollection.findOneAndUpdate(
-      { _id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId) },
-      { $pull: { "comments.$.likes": userId } },
-      { returnDocument: "after" }
-    );
+    let updateInfo;
+    if (originalComment.likes.includes(userId)) {
+      updateInfo = await libraryCollection.findOneAndUpdate(
+        {_id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId)},
+        {$pull: {"comments.$.likes": userId}},
+        {returnDocument: 'after'}
+      );
+    }
+    else {
+      updateInfo = await libraryCollection.findOneAndUpdate(
+        {_id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId)},
+        {$push: {"comments.$.likes": userId}},
+        {returnDocument: 'after'}
+      );
+    }
 
     if (updateInfo.lastErrorObject.n === 0) throw "Error: Like failed";
 

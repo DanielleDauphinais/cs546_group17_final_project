@@ -1,45 +1,44 @@
+{{#with @root}}
 <article>
-    <h1>{{library.name}}</h1>
-    <img alt="{{library.name}}" src="{{library.imageURL}}">
-    <p>Created by: {{library.ownerID}}</p>
-    <h2>Fullness: {{library.fullness}}</h2>
-    <p>Last Rated On: {{library.lastRating}}</p>
+    <h1>{{name}}</h1>
+    <img alt="{{name}}" src="{{imageURL}}">
+    <address>{{address}}</address>
+    <p>Created by: {{owner}}</p>
+    <h2>Fullness: {{fullnessRating}}/5</h2>
+    <p>Last Rated On: {{lastServayed}}</p>
     <ul>
-        {{#each library.genres}}
+        {{#each genres}}
             <li>
-                <p>{{genre}}</p>
+                <p>{{this}}</p>
             </li>
         {{/each}}
     </ul>
+    <form action="/libraries/{{_id}}/survey" method="GET">
+        <button type="submit">Rate Fullness / Add Genres</button>
+    </form>
     <div id="favorites">
-        <p>{{library.numFavorites}}</p>
+        <form action="/libraries/{{_id}}" method="POST">
+            <button type="submit">{{numFavorites}}</button>
+        </form>
     </div>
     <br>
     <h2>Comments Section</h2>
     <div id="comments">
-        {{#each library.comments}}
+        {{#each comments}}
             {{> comment }}
         {{/each}}
     </div>
     <div id="createComment">
-        <form id="newComment" {{!-- action="/libraries/comments/create/{{library._id}}" method="POST" --}}>
+        <h2>Post a Comment</h2>
+        <form id="newComment">
             <label for="text_input">
-                <textarea name="text" id="text_input"></textarea>
+                <textarea name="text_input" id="text_input"></textarea>
             </label>
-            <input type="hidden" name="userid" value="{{userid}}"/>
-            <input type="hidden" name="libraryid" value="{{library._id}}"/>
             <button type="submit">Post Comment</button>
         </form>
     </div>
-    {{#if hasErrors}}
-    <ul class="error-list">
-        {{#each errors}}
-        <li>
-        {{this}}
-        </li>
-        {{/each}}
-    </ul>
-    {{/if}}
+    <div id="commentCreateError" hidden></div>
 </article>
 <script type="module" src="../../public/js/comments.js"></script>
 <script type="module" src="../../public/js/validators/util.js"></script>
+{{/with}}
