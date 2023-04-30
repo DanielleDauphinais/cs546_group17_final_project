@@ -202,3 +202,17 @@ html {
 	margin: 10px 0;
 	width: 70%;
 }
+.library img{
+	margin: auto;
+	width: 20%;
+	border-radius: 10px;
+}
+.library{
+	text-align: center ;
+	align-items: center;
+}
+.library #listGenrers{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
