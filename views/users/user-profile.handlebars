@@ -13,8 +13,12 @@
     {{#each favLibs}}
     <div class="library">
       <h2>{{this.name}}</h2>
-      <p>Fullness: {{this.fullnessRating}}</p>
-      <button>Unfavorite</button>
+      <p>Fullness: {{this.fullnessRating}} </p>
+      <form action='/users/{{../user._id}}' method="post">
+      <input type="hidden" name="libId" value={{this._id}}>
+      <button type="submit">Unfollow</button>
+      </form>
+      <br>
       <a href="/libraries/{{this._id}}">Expand</a>
     </div>
     {{/each}}

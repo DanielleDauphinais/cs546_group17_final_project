@@ -13,13 +13,17 @@ let exportedMethods = {
   async getAllUsers() {
     const userCollection = await users();
     const userList = await userCollection.find({}).toArray();
-    return userList;
+    return userList.map((user) => { 
+      user._id = user._id.toString(); 
+      return user; 
+    });
   },
   async getUserById(id) {
     id = validation.checkValidId(id,"user_id");
     const userCollection = await users();
     const user = await userCollection.findOne({_id: new ObjectId(id)});
     if (!user) throw 'Error: User not found';
+    user._id = user._id.toString();
     return user;
   },
   async getUserByEmail(email) {
@@ -27,6 +31,7 @@ let exportedMethods = {
     const userCollection = await users();
     const user = await userCollection.findOne({emailAddress: email});
     if (!user) throw 'Error: User not found';
+    user._id = user._id.toString();
     return user;
   },
   async favoriteLibrary(userId, libraryId) {
