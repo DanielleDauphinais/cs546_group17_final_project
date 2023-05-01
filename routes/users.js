@@ -89,9 +89,11 @@ router.get('/logout', async (req, res) => {
  * @name http://localhost:3000/users/:id
  */
 router
-  .route('/:id').get(async (req,res) => {
+  .route('/:id')
+  .get(async (req,res) => {
+    let id, user;
     try {
-      var id = validation.checkValidId(req.params.id,"user_id");
+      id = validation.checkValidId(req.params.id,"user_id");
     } catch (error) {
       return res.status(400).render('error',
       { searchValue:"user", 
@@ -100,7 +102,7 @@ router
     }
 
     try {
-      var user = await userData.getUserById(id)
+      user = await userData.getUserById(id)
     } catch (error) {
       return res.status(404).render('error',
       { searchValue:"user", 
@@ -108,12 +110,13 @@ router
       })
     }
 
+    let favLibs, ownedLibs;
     try {
-      var favLibs = await Promise.all(user.favLibraries.map(async lib => await libraryData.get(lib)))
-      var ownedLibs = await Promise.all(user.ownedLibraries.map(async lib => await libraryData.get(lib)))
+      favLibs = await Promise.all(user.favLibraries.map(async lib => await libraryData.get(lib)))
+      ownedLibs = await Promise.all(user.ownedLibraries.map(async lib => await libraryData.get(lib)))
       return res.status(200).render('users/user-profile',
       { favLibs: favLibs,
-        ownedLibs: ownedLibs 
+        ownedLibs: ownedLibs
       })
     } catch (error) {
       return res.status(500).render('error',
@@ -121,6 +124,21 @@ router
         errorCode:"500"
       })
     }
+  })
+  .post(async (req,res) => {
+    let libId, userId;
+    try {
+      userId = validation.checkValidId(req.params.id, "User ID");
+      libId = validation.checkValidId(req.body.libId, "Library ID");
+      await userData.unFavoriteLibrary(userId,libId)
+    } catch (error) {
+      console.log(error)
+      return res.status(500).render('error',
+      { searchValue:"user", 
+        errorCode:"500"
+      })
+    }
+    return res.status(200).redirect(`/users/${userId}`)
   });
 
 export default router;
