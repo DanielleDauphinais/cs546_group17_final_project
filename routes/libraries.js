@@ -87,6 +87,13 @@ router
       }
     }
     catch(e){
+      fs.unlink(req.file.path, (err) => {
+        console.log(e)
+        if (err) {
+          return res
+            .status(500)
+            .render("error", { errorCode: 500, title: "Error" });
+        }})
       return res.status(500).render('error', {errorNum: 500, title: "Error"})
     }
     if(city !== "Hoboken" && city2 !== "Hoboken, NJ, USA" && city2 !== "Hoboken, NJ 07030, USA") {
@@ -95,6 +102,13 @@ router
       errors.push("The location of the little free library must be in Hoboken");
     }
     if(address === ''){
+      fs.unlink(req.file.path, (err) => {
+        console.log(e)
+        if (err) {
+          return res
+            .status(500)
+            .render("error", { errorCode: 500, title: "Error" });
+        }})
       return res.status(500).render('error', {errorNum: 500, title: "Error"})
     }
     try {
@@ -141,20 +155,12 @@ router
       }
 
     } catch (e) {
-      return res
-        .status(500)
-        .render("error", { errorCode: 500, title: "Error" });
+      errors.push(e)
     }
     try {
       checkImageFileString(req.file.path, "Image upload")
     } catch (e) {
       // This can be used to remove file from data
-      fs.unlink(req.file.path, (err) => {
-        if (err) {
-          return res
-            .status(500)
-            .render("error", { errorCode: 500, title: "Error" });
-        }})
       errors.push(e)
     }
 
@@ -205,6 +211,7 @@ router
           
       }
       else{
+        console.log("couldnt make")
         res
         .status(500)
         .render("error", { errorCode: 500, title: "error", id: req.session.user._id});
