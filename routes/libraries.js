@@ -7,22 +7,7 @@ import multer from "multer";
 import axios from 'axios';
 import xss from 'xss';
 import fs from "fs";
-import { create } from "domain";
-
-
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "public/uploads/"),
-  filename: (req, file, cb) => {
-      let extension = file.originalname.split('.')[1];
-      if (!extension) extension = "";
-      else extension = "." + extension;
-      
-      return cb(null, `${Date.now()}${extension}`);
-  }
-});
-
-const upload = multer({ storage });
+import { upload } from "./image.js";
 
 router.route("/").get(async (req, res) => {
   try {
@@ -190,7 +175,7 @@ router
         genresInput // TODO:Need to be updated
       );
       // TODO: will need to figure out where it will sent
-      res.send(newLibrary); // TODO: will probably be to the library's page
+      res.redirect(`/libraries/${newLibrary._id}`); // TODO: will probably be to the library's page
     } catch (e) {
       if (e.startsWith("VError")) {
         errors.push(e.substr(1))
@@ -500,69 +485,11 @@ router.route('/:id/comments')
     try {
       let user = req.session.user;
       let createComment = await libraryData.createComment(id, user._id, user.userName, text);
-      createComment.numLikes = createComment.likes.length;
       res.render('partials/comment', {layout: null, library, userid: user._id, userId: user._id, ...createComment});
     } catch (e) {
       console.log(e);
       res.status(500).render('error', {errorCode: "500", title: "Error Page"});
     }
-
-    // try {
-    //   newLibraryData.ownerID = validation.checkValidId(
-    //     newLibraryData.ownerID,
-    //     "Library Owner ID"
-    //   );
-    // } catch (e) {
-    //   errors.push(e);
-    // }
-    // try {
-    //   // TODO: THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
-    //   newLibraryData.fullness = parseInt(newLibraryData.fullness);
-    //   newLibraryData.fullness = validation.isValidNumber(
-    //     newLibraryData.fullness,
-    //     "Fullness Rating"
-    //   );
-    //   if (0 > newLibraryData.fullness || newLibraryData.fullness > 5) {
-    //     throw "Fullness rating must be between 0-5";
-    //   }
-    // } catch (e) {
-    //   errors.push(e);
-    // }
-    // try {
-    //   // TODO:THIS WILL BE UPDATED BECAUSE THE WAY OF SERVY CHANGING
-    //   newLibraryData.genres = validation.checkStringArray(
-    //     newLibraryData.genres,
-    //     "Genres Available"
-    //   );
-    // } catch (e) {
-    //   errors.push(e);
-    // }
-    // if (errors.length > 0) {
-    //   res.render("libraries/new", {
-    //     errors: errors,
-    //     hasErrors: true,
-    //     library: newLibraryData,
-    //     title: "Creating a Library",
-    //     id: "NEED TO FIX",
-    //   });
-    //   return;
-    // }
-    // try {
-    //   const { name, ownerID, fullnessRating, genres } = newLibraryData;
-    //   const newLibrary = await libraryData.create(
-    //     name,
-    //     location,
-    //     image,
-    //     ownerID,
-    //     fullnessRating,
-    //     genres
-    //   );
-    //   res.json(newLibrary); // TODO: will probably be to the library's page
-    // } catch (e) {
-    //   res
-    //     .status(500)
-    //     .render({ errorCode: 500, title: "error", id: "NEED TO FIX" });
-    // }
   });
 
 router

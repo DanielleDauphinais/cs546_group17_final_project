@@ -1,4 +1,4 @@
-import {validationsForStrings, checkImageFileString} from '../validators/util.js';
+import {validationsForStrings, checkImageFileString, isNumber} from '../validators/util.js';
 
 let newLibraryForm = document.getElementById("new-Library-form");
 let errorList = document.getElementById("error");
@@ -17,6 +17,8 @@ if(newLibraryForm){
         let lat =  document.getElementById("lat");
         let lng =  document.getElementById("lng");
         let image = document.getElementById("library-image");
+        let fullnessVal = document.getElementById("fullness").value;
+        console.log(fullnessVal)
         removeElementsByClass("error-list")
         errorList.innerHTML = "" 
         errorList.hidden = true
@@ -50,6 +52,31 @@ if(newLibraryForm){
         } catch (e) {
             errorList.innerHTML += `<li> ${e} </li>`;
             image.value = null
+        }
+        let genresForm, genres;
+        try {
+            (function ($) {
+                genresForm = $("#genres input");
+            })(window.jQuery);
+            genres = genresForm.toArray();
+            genres = genres.filter((input) => input.checked);
+        } catch (e) {
+            if (typeof e === "string" && e.startsWith("VError")) {
+                e = e.substr(1);
+            }
+            errorList.innerHTML += `<li> ${e} </li>`;
+        }
+        try {
+            if (!isNumber(Number(fullnessVal))) throw "You must select a fullness!";
+            if (fullnessVal < 0 || fullnessVal > 5) throw "Improper Range on Fullness";
+        } catch (e) {
+            errorList.innerHTML += `<li> ${e} </li>`;
+        }
+        try {
+            if (genres.length === 0 && fullnessVal > 0) throw "You must select at least one genre if the library is non-empty!";
+            if (genres.length > 0 && fullnessVal === 0) throw "You cannot select any genres if the library is empty!";
+        } catch (e) {
+            errorList.innerHTML += `<li> ${e} </li>`;
         }
         if(errorList.innerHTML !== ""){
             errorList.hidden = false;
