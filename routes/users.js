@@ -132,7 +132,7 @@ router
     try {
       userId = validation.checkValidId(req.params.id, "User ID");
       libId = validation.checkValidId(req.body.libId, "Library ID");
-      await userData.unFavoriteLibrary(userId,libId)
+      await userData.favoriteLibrary(userId,libId)
     } catch (error) {
       console.log(error)
       return res.status(500).render('error',
