@@ -7,21 +7,7 @@ import multer from "multer";
 import axios from 'axios';
 import xss from 'xss';
 import fs from "fs";
-
-
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "public/uploads/"),
-  filename: (req, file, cb) => {
-      let extension = file.originalname.split('.')[1];
-      if (!extension) extension = "";
-      else extension = "." + extension;
-      
-      return cb(null, `${Date.now()}${extension}`);
-  }
-});
-
-const upload = multer({ storage });
+import { upload } from "./image.js";
 
 router.route("/").get(async (req, res) => {
   try {

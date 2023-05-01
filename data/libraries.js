@@ -65,7 +65,11 @@ let exportedMethods = {
   /** This function gets all the libraries and returns the json data in an array*/
   async getAllLibraries() {
     const librariesCollection = await libraries();
-    return await librariesCollection.find({}).toArray();
+    let libs = await librariesCollection.find({}).toArray();
+    return libs.map((lib) => {
+      lib._id = lib._id.toString();
+      return lib;
+    });
   },
   async get(id) {
     // ejinks - reconfiged to export all
@@ -79,9 +83,10 @@ let exportedMethods = {
   async getLibraryByName(name) {
     name = validation.checkString(name);
     const librariesCollection = await libraries();
-    const lib = await librariesCollection.findOne({ name: name });
-    if (!lib) throw "VError: There is no libraries with the given name";
-    return lib;
+    const lib = await librariesCollection.findOne({name: name});
+    if (!lib) throw "VError: There is no libraries with the given name"
+    lib._id = lib._id.toString()
+    return lib
   },
   /**
    * @name editLibrary
