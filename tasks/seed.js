@@ -5,6 +5,7 @@ let user1, user2, lib1, lib2;
 
 const db = await dbConnection();
 await db.dropDatabase();
+let allUsers, user1Id, user2Id;
 
 try {
     user1 = await userData.createUser("Evan", "Jinks", "ejinks2@stevens.edu", "Hello123!", 21, "ejinks2");
@@ -12,9 +13,9 @@ try {
     console.log(error)
 }
 
-let allUsers = await userData.getAllUsers();
+allUsers = await userData.getAllUsers();
 console.log(allUsers)
-let user1Id;
+user1Id;
 allUsers.forEach(x => {
   if (x.emailAddress === "ejinks2@stevens.edu"){
     user1Id = x._id;

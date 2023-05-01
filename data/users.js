@@ -6,7 +6,8 @@ import libraryFunctions from './libraries.js';
 import bcrypt from 'bcrypt';
 import { validationsForCheckUser, validationsForCreateUser } from '../public/js/validators/user.js';
 
-const usersCollection = await users();
+const userCollection = await users();
+const libraryCollection = await libraries();
 
 let exportedMethods = {
   async getAllUsers() {
@@ -38,50 +39,39 @@ let exportedMethods = {
     libraryId = validation.checkValidId(libraryId);
 
     // Check if library exists
-    const libraryCollection = await libraries();
-    const library = await libraryCollection.findOne(
-        {_id: new ObjectId(libraryId)},
-    );
-    if (library === null) throw "Error: No library found with given ID.";
+    let library = await libraryFunctions.get(libraryId);
 
     // Add libraryId to user's favorited libraries
     const userCollection = await users();
 
     const user = await userCollection.findOne({ _id: new ObjectId(userId) });
     if (user === null) throw "Error: No user found with given ID.";
-    // If the user has not already favorited this library
-    if (user.favLibraries.includes(libraryId)) throw "VError: User has already favorited this library"
+    user._id = user._id.toString();
     
-    await userCollection.updateOne(
-      { _id: new ObjectId(userId) },
-      { $push: {favLibraries: libraryId} }
+    // If the user has not already favorited this library
+    if (!user.favLibraries.includes(libraryId)){
+      await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $push: {favLibraries: libraryId} }
       );
 
-  },
-  async unFavoriteLibrary(userId, libraryId) {
-    userId = validation.checkValidId(userId);
-    libraryId = validation.checkValidId(libraryId);
+      await libraryCollection.updateOne(
+        { _id: new ObjectId(libraryId) },
+        { $push: {favorites: userId} }
+      );
+    }
+    // If the user has already favorited this library
+    else{
+      await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $pull: {favLibraries: libraryId} }
+      );
 
-    // Check if library exists
-    const libraryCollection = await libraries();
-    const library = await libraryCollection.findOne(
-        {_id: new ObjectId(libraryId)},
-    );
-    if (library === null) throw "Error: No library found with given ID.";
-
-    // Add libraryId to user's favorited libraries
-    const userCollection = await users();
-
-    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
-    if (user === null) throw "Error: No user found with given ID.";
-    
-    // If the user has already favorited this 
-    if (!user.favLibraries.includes(libraryId)) throw "VError: User cannot unfavorite a library that was not favorited"
-    
-    await userCollection.updateOne(
-      { _id: new ObjectId(userId) },
-      { $pull: {favLibraries: libraryId} }
-    );
+      await libraryCollection.updateOne(
+        { _id: new ObjectId(libraryId) },
+        { $pull: {favorites: userId} }
+      );
+    }
   },
   async getAllFavoritedLibraries(userId) {
     userId = validation.checkValidId(userId);
@@ -113,7 +103,7 @@ let exportedMethods = {
     emailAddress = emailAddress.trim();
     emailAddress = emailAddress.toLowerCase();
   
-    let userFromDB = await usersCollection.findOne({ emailAddress });
+    let userFromDB = await userCollection.findOne({ emailAddress });
   
     if (userFromDB) throw "VError: User already exists with this email address";
   
@@ -131,11 +121,12 @@ let exportedMethods = {
       ownedLibraries: [] 
     };
   
-    const { acknowledged, insertedId } = await usersCollection.insertOne(newUser);
+    const { acknowledged, insertedId } = await userCollection.insertOne(newUser);
   
     if (!acknowledged || !insertedId) throw "VError: Couldn't add user";
     return { insertedUser: true };
   },
+  
   async addOwnedLibrary(userId,libraryId){
 
     libraryId = validation.checkValidId(libraryId, "Library ID")
@@ -164,7 +155,7 @@ let exportedMethods = {
     emailAddress = emailAddress.trim();
     emailAddress = emailAddress.toLowerCase();
     
-    let userFromDB = await usersCollection.findOne({ emailAddress });
+    let userFromDB = await userCollection.findOne({ emailAddress });
   
     if (!userFromDB) throw "Either the email address or password is invalid";
   

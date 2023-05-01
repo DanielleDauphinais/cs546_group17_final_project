@@ -34,6 +34,18 @@ const isCharNumber = (c) => ((c.charCodeAt(0) >= 48) && (c.charCodeAt(0) <= 57))
 
 const hasNumbers = (s) => s.match(/[0-9]+/);
 
+const checkImageFileString = (str, strName) =>{
+  if (!str) throw `Error: ${strName} parameter should exist`;
+    if(!isJustAString(str)) throw `Error: ${strName} parameter should be a string`;
+    str = str.toLowerCase();
+    let myArray = str.split(".");
+    if(myArray.length != 2){
+      throw `Error: ${strName} is not of the correct form.`
+    }
+    if(myArray[1]!== "jpeg" && myArray[1]!== "jpg" && myArray[1]!== "png" && myArray[1]!== "pdf"){
+      throw `Error: ${strName} must have the extention .jpeg, .jpg, .png or .pdf`
+    }
+  }
 export {
     isJustAString,
     isJustEmptySpaces,
@@ -43,5 +55,6 @@ export {
     isNumber,
     isCharUpperCase,
     isCharNumber,
-    hasNumbers
+    hasNumbers,
+    checkImageFileString
 };
