@@ -113,7 +113,9 @@ router
       var ownedLibs = await Promise.all(user.ownedLibraries.map(async lib => await libraryData.get(lib)))
       return res.status(200).render('users/user-profile',
       { favLibs: favLibs,
-        ownedLibs: ownedLibs 
+        ownedLibs: ownedLibs,
+        isLoggedIn: true,
+        title: "Profile"
       })
     } catch (error) {
       return res.status(500).render('error',

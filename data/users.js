@@ -121,6 +121,7 @@ let exportedMethods = {
     if (!acknowledged || !insertedId) throw "VError: Couldn't add user";
     return { insertedUser: true };
   },
+  
   async addOwnedLibrary(userId,libraryId){
 
     libraryId = validation.checkValidId(libraryId, "Library ID")
