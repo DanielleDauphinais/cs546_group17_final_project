@@ -117,6 +117,7 @@ router
       return res.status(200).render('users/user-profile',
       { favLibs: favLibs,
         ownedLibs: ownedLibs,
+        searchedUser: user,
         isLoggedIn: true,
         title: "Profile"
       })
@@ -134,7 +135,6 @@ router
       libId = validation.checkValidId(req.body.libId, "Library ID");
       await userData.favoriteLibrary(userId,libId)
     } catch (error) {
-      console.log(error)
       return res.status(500).render('error',
       { searchValue:"user", 
         errorCode:"500"
