@@ -7,6 +7,7 @@ import multer from "multer";
 import axios from 'axios';
 import xss from 'xss';
 import fs from "fs";
+import { create } from "domain";
 
 
 
@@ -499,8 +500,10 @@ router.route('/:id/comments')
     try {
       let user = req.session.user;
       let createComment = await libraryData.createComment(id, user._id, user.userName, text);
+      createComment.numLikes = createComment.likes.length;
       res.render('partials/comment', {layout: null, library, userid: user._id, userId: user._id, ...createComment});
     } catch (e) {
+      console.log(e);
       res.status(500).render('error', {errorCode: "500", title: "Error Page"});
     }
 

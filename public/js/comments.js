@@ -18,13 +18,19 @@ import {validationsForStrings} from './validators/util.js';
     try {
       text = textArea.val();
       validationsForStrings("Comment body", text);
-      $(error).attr("hidden", true);
+      //$(error).attr("hidden", true);
+      error.text("");
     } catch (e) {
-      $(error).attr("hidden", false);
-      $(error).attr("innerHTML", e); // Not sure why this isn't rendering???
+      event.preventDefault();
+      console.log(e);
+      //$(error).attr("hidden", false);
+      // $(error).attr("display", "block");
+      // $(error).attr("innerHTML", e); // Not sure why this isn't rendering???
+      error.text(e);
+      return;
     }
 
-    if (text) {
+    
       let requestConfig = {
         method: 'POST',
         url: `/libraries/${libraryId}/comments`,
@@ -34,12 +40,12 @@ import {validationsForStrings} from './validators/util.js';
         })
       };
       
+      console.log("Made it here");
       $.ajax(requestConfig).then(function (responseMessage) {
         let newElement = $(responseMessage);
         commentSection.append(newElement);
         textArea.val('');
         commentSection.focus();
       });
-    }
   });
 })(window.jQuery);

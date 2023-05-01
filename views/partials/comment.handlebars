@@ -4,21 +4,21 @@
     <p>{{text}}</p>
     <p>{{numLikes}}</p>
     {{#if (ne @root.userid userId)}}
-        <div id="commentLike">
+        <div class="commentLike">
             <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}" method="POST">
                 <button type="submit" name="addCommentLike" value="{{_id}}">Like</button>
             </form>
         </div>
     {{/if}}
     {{#if (eq @root.userid userId)}}
-        <div id="commentEdit">
+        <div class="commentEdit">
             <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/edit" method="POST">
                 <label for="update_text_input">
                     <textarea name="update_text_input" id="update_text_input"></textarea>
                 </label>
                 <button type="submit">Edit</button>
             </form>
-            <div id="commentEditError" hidden></div>
+            <div id="commentEditError-{{_id}}" hidden></div>
         </div>
         <div id="commentDelete">
             <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/delete" method="POST">
