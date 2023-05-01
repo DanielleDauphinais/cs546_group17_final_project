@@ -189,7 +189,7 @@ router
         genresInput // TODO:Need to be updated
       );
       // TODO: will need to figure out where it will sent
-      res.send(newLibrary); // TODO: will probably be to the library's page
+      res.redirect(`/libraries/${newLibrary._id}`); // TODO: will probably be to the library's page
     } catch (e) {
       if (e.startsWith("VError")) {
         errors.push(e.substr(1))
