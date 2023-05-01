@@ -6,7 +6,9 @@
       <a href="/libraries/{{this._id}}">Expand</a>
     </div>
     {{/each}}
-
+<form action="/libraries/new" method="GET">
+    <button type="submit">Click here to create a new library!</button>
+</form>
 <h1>Favorited Libraries</h1>
     {{#each favLibs}}
     <div class="library">

@@ -1,11 +1,13 @@
 {{#with @root}}
+<div class="library">
 <article>
     <h1>{{name}}</h1>
-    <img alt="{{name}}" src="{{imageURL}}">
+    <img alt="{{name}}" src="{{image}}">
     <address>{{address}}</address>
     <p>Created by: {{owner}}</p>
     <h2>Fullness: {{fullnessRating}}/5</h2>
     <p>Last Rated On: {{lastServayed}}</p>
+    <div id="listGenrers">
     <ul>
         {{#each genres}}
             <li>
@@ -13,6 +15,7 @@
             </li>
         {{/each}}
     </ul>
+    </div>
     <form action="/libraries/{{_id}}/survey" method="GET">
         <button type="submit">Rate Fullness / Add Genres</button>
     </form>
@@ -22,6 +25,7 @@
         </form>
     </div>
     <br>
+    <div id="commentSectionLibs">
     <h2>Comments Section</h2>
     <div id="comments">
         {{#each comments}}
@@ -38,7 +42,9 @@
         </form>
     </div>
     <div id="commentCreateError" hidden></div>
+    </div>
 </article>
 <script type="module" src="../../public/js/comments.js"></script>
 <script type="module" src="../../public/js/validators/util.js"></script>
+</div>
 {{/with}}
