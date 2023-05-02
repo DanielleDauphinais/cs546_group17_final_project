@@ -138,7 +138,11 @@ async function routeValidationsForLibrary(newLibraryData, res, req) {
 
   let { city, city2, address } = addressObj;
 
-  if (city !== "Hoboken" && city2 !== "Hoboken" && city2 !== "07030") {
+  if (
+    (city !== "Hoboken" && city2 !== "Hoboken" && city2 !== "07030") ||
+    !address.includes("Hoboken") ||
+    !address.toLowerCase().includes("hoboken")
+  ) {
     newLibraryData.lat = ''
     newLibraryData.lng = ''
     errors.push("The location of the little free library must be in Hoboken");
