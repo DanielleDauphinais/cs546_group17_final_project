@@ -23,6 +23,7 @@ if (newLibraryForm) {
     let lng = document.getElementById("lng");
     let image = document.getElementById("library-image");
     let fullnessVal = document.getElementById("fullness").value;
+    let type = document.getElementById("type").textContent;
     console.log(fullnessVal);
     removeElementsByClass("error-list");
     errorList.innerHTML = "";
@@ -58,7 +59,9 @@ if (newLibraryForm) {
       errorList.innerHTML += `<li> ${e} </li>`;
     }
     try {
-      checkImageFileString(image.value, "Input Image");
+      if (type === "Create") {
+        checkImageFileString(image.value, "Input Image");
+      }
     } catch (e) {
       errorList.innerHTML += `<li> ${e} </li>`;
       image.value = null;

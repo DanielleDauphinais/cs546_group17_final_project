@@ -216,3 +216,8 @@ html {
 	align-items: center;
 	justify-content: center;
 }
+.newLibrary img{
+	margin: auto;
+	width: 20%;
+	border-radius: 10px;
+}
