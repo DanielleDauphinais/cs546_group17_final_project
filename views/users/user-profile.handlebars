@@ -1,3 +1,10 @@
+<h1>User Information</h1>
+  <h2>{{searchedUser.userName}}</h2>
+  <ul>
+    <li>Name: {{searchedUser.firstName}} {{searchedUser.lastName}}</li>
+    <li>Email: {{searchedUser.emailAddress}}</li>
+    <li>Member Since: {{searchedUser.dateCreated}}</li>
+  </ul>
 <h1>Owned Libraries</h1>
     {{#each ownedLibs}}
     <div class="library">
@@ -6,18 +13,22 @@
       <a href="/libraries/{{this._id}}">Expand</a>
     </div>
     {{/each}}
+{{#if (eq searchedUser._id user._id)}}    
 <form action="/libraries/new" method="GET">
     <button type="submit">Click here to create a new library!</button>
 </form>
+{{/if}}
 <h1>Favorited Libraries</h1>
     {{#each favLibs}}
     <div class="library">
       <h2>{{this.name}}</h2>
       <p>Fullness: {{this.fullnessRating}} </p>
-      <form action='/users/{{../user._id}}' method="post">
+      {{#if (eq ../searchedUser._id ../user._id)}}   
+      <form action='/users/{{../searchedUser._id}}' method="post">
       <input type="hidden" name="libId" value={{this._id}}>
       <button type="submit">Unfollow</button>
       </form>
+      {{/if}}
       <br>
       <a href="/libraries/{{this._id}}">Expand</a>
     </div>
