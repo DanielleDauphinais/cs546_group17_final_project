@@ -33,12 +33,10 @@ router.post("/login", async (req, res) => {
 
     if (typeof err === "string")
       return err.startsWith("VError")
-        ? res
-            .status(400)
-            .render("users/login", {
-              title: "Login",
-              error: `400 - ${err.substr(1)}`,
-            })
+        ? res.status(400).render("users/login", {
+            title: "Login",
+            error: `400 - ${err.substr(1)}`,
+          })
         : res
             .status(400)
             .render("users/login", { title: "Login", error: `400 - ${err}` });
@@ -81,12 +79,10 @@ router.post("/signup", async (req, res) => {
     );
 
     if (password !== confirmPasswordInput)
-      return res
-        .status(400)
-        .render("users/signup", {
-          title: "Signup",
-          error: "400 - Error: Both password & confirm password should match.",
-        });
+      return res.status(400).render("users/signup", {
+        title: "Signup",
+        error: "400 - Error: Both password & confirm password should match.",
+      });
 
     let newUser = await createUser(
       firstName,
@@ -103,12 +99,10 @@ router.post("/signup", async (req, res) => {
 
     if (typeof err === "string")
       return err.startsWith("VError")
-        ? res
-            .status(400)
-            .render("users/signup", {
-              title: "Signup",
-              error: `400 - ${err.substr(1)}`,
-            })
+        ? res.status(400).render("users/signup", {
+            title: "Signup",
+            error: `400 - ${err.substr(1)}`,
+          })
         : res
             .status(400)
             .render("users/signup", { title: "Signup", error: `400 - ${err}` });
@@ -157,17 +151,15 @@ router
       ownedLibs = await Promise.all(
         user.ownedLibraries.map(async (lib) => await libraryData.get(lib))
       );
-      return res
-        .status(200)
-        .render("users/user-profile", {
-          favLibs: favLibs,
-          ownedLibs: ownedLibs,
-          searchedUser: user,
-          isLoggedIn: true,
-          title: "Profile",
-        });
+      return res.status(200).render("users/user-profile", {
+        favLibs: favLibs,
+        ownedLibs: ownedLibs,
+        searchedUser: user,
+        isLoggedIn: true,
+        title: "Profile",
+      });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return res
         .status(500)
         .render("error", { searchValue: "user", errorCode: "500" });

@@ -133,6 +133,12 @@ margin-right: 10px;
 	font-weight: bold;
 }
 
+.newLibrary .error {
+	color: red;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
 footer {
 	border-top: 1px dotted #4d4d4d;
 }
@@ -171,6 +177,14 @@ html {
 
 .mt-auto {
 	margin-top: auto;
+}
+
+.mb-10 {
+	margin-bottom: 10px;
+}
+
+.mt-10 {
+	margin-top: 10px;
 }
 
 .pl-25 {

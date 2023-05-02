@@ -23,8 +23,6 @@ if (newLibraryForm) {
     let lng = document.getElementById("lng");
     let image = document.getElementById("library-image");
     let fullnessVal = document.getElementById("fullness").value;
-    let type = document.getElementById("type").textContent;
-    console.log(fullnessVal);
     removeElementsByClass("error-list");
     errorList.innerHTML = "";
     errorList.hidden = true;
@@ -33,10 +31,12 @@ if (newLibraryForm) {
         min: 3,
         max: 40,
       });
+      document.getElementById("nameError").innerText = "";
     } catch (e) {
       if (typeof e === "string" && e.startsWith("VError")) {
         e = e.substr(1);
       }
+      document.getElementById("nameError").innerText = e;
       name.value = "";
       errorList.innerHTML += `<li> ${e} </li>`;
     }
@@ -45,7 +45,9 @@ if (newLibraryForm) {
       lat.value = Number(lat.value);
       if (lat.value === "0")
         throw `Error: latitude parameter should be selected using the map`;
+      document.getElementById("latError").innerText = "";
     } catch (e) {
+      document.getElementById("latError").innerText = e;
       lat.value = "";
       errorList.innerHTML += `<li> ${e} </li>`;
     }
@@ -54,36 +56,42 @@ if (newLibraryForm) {
       lng.value = Number(lng.value);
       if (lng.value === "0")
         throw `Error: longitude parameter should be selected using the map`;
+      document.getElementById("lngError").innerText = "";
     } catch (e) {
+      document.getElementById("lngError").innerText = e;
       lng.value = "";
       errorList.innerHTML += `<li> ${e} </li>`;
     }
     try {
-      if (type === "Create") {
+      if (type === "Create" || image.value !== "") {
         checkImageFileString(image.value, "Input Image");
       }
+      document.getElementById("imageError").innerText = "";
     } catch (e) {
+      document.getElementById("imageError").innerText = e;
       errorList.innerHTML += `<li> ${e} </li>`;
       image.value = null;
     }
     let genresForm, genres;
     try {
-      (function ($) {
-        genresForm = $("#genres input");
-      })(window.jQuery);
+      genresForm = $("#genres input");
       genres = genresForm.toArray();
       genres = genres.filter((input) => input.checked);
+      document.getElementById("genresError").innerText = "";
     } catch (e) {
       if (typeof e === "string" && e.startsWith("VError")) {
         e = e.substr(1);
       }
+      document.getElementById("genresError").innerText = e;
       errorList.innerHTML += `<li> ${e} </li>`;
     }
     try {
       if (!isNumber(Number(fullnessVal))) throw "You must select a fullness!";
       if (fullnessVal < 0 || fullnessVal > 5)
         throw "Improper Range on Fullness";
+      document.getElementById("fullnessError").innerText = "";
     } catch (e) {
+      document.getElementById("fullnessError").innerText = e;
       errorList.innerHTML += `<li> ${e} </li>`;
     }
     try {
@@ -91,8 +99,10 @@ if (newLibraryForm) {
         throw "You must select at least one genre if the library is non-empty!";
       if (genres.length > 0 && fullnessVal === 0)
         throw "You cannot select any genres if the library is empty!";
+      document.getElementById("genresError").innerText = "";
     } catch (e) {
       errorList.innerHTML += `<li> ${e} </li>`;
+      document.getElementById("genresError").innerText = "";
     }
     if (errorList.innerHTML !== "") {
       errorList.hidden = false;
