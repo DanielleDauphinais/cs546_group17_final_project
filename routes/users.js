@@ -122,6 +122,7 @@ router
         title: "Profile"
       })
     } catch (error) {
+      console.error(error);
       return res.status(500).render('error',
       { searchValue:"user", 
         errorCode:"500"
