@@ -97,24 +97,23 @@
 
         <div class="error" id="genresError">{{genresError}}</div>
 
-        <button type="submit">{{editOrCreate}} Library</button>
-        <button type="reset">Clear Form</button>
-      </form>
+      <button type="submit">Create New Library</button>
+      <button type="reset">Clear Form</button>
+    </form>
+    {{!-- front end js error --}}
+    <ul id="error" class="error" hidden></ul>
+    {{!-- backend js errors --}}
+    {{#if hasErrors}}
+    <ul class="error-list">
+      {{#each errors}}
+      <li>
+        {{this}}
+      </li>
+      {{/each}}
+    </ul>
+    {{/if}}
 
-      {{!-- front end js error --}}
-      <ul id="error" class="error" hidden></ul>
-      {{!-- backend js errors --}}
-      {{#if hasErrors}}
-      <ul class="error-list">
-        {{#each errors}}
-        <li>
-          {{this}}
-        </li>
-        {{/each}}
-      </ul>
-      {{/if}}
-  </div>
-
+</div>
   <div id="rightSide">
     <iframe src="/selectLocation" frameborder="0" class="gmaps"></iframe>
   </div>

@@ -53,6 +53,8 @@ const createNewLibrary = async (
         nameError: e.substr(1),
         hasErrors: true,
         library: newLibraryData,
+        formAction: "/libraries/new",
+        formMethod: "POST",
       });
     }
 
@@ -105,6 +107,8 @@ const editLibrary = async (
         nameError: e.substr(1),
         hasErrors: true,
         library: editedLibraryData,
+        formAction: "/libraries/edit",
+        formMethod: "POST",
       });
     }
 
@@ -158,7 +162,7 @@ const handleValidationErrors = (
     if (action === "Create") {
       return "new";
     } else {
-      return "edit";
+      return req.params.id + "/edit";
     }
   };
   let title = (action) => {
@@ -183,7 +187,7 @@ const handleValidationErrors = (
   /** We don't have to let the user know if any error has occured while deleting the image */
   if (req.file) fs.unlink(req.file.path, () => {});
 
-  return res.status(400).render(`/libraries/${formAction(action)}`, errorObj);
+  return res.status(400).render("libraries/new", errorObj);
 };
 
 async function routeValidationsForLibrary(newLibraryData, action, res, req) {
@@ -580,7 +584,7 @@ router
         title: "Editing a Library",
         editOrCreate: "Edit",
         user: req.session.user,
-        formAction: `/${id}/edit`,
+        formAction: `edit`,
         formMethod: "POST",
         libraryObject: JSON.stringify(library),
         name: library.name,
@@ -593,6 +597,7 @@ router
   .post(async (req, res) => {
     // Update the library with the form data
     const updatedLibraryData = req.body;
+    console.log(req.body);
 
     await routeValidationsForLibrary(updatedLibraryData, "Edit", res, req);
 

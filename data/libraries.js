@@ -97,23 +97,27 @@ let exportedMethods = {
    * @param {String} libraryID
    * @param {String} name
    * @param {[Number, Number]} coordinates
+   * @param {String} address
    * @param {String} image
+   * @param {String} ownerID
    * @param {Number} fullnessRating
    * @param {Array<String>} genres
-   * @returns {{id: String, name: String, coordinates: [Number, Number], image: String, ownerId: string,
-   *  fullnessRating: number, lastServayed: string, genres: Array<String>, favorites: Array, comments: Array}}
+   * @returns {Object}
    */
   async editLibrary(
     libraryId,
     name,
     coordinates,
+    address,
     image,
+    ownerID,
     fullnessRating,
     genres
   ) {
     /* Pretty much just use the validation code form Create */
     libraryId = validation.checkValidId(libraryId, "Library ID");
     name = validation.checkString(name, "Library Name");
+    ownerID = validation.checkValidId(ownerID, "Library Owner ID");
     fullnessRating = validation.isValidNumber(
       fullnessRating,
       "Fullness Rating"
@@ -128,11 +132,15 @@ let exportedMethods = {
       hour: "2-digit",
       minute: "2-digit",
     });
-    // TODO: ADD "path": "public/uploads/1681934019520.png", information
-    // TODO: ADD Stuff to check city using Google maps API using lat, lng,
+    try {
+      checkImageFileString(image, "Image input");
+    } catch (e) {
+      throw "V" + e;
+    }
     let editedLibrary = {
       name: name,
       coordinates: coordinates,
+      address: address,
       image: image,
       fullnessRating: fullnessRating,
       lastServayed: lastServayed,
@@ -140,6 +148,10 @@ let exportedMethods = {
     };
     /* Pretty much the same code from the FormUpdate */
     const librariesCollection = await libraries();
+    let library = await libraryCollection.findOne({ _id: new ObjectId(id) });
+    if (library === null) throw "Error: No library found with given ID.";
+    if (library.ownerID !== ownerID)
+      throw "Error: User is not the library's owner.";
     const updateInfo = await librariesCollection.findOneAndUpdate(
       { _id: new ObjectId(libraryId) },
       { $set: editedLibrary },
