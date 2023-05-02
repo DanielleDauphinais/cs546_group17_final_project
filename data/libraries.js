@@ -31,7 +31,7 @@ let exportedMethods = {
       minute: "2-digit",
     });
     try {
-      checkImageFileString(image)
+      checkImageFileString(image, "Image input")
     } catch (e) {
       throw "V"+e
     }
