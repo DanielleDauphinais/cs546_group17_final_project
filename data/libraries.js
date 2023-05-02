@@ -1,7 +1,7 @@
 import { libraries } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import validation from "../public/js/validators/validation.js";
-import {checkImageFileString} from "../public/js/validators/util.js";
+import { checkImageFileString } from "../public/js/validators/util.js";
 import userFunctions from "./users.js";
 
 let exportedMethods = {
@@ -12,14 +12,17 @@ let exportedMethods = {
     name,
     coordinates,
     address,
-    image, 
+    image,
     ownerID,
     fullnessRating,
     genres
   ) {
     name = validation.checkString(name, "Library Name");
     ownerID = validation.checkValidId(ownerID, "Library Owner ID");
-    fullnessRating = validation.isValidNumber(fullnessRating, "Fullness Rating");
+    fullnessRating = validation.isValidNumber(
+      fullnessRating,
+      "Fullness Rating"
+    );
     genres = validation.checkStringArray(genres, "Genres Available");
     const currentDate = new Date();
     const lastServayed = currentDate.toLocaleString(undefined, {
@@ -31,12 +34,12 @@ let exportedMethods = {
       minute: "2-digit",
     });
     try {
-      checkImageFileString(image, "Image input")
+      checkImageFileString(image, "Image input");
     } catch (e) {
-      throw "V"+e
+      throw "V" + e;
     }
     // TODO: Need to make it so can only have library with one name and one location
-    // TODO: Need to add function to update user with this library as something it owns 
+    // TODO: Need to add function to update user with this library as something it owns
     let newLibrary = {
       name: name,
       coordinates: coordinates,
@@ -50,7 +53,7 @@ let exportedMethods = {
       comments: [],
     };
     const librariesCollection = await libraries();
-    const lib = await librariesCollection.findOne({ name: name }); 
+    const lib = await librariesCollection.findOne({ name: name });
     if (lib !== null)
       throw "VError: There already exists a library with the given name";
     const insertInfo = await librariesCollection.insertOne(newLibrary);
@@ -83,10 +86,10 @@ let exportedMethods = {
   async getLibraryByName(name) {
     name = validation.checkString(name);
     const librariesCollection = await libraries();
-    const lib = await librariesCollection.findOne({name: name});
-    if (!lib) throw "VError: There is no libraries with the given name"
-    lib._id = lib._id.toString()
-    return lib
+    const lib = await librariesCollection.findOne({ name: name });
+    if (!lib) throw "VError: There is no libraries with the given name";
+    lib._id = lib._id.toString();
+    return lib;
   },
   /**
    * @name editLibrary
@@ -152,17 +155,20 @@ let exportedMethods = {
   async removeLibrary(libraryId, userId) {
     libraryId = validation.checkValidId(libraryId);
     userId = validation.checkValidId(userId);
-    const libary = getLibraryById(libraryId); // This is misspelt. Did you mean this?
-    if (userId === libary.ownerId) {
-      const librariesCollection = await libraries();
+    const librariesCollection = await libraries();
+    let library = await librariesCollection.findOne({
+      _id: new ObjectId(libraryId),
+    });
+    if (userId === library.ownerID) {
       const deletionInfo = await librariesCollection.findOneAndDelete({
-        _id: ObjectId(libraryId),
+        _id: new ObjectId(libraryId),
       });
       if (deletionInfo.lastErrorObject.n === 0)
-        throw `Error: Could not delete post with id of ${libraryId}`; // Not sure if you meant to keep the word post here
+        throw `Error: Could not delete library with id of ${libraryId}`;
+      await userFunctions.dropOwnedLibrary(userId, libraryId);
       return { ...deletionInfo.value, deleted: true };
     } else {
-      throw `Error: Could not delete post with id of ${libraryId}`;
+      throw `Error: Could not delete library with id of ${libraryId}`;
     }
   },
   async getAllComments(id) {
@@ -180,13 +186,13 @@ let exportedMethods = {
     commentId = validation.checkValidId(commentId, "Comment ID");
 
     const libraryCollection = await libraries();
-    
+
     let library = await libraryCollection.findOne(
-      {"comments._id": new ObjectId(commentId)},
-      {projection: {_id: 0, 'comments.$': 1}}
+      { "comments._id": new ObjectId(commentId) },
+      { projection: { _id: 0, "comments.$": 1 } }
     );
     if (library === null) throw "Error: No library found with given ID.";
-    
+
     let comment = library.comments[0];
     comment._id = comment._id.toString();
     return comment;
@@ -205,7 +211,7 @@ let exportedMethods = {
       userName: userName,
       dateCreated: new Date().toLocaleString(),
       text: text,
-      likes: []
+      likes: [],
     };
 
     const libraryCollection = await libraries();
@@ -213,7 +219,7 @@ let exportedMethods = {
       { _id: new ObjectId(libraryId) },
       { $push: { comments: newComment } }
     );
-    
+
     newComment._id = newComment._id.toString();
     return newComment;
   },
@@ -224,8 +230,9 @@ let exportedMethods = {
     text = validation.checkString(text, "Update Comment Body");
 
     const originalComment = await this.getComment(commentId);
-    
-    if (userId !== originalComment.userId) throw "Error: User does not have permission to edit this comment";
+
+    if (userId !== originalComment.userId)
+      throw "Error: User does not have permission to edit this comment";
 
     let updateComment = {
       _id: new ObjectId(originalComment._id),
@@ -233,17 +240,18 @@ let exportedMethods = {
       userName: originalComment.userName,
       dateCreated: new Date().toLocaleString(),
       text: text,
-      likes: originalComment.likes
-    }
+      likes: originalComment.likes,
+    };
 
     const libraryCollection = await libraries();
     const updateInfo = await libraryCollection.findOneAndUpdate(
-      {"comments._id": new ObjectId(commentId)},
-      {$set: {"comments.$": updateComment}},
-      {returnDocument: 'after'}
+      { "comments._id": new ObjectId(commentId) },
+      { $set: { "comments.$": updateComment } },
+      { returnDocument: "after" }
     );
 
-    if (updateInfo.lastErrorObject.n === 0) throw "Error: Comment update failed";
+    if (updateInfo.lastErrorObject.n === 0)
+      throw "Error: Comment update failed";
     let comment = updateInfo.value.comments[0];
     comment._id = comment._id.toString();
     return comment;
@@ -262,7 +270,7 @@ let exportedMethods = {
     const libraryCollection = await libraries();
     await libraryCollection.updateOne(
       { _id: new ObjectId(libraryId) },
-      { $pull: { comments: {_id: new ObjectId(originalComment._id)} } }
+      { $pull: { comments: { _id: new ObjectId(originalComment._id) } } }
     );
   },
   async likeComment(libraryId, userId, commentId) {
@@ -272,22 +280,28 @@ let exportedMethods = {
     commentId = validation.checkValidId(commentId, "Comment ID");
 
     const originalComment = await this.getComment(commentId);
-    if (userId === originalComment.userId) throw "Error: User does not have permission to like this comment.";
+    if (userId === originalComment.userId)
+      throw "Error: User does not have permission to like this comment.";
 
     const libraryCollection = await libraries();
     let updateInfo;
     if (originalComment.likes.includes(userId)) {
       updateInfo = await libraryCollection.findOneAndUpdate(
-        {_id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId)},
-        {$pull: {"comments.$.likes": userId}},
-        {returnDocument: 'after'}
+        {
+          _id: new ObjectId(libraryId),
+          "comments._id": new ObjectId(commentId),
+        },
+        { $pull: { "comments.$.likes": userId } },
+        { returnDocument: "after" }
       );
-    }
-    else {
+    } else {
       updateInfo = await libraryCollection.findOneAndUpdate(
-        {_id: new ObjectId(libraryId), "comments._id": new ObjectId(commentId)},
-        {$push: {"comments.$.likes": userId}},
-        {returnDocument: 'after'}
+        {
+          _id: new ObjectId(libraryId),
+          "comments._id": new ObjectId(commentId),
+        },
+        { $push: { "comments.$.likes": userId } },
+        { returnDocument: "after" }
       );
     }
 
