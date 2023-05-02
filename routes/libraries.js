@@ -57,15 +57,15 @@ router
       errors.push(e);
     }
     // Getting the address of the library
-    let city2 = ''
     let city = ''
+    let city2 = ''
     let address = ''
     try{
       // This axios request does reverse geocatching to get the address of the library
       let data = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${newLibraryData.lat},${newLibraryData.lng}&key=AIzaSyAPxSPvWssw3gI4W1qJaFk9xlBqBicI3iY`);
-      city = data.data.results[0].address_components[2].long_name
-      city2 =data.data.results[4].formatted_address
-      if(city!== "Hoboken" && city2 === "Hoboken, NJ, USA"){
+      city2 = data.data.results[5].address_components[0].long_name//data.data.results[0].address_components[2].long_name
+      city = data.data.results[7].address_components[0].long_name
+      if(city!== "Hoboken"  && city2 === "Hoboken" || city2 === "07030"){
         address = data.data.results[0].formatted_address
       }
       else{
@@ -73,14 +73,26 @@ router
       }
     }
     catch(e){
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          return res
+            .status(500)
+            .render("error", { errorCode: 500, title: "Error" });
+        }})
       return res.status(500).render('error', {errorNum: 500, title: "Error"})
     }
-    if(city !== "Hoboken" && city2 !== "Hoboken, NJ, USA" && city2 !== "Hoboken, NJ 07030, USA") {
+    if(city !== "Hoboken" && city2 !== "Hoboken" && city2 !== "07030") {
       newLibraryData.lat = ''
       newLibraryData.lng = ''
       errors.push("The location of the little free library must be in Hoboken");
     }
     if(address === ''){
+      fs.unlink(req.file.path, (err) => {
+        if (err) {
+          return res
+            .status(500)
+            .render("error", { errorCode: 500, title: "Error" });
+        }})
       return res.status(500).render('error', {errorNum: 500, title: "Error"})
     }
     try {
@@ -127,20 +139,12 @@ router
       }
 
     } catch (e) {
-      return res
-        .status(500)
-        .render("error", { errorCode: 500, title: "Error" });
+      errors.push(e)
     }
     try {
       checkImageFileString(req.file.path, "Image upload")
     } catch (e) {
       // This can be used to remove file from data
-      fs.unlink(req.file.path, (err) => {
-        if (err) {
-          return res
-            .status(500)
-            .render("error", { errorCode: 500, title: "Error" });
-        }})
       errors.push(e)
     }
 

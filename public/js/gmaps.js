@@ -7,7 +7,7 @@ const initMap = async () => {
         /** If there aren't any libraries in the database let's focus our map to Gateway Center */
         let mapPositioning = { zoom: 15, center: { lat: 40.744, lng: -74.0324 } };
 
-        if (tourStops.length > 0) mapPositioning = { zoom: 12, center: tourStops[0][0] };
+        if (tourStops.length > 0) mapPositioning = { zoom: 14, center: tourStops[0][0] };
         
         const map = new google.maps.Map(document.getElementById("map"), mapPositioning);
 

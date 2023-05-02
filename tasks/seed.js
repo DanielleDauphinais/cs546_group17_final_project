@@ -14,7 +14,7 @@ try {
 }
 
 allUsers = await userData.getAllUsers();
-console.log(allUsers)
+
 allUsers.forEach(x => {
   if (x.emailAddress === "ejinks2@stevens.edu"){
     user1Id = x._id;
@@ -22,7 +22,7 @@ allUsers.forEach(x => {
 });
 
 try {
-    lib1 = await libraryData.create("Evan's Library", [40.7440, 74.0324], "44 Clinton Street","tempimage", user1Id, 3, ['horror']);
+    lib1 = await libraryData.create("Evan's Library", [40.74158452735219, -74.04018872438458], "211 Jackson St, Hoboken, NJ, 07030","http://localhost:3000/public/images/211Jackson.jpeg", user1Id, 3, ['horror']);
 } catch (error) {
     console.log(error)
 }
@@ -32,21 +32,25 @@ try {
 } catch (error) {
     console.log(error)
 }
+try {
+    await userData.createUser("Danielle","Dauphinais","djdauph@icloud.com","123Love!","20","ddauph")
+} catch (error) {
+    console.log(error)
+}
 user2 = await userData.getUserByEmail("galapatt@stevens.edu")
 
 try {
-    await libraryData.create("Wash Street Library", [40.740652, -74.029897], "406 Washington Street","/public/uploads/1681934019520.png", user2._id, 3.5, ["Fiction","Historical Fiction"])   
+    await libraryData.create("George's library", [40.74242381352739, -74.03200659795047],"Church Square Park, Hoboken, NJ, 07030", "http://localhost:3000/public/images/5thandWillow.jpeg", user2._id, 2, ['mystery', 'horror'])   
 } catch (error) {
     console.log(error)
 }
 
 try {
-    lib2 = await libraryData.getLibraryByName("Wash Street Library")
+    lib2 = await libraryData.getLibraryByName("George's library")
 } catch (error) {
     console.log(error)
 }
 
-console.log(lib2)
 
 try {
     await userData.favoriteLibrary(user2._id,lib2._id) 
@@ -55,6 +59,5 @@ try {
 }
 
 user2 = await userData.getUserByEmail("galapatt@stevens.edu")
-console.log(user2)
 
 await closeConnection();

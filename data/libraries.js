@@ -1,6 +1,7 @@
 import { libraries } from "../config/mongoCollections.js";
 import { ObjectId } from "mongodb";
 import validation from "../public/js/validators/validation.js";
+import {checkImageFileString} from "../public/js/validators/util.js";
 import userFunctions from "./users.js";
 
 let exportedMethods = {
@@ -29,6 +30,11 @@ let exportedMethods = {
       hour: "2-digit",
       minute: "2-digit",
     });
+    try {
+      checkImageFileString(image, "Image input")
+    } catch (e) {
+      throw "V"+e
+    }
     // TODO: Need to make it so can only have library with one name and one location
     // TODO: Need to add function to update user with this library as something it owns 
     let newLibrary = {
@@ -44,7 +50,7 @@ let exportedMethods = {
       comments: [],
     };
     const librariesCollection = await libraries();
-    const lib = await librariesCollection.findOne({ name: name });
+    const lib = await librariesCollection.findOne({ name: name }); 
     if (lib !== null)
       throw "VError: There already exists a library with the given name";
     const insertInfo = await librariesCollection.insertOne(newLibrary);
