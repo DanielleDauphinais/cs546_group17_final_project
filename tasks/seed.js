@@ -5,7 +5,7 @@ let user1, user2, lib1, lib2;
 
 const db = await dbConnection();
 await db.dropDatabase();
-let allUsers, user1Id, user2Id;
+let allUsers, user1Id;
 
 try {
     user1 = await userData.createUser("Evan", "Jinks", "ejinks2@stevens.edu", "Hello123!", 21, "ejinks2");
@@ -15,7 +15,6 @@ try {
 
 allUsers = await userData.getAllUsers();
 console.log(allUsers)
-user1Id;
 allUsers.forEach(x => {
   if (x.emailAddress === "ejinks2@stevens.edu"){
     user1Id = x._id;
@@ -23,7 +22,7 @@ allUsers.forEach(x => {
 });
 
 try {
-    lib1 = await libraryData.create("Evan's Library", [40.7440, 74.0324], "tempimage", user1Id, 3, ['horror']);
+    lib1 = await libraryData.create("Evan's Library", [40.7440, 74.0324], "44 Clinton Street","tempimage", user1Id, 3, ['horror']);
 } catch (error) {
     console.log(error)
 }
@@ -36,7 +35,7 @@ try {
 user2 = await userData.getUserByEmail("galapatt@stevens.edu")
 
 try {
-    await libraryData.create("Wash Street Library", [40.740652, -74.029897], "/public/uploads/1681934019520.png", user2._id, 3.5, ["Fiction","Historical Fiction"])   
+    await libraryData.create("Wash Street Library", [40.740652, -74.029897], "406 Washington Street","/public/uploads/1681934019520.png", user2._id, 3.5, ["Fiction","Historical Fiction"])   
 } catch (error) {
     console.log(error)
 }
