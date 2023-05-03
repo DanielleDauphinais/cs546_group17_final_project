@@ -1,6 +1,6 @@
   <body>
     <h1>Update User Profile</h1>
-    <form action="/edit/{{updateUser._id}}" method="POST" class="update-form">
+    <form action="/users/edit/{{updateUser._id}}" method="POST" id="update-form">
       <label for="userNameInput">Username:</label>
       <input type="text" id="userNameInput" name="userNameInput" value="{{updateUser.userName}}" required>
       <br><br>
@@ -15,13 +15,19 @@
       <br><br>
       <label for="ageInput">Age:</label>
       <input type="number" id="ageInput" name="ageInput" min="0" max="120" value={{updateUser.age}} required>
-      <div class="confirm-changes"></div>
-      {{!-- <br>
-      <label for="password" style="display:none;">Enter Password to Confirm Changes:</label>
-      <input type="password" id="password" name="password" style="display:none;">
-      <br> --}}
+      <div class="confirm-changes">
+        <br>
+        <label for="passwordInput">Enter Password to Confirm Changes:</label>
+        <input type="password" id="passwordInput" name="passwordInput">
+      </div>
+      <br><br>
       <span id="error" class="error">{{{error}}}</span>
       <br><br>
       <input type="submit" value="Update Profile">
     </form>
+    <div class="confirm-changes">
+      <br>
+      <button id="cancel-changes">Cancel</button>
+    </div>
+    <script src="/public/js/login.js" type="module"></script>
   </body>

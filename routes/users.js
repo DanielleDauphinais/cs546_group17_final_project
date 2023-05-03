@@ -162,15 +162,42 @@ router
     if (req.session.user._id !== id){
       return res.status(403).render('error',{
         searchValue:"user", 
-        errorCode:"400"      
+        errorCode:"403"      
       })
     }
-    console.log(user)
     return res.status(200).render('users/edit-profile', {
       updateUser : user
     })
   })
   .post(async (req,res) => {
+    let id, user;
+    try {
+      id = validation.checkValidId(req.params.id,"user_id");
+      user = await userData.getUserById(id)
+      if (!req.body) throw "Error: No parameters inputted";
+      
+      let {
+        firstNameInput: firstName,
+        lastNameInput: lastName,
+        emailAddressInput: emailAddress,
+        passwordInput: password,
+        ageInput: age,
+        userNameInput: userName
+      } = req.body;
 
+      validationsForCreateUser(firstName.trim(), lastName.trim(), emailAddress.trim(), password, Number(age), userName);
+      await userData.update(id, firstName, lastName, emailAddress, password, age, userName)
+      return res.status(200).redirect(`/users/${id}`)
+
+    } catch (err) {
+      console.error(err);
+
+      if (typeof err === "string") 
+        return err.startsWith("VError") ? 
+          res.status(400).render('users/edit-profile', { updateUser: user, error: `400 - ${err.substr(1)}`}) : 
+          res.status(400).render('users/edit-profile', { updateUser: user, error: `400 - ${err}` });
+
+      return res.status(500).send("Internal Server Error");
+    }
   });
 export default router;
