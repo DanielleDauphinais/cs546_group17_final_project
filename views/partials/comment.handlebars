@@ -12,11 +12,12 @@
     {{/if}}
     {{#if (eq @root.userid userId)}}
         <div class="commentEdit">
-            <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/edit" method="POST">
+            <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/edit" class="edit-form" method="POST">
                 <label for="update_text_input">
                     <textarea name="update_text_input" id="update_text_input" placeholder="Input text here to edit comment above"></textarea>
                 </label>
                 <button type="submit">Edit</button>
+                <div class="error">{{error}}</div>
             </form>
             <div id="commentEditError-{{_id}}" hidden></div>
         </div>
