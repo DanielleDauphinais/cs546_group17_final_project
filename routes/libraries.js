@@ -2,7 +2,7 @@ import { Router } from "express";
 const router = Router();
 import { libraryData, userData } from "../data/index.js";
 import validation from "../public/js/validators/validation.js";
-import {checkImageFileString} from "../public/js/validators/util.js";
+import {checkImageFileString, validationsForStrings} from "../public/js/validators/util.js";
 import axios from 'axios';
 import xss from 'xss';
 import fs from "fs";
@@ -99,6 +99,7 @@ async function routeValidationsForLibrary(newLibraryData, res, req) {
 
   try {
     newLibraryData.name = validation.checkString(newLibraryData.name, "Library name");
+    validationsForStrings("Library Name", newLibraryData.name, false, {min: 3, max:40});
   } catch (e) {
     return handleValidationErrors(res, req, "Create", "nameError", e, newLibraryData);
   }

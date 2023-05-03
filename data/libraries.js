@@ -17,20 +17,21 @@ let exportedMethods = {
     fullnessRating,
     genres
   ) {
-    name = validation.checkString(name, "Library Name");
-    ownerID = validation.checkValidId(ownerID, "Library Owner ID");
-    fullnessRating = validation.isValidNumber(fullnessRating, "Fullness Rating");
-    genres = validation.checkStringArray(genres, "Genres Available");
-    const currentDate = new Date();
-    const lastServayed = currentDate.toLocaleString(undefined, {
-      // should be in form "7/22/2016, 04:21 AM"
-      day: "numeric",
-      month: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
     try {
+      // All these tests should result in rerendering the page so if there is an error it should start with a V
+      name = validation.checkString(name, "Library Name");
+      ownerID = validation.checkValidId(ownerID, "Library Owner ID");
+      fullnessRating = validation.isValidNumber(fullnessRating, "Fullness Rating");
+      genres = validation.checkStringArray(genres, "Genres Available");
+      const currentDate = new Date();
+      const lastServayed = currentDate.toLocaleString(undefined, {
+        // should be in form "7/22/2016, 04:21 AM"
+        day: "numeric",
+        month: "numeric",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
       checkImageFileString(image, "Image input")
     } catch (e) {
       throw "V"+e
@@ -50,9 +51,9 @@ let exportedMethods = {
       comments: [],
     };
     const librariesCollection = await libraries();
-    const lib = await librariesCollection.findOne({ name: name }); 
+    const lib = await librariesCollection.findOne({ address: address }); 
     if (lib !== null)
-      throw "VError: There already exists a library with the given name";
+      throw "VError: There already exists a library at the given address.";
     const insertInfo = await librariesCollection.insertOne(newLibrary);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
       throw "Error: Could not add Library";
