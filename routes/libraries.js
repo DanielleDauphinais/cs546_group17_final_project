@@ -209,7 +209,7 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
   let errors = [];
   try {
     newLibraryData.name = validation.checkString(
-      newLibraryData.name,
+      xss(newLibraryData.name),
       "Library name"
     );
   } catch (e) {
@@ -224,7 +224,7 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
   }
 
   try {
-    newLibraryData.lat = Number(newLibraryData.lat);
+    newLibraryData.lat = Number(xss(newLibraryData.lat));
     newLibraryData.lat = validation.isValidNumber(
       newLibraryData.lat,
       "Librarys Latitude"
@@ -234,7 +234,7 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
   }
 
   try {
-    newLibraryData.lng = Number(newLibraryData.lng);
+    newLibraryData.lng = Number(xss(newLibraryData.lng));
     newLibraryData.lng = validation.isValidNumber(
       newLibraryData.lng,
       "Librarys Longitude"
