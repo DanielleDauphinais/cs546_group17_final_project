@@ -107,14 +107,14 @@ async function routeValidationsForLibrary(newLibraryData, res, req) {
     newLibraryData.lat = Number(newLibraryData.lat);
     newLibraryData.lat = validation.isValidNumber(newLibraryData.lat, "Librarys Latitude");
   } catch (error) {
-    return handleValidationErrors(res, req, "Create", "latError", e, newLibraryData);
+    return handleValidationErrors(res, req, "Create", "latError", error, newLibraryData);
   }
 
   try {
     newLibraryData.lng = Number(newLibraryData.lng);
     newLibraryData.lng = validation.isValidNumber(newLibraryData.lng, "Librarys Longitude");
   } catch (error) {
-    return handleValidationErrors(res, req, "Create", "lngError", e, newLibraryData);
+    return handleValidationErrors(res, req, "Create", "lngError", error, newLibraryData);
   }
 
   /** Something went wrong saving the image */
