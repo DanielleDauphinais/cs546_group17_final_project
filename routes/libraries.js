@@ -216,14 +216,7 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
       "Librarys Latitude"
     );
   } catch (error) {
-    return handleValidationErrors(
-      res,
-      req,
-      action,
-      "latError",
-      e,
-      newLibraryData
-    );
+    return handleValidationErrors(res, req, "Create", "latError", error, newLibraryData);
   }
 
   try {
@@ -233,14 +226,7 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
       "Librarys Longitude"
     );
   } catch (error) {
-    return handleValidationErrors(
-      res,
-      req,
-      action,
-      "lngError",
-      e,
-      newLibraryData
-    );
+    return handleValidationErrors(res, req, "Create", "lngError", error, newLibraryData);
   }
 
   /** Something went wrong saving the image */
@@ -850,7 +836,15 @@ router.route("/:id/comments").post(async (req, res) => {
       .render("error", { errorCode: "404", searchValue: "Library" });
   }
 
-  let text;
+    try {
+      let user = req.session.user;
+      let createComment = await libraryData.createComment(id, user._id, user.userName, text);
+      res.render('partials/comment', {layout: null, library, libraryid: library._id, userid: user._id, userId: user._id, ...createComment});
+    } catch (e) {
+      console.log(e);
+      res.status(500).render('error', {errorCode: "500", title: "Error Page"});
+    }
+  });
 
   try {
     text = req.body.text;

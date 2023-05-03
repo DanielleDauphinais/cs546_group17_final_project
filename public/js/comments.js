@@ -18,13 +18,15 @@ import {validationsForStrings} from './validators/util.js';
     try {
       text = textArea.val();
       validationsForStrings("Comment body", text);
-      $(error).attr("hidden", true);
+      error.text("");
     } catch (e) {
-      $(error).attr("hidden", false);
-      $(error).attr("innerHTML", e); // Not sure why this isn't rendering???
+      event.preventDefault();
+      console.log(e);
+      error.text(e);
+      return;
     }
 
-    if (text) {
+    
       let requestConfig = {
         method: 'POST',
         url: `/libraries/${libraryId}/comments`,
@@ -40,6 +42,22 @@ import {validationsForStrings} from './validators/util.js';
         textArea.val('');
         commentSection.focus();
       });
-    }
   });
 })(window.jQuery);
+
+
+
+let comment = document.getElementById("comments");
+let comments = comment.childNodes;
+
+for (let i = 1; i < comments.length; i+=2){
+  
+}
+
+function editComment(event) {
+  try {
+    validationsForStrings("Comment body", text);
+  } catch (e) {
+    event.preventDefault();
+  }
+} 
