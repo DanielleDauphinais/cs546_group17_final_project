@@ -523,8 +523,9 @@ router.route('/:id/comments')
     try {
       let user = req.session.user;
       let createComment = await libraryData.createComment(id, user._id, user.userName, text);
-      res.render('partials/comment', {layout: null, library, libraryid:library._id, userid: user._id, userId: user._id, ...createComment});
+      res.render('partials/comment', {layout: null, library, libraryid: library._id, userid: user._id, userId: user._id, ...createComment});
     } catch (e) {
+      console.log(e);
       res.status(500).render('error', {errorCode: "500", title: "Error Page"});
     }
   });
