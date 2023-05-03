@@ -169,6 +169,7 @@ let exportedMethods = {
 
   /**
    * This function will update a user's profile with the given information.
+   * @param {string} id
    * @param {string} firstName 
    * @param {string} lastName 
    * @param {string} emailAddress 
