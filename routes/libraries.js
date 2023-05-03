@@ -584,7 +584,7 @@ router
         title: "Editing a Library",
         editOrCreate: "Edit",
         user: req.session.user,
-        formAction: `edit`,
+        formAction: `/libraries/${id}/edit`,
         formMethod: "POST",
         libraryObject: JSON.stringify(library),
         name: library.name,
