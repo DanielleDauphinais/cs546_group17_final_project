@@ -20,9 +20,16 @@
         <button type="submit">Rate Fullness / Add Genres</button>
     </form>
     <div id="favorites">
+        <p>Count of users who follow {{name}}</p>
+        {{#if (ne ownerID userid)}}
+        <p>Click here to add {{name}} to your favorites (or unfavorite)!</p>
         <form action="/libraries/{{_id}}" method="POST">
             <button type="submit">{{numFavorites}}</button>
         </form>
+        {{/if}}
+        {{#if (eq ownerID userid)}}
+        <button>{{numFavorites}}</button>
+        {{/if}}
     </div>
     <br>
     <div id="commentSectionLibs">

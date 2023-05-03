@@ -309,7 +309,6 @@ router
     } catch (e) {
       return res.status(404).render('error', {errorCode: "404", searchValue: "Library"});
     }
-
     try {
       let favorite = await userData.favoriteLibrary(user._id, library._id);
       res.redirect(`/libraries/${library._id}`);
