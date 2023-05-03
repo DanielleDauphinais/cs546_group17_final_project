@@ -58,7 +58,6 @@ const createNewLibrary = async (
       });
     }
 
-    console.error(e);
     return res.status(500).render("error", {
       errorCode: 500,
       title: "error",
@@ -68,6 +67,7 @@ const createNewLibrary = async (
 };
 
 const editLibrary = async (
+  id,
   editedLibraryData,
   address,
   req,
@@ -83,13 +83,30 @@ const editLibrary = async (
 
     if (!process.env.DOMAIN)
       return res.status(500).render("error", { errorCode: 500 });
+    
 
+    let image;
+    if (!req.file){
+      let library;
+      try {
+        library = await libraryData.get(id);
+      } catch (e) {
+        return res
+          .status(404)
+          .render("error", { errorCode: "404", searchValue: "Library" });
+      }
+      image = library.image
+    }
+    else{
+      image = process.env.DOMAIN + req.file.path;
+    }
+    // If the library is not found, render the error page with a status code of 404
     const editedLibrary = await libraryData.editLibrary(
       id,
       name,
       [lat, lng],
       address,
-      process.env.DOMAIN + req.file.path,
+      image,
       req.session.user._id,
       fullness,
       genresInput
@@ -112,7 +129,6 @@ const editLibrary = async (
       });
     }
 
-    console.error(e);
     return res.status(500).render("error", {
       errorCode: 500,
       title: "error",
@@ -186,13 +202,11 @@ const handleValidationErrors = (
 
   /** We don't have to let the user know if any error has occured while deleting the image */
   if (req.file) fs.unlink(req.file.path, () => {});
-
   return res.status(400).render("libraries/new", errorObj);
 };
 
 async function routeValidationsForLibrary(newLibraryData, action, res, req) {
   let errors = [];
-
   try {
     newLibraryData.name = validation.checkString(
       newLibraryData.name,
@@ -230,7 +244,7 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
   }
 
   /** Something went wrong saving the image */
-  if (!req.file)
+  if (action === "Create" && !req.file)
     return handleValidationErrors(
       res,
       req,
@@ -260,7 +274,6 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
 
     if (req.file) fs.unlink(req.file.path, () => {});
 
-    console.error(e);
     return res.status(500).render("error", { errorNum: 500, title: "Error" });
   }
 
@@ -288,7 +301,6 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
   if (address === "") {
     if (req.file) fs.unlink(req.file.path, () => {});
 
-    console.error(e);
     return res.status(500).render("error", { errorNum: 500, title: "Error" });
   }
 
@@ -370,7 +382,8 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
   }
 
   try {
-    checkImageFileString(req.file.path, "Image upload");
+    if (action === "Create"  || req.file)
+      checkImageFileString(req.file.path, "Image upload");
   } catch (e) {
     /** This can be used to remove file from data */
     errors.push(e);
@@ -520,7 +533,6 @@ router
       let favorite = await userData.favoriteLibrary(user._id, library._id);
       res.redirect(`/libraries/${library._id}`);
     } catch (e) {
-      console.log(e);
       res.status(500).render("error", { errorCode: "500" });
     }
   });
@@ -583,16 +595,25 @@ router
   .post(upload.single("image"), async (req, res) => {
     // Update the library with the form data
     const updatedLibraryData = req.body;
-    console.log(req.body);
 
     await routeValidationsForLibrary(updatedLibraryData, "Edit", res, req);
 
+    let id;
+    try {
+      id = req.params.id;
+      id = validation.checkValidId(id);
+    } catch (e) {
+      return res
+        .status(400)
+        .render("error", { errorCode: "400", searchValue: "Library ID" });
+    }
     /**
      * By default the status code is 200 and we don't send any 200 in the above function
      * this will prevent resending the headers.
      */
     if (res.statusCode === 200)
       await editLibrary(
+        id,
         updatedLibraryData,
         updatedLibraryData.address,
         req,
@@ -642,9 +663,8 @@ router.route("/:id/delete").post(async (req, res) => {
   }
 
   try {
-    libraryData.removeLibrary(id, req.session.user._id);
+    await libraryData.removeLibrary(id, req.session.user._id);
   } catch (e) {
-    console.log(e);
     return res.status(500).render("error", { errorCode: "404" });
   }
 
@@ -811,70 +831,45 @@ router
     }
   });
 
-router.route("/:id/comments").post(async (req, res) => {
-  // Creates a new comment
-  let id;
+  router.route('/:id/comments')
+  .post(async (req, res) => {
+    // Creates a new comment
+    let id;
+    
+    // If the library ID is not valid, render the error page with a status code of 400
+    try {
+      id = req.params.id;
+      id = validation.checkValidId(id);
+    } catch (e) {
+      res.status(400).render('error', {errorCode: "400", searchValue: "Library ID"});
+    }
 
-  // If the library ID is not valid, render the error page with a status code of 400
-  try {
-    id = req.params.id;
-    id = validation.checkValidId(id);
-  } catch (e) {
-    res
-      .status(400)
-      .render("error", { errorCode: "400", searchValue: "Library ID" });
-  }
+    let library;
 
-  let library;
+    // If the library is not found, render the error page with a status code of 404
+    try {
+      library = await libraryData.get(id);
+    } catch (e) {
+      return res.status(404).render('error', {errorCode: "404", searchValue: "Library"});
+    }
 
-  // If the library is not found, render the error page with a status code of 404
-  try {
-    library = await libraryData.get(id);
-  } catch (e) {
-    return res
-      .status(404)
-      .render("error", { errorCode: "404", searchValue: "Library" });
-  }
+    let text;
+    
+    try {
+      text = req.body.text;
+      text = validation.checkString(text, "Comment Body");
+    } catch (e) {
+      return res.status(400).render('error', {errorCode: "400", searchValue: "Comment Body"});
+    }
 
     try {
       let user = req.session.user;
       let createComment = await libraryData.createComment(id, user._id, user.userName, text);
       res.render('partials/comment', {layout: null, library, libraryid: library._id, userid: user._id, userId: user._id, ...createComment});
     } catch (e) {
-      console.log(e);
       res.status(500).render('error', {errorCode: "500", title: "Error Page"});
     }
   });
-
-  try {
-    text = req.body.text;
-    text = validation.checkString(text, "Comment Body");
-  } catch (e) {
-    return res
-      .status(400)
-      .render("error", { errorCode: "400", searchValue: "Comment Body" });
-  }
-
-  try {
-    let user = req.session.user;
-    let createComment = await libraryData.createComment(
-      id,
-      user._id,
-      user.userName,
-      text
-    );
-    res.render("partials/comment", {
-      layout: null,
-      library,
-      libraryid: library._id,
-      userid: user._id,
-      userId: user._id,
-      ...createComment,
-    });
-  } catch (e) {
-    res.status(500).render("error", { errorCode: "500", title: "Error Page" });
-  }
-});
 
 router.route("/:id/comments/:commentid").post(async (req, res) => {
   // Allows a user to like a comment

@@ -148,7 +148,7 @@ let exportedMethods = {
     };
     /* Pretty much the same code from the FormUpdate */
     const librariesCollection = await libraries();
-    let library = await libraryCollection.findOne({ _id: new ObjectId(id) });
+    let library = await librariesCollection.findOne({ _id: new ObjectId(libraryId) });
     if (library === null) throw "Error: No library found with given ID.";
     if (library.ownerID !== ownerID)
       throw "Error: User is not the library's owner.";
