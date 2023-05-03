@@ -57,7 +57,7 @@ app.use(express.urlencoded({ extended: true }));
 app.engine('handlebars', exphbs.engine({defaultLayout: 'main', partialsDir: ['views/partials/']}));
 app.set('view engine', 'handlebars');
 
-var hbs = exphbs.create({});
+let hbs = exphbs.create({});
 
 // register new function
 hbs.handlebars.registerHelper({

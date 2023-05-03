@@ -1,57 +1,63 @@
-import {dbConnection, closeConnection} from '../config/mongoConnection.js';
-import users from '../data/users.js';
-import libraries from '../data/libraries.js';
+import {userData,libraryData} from "../data/index.js"
+import {dbConnection, closeConnection} from '../config/mongoConnection.js'
+
+let user1, user2, lib1, lib2;
 
 const db = await dbConnection();
 await db.dropDatabase();
-let allUsers, user1Id, user2Id;
+let allUsers, user1Id;
 
 try {
-  let user1 = await users.createUser("Evan", "Jinks", "ejinks2@stevens.edu", "Hello123!", 21, "ejinks2");
-
-  allUsers = await users.getAllUsers();
-  allUsers.forEach(x => {
-    if (x.emailAddress === "ejinks2@stevens.edu"){
-      user1Id = x._id.toString();
-    }
-  });
-} catch (e) {
-  console.log(e);
+    user1 = await userData.createUser("Evan", "Jinks", "ejinks2@stevens.edu", "Hello123!", 21, "ejinks2");
+} catch (error) {
+    console.log(error)
 }
-/**
- * name,
-    coordinates,
-    address,
-    image, 
-    ownerID,
-    fullnessRating,
-    genres
- */
-try { // 211 Jackson Street HLFL
-  let library1 = await libraries.create("Evan's Library", [40.74158452735219, -74.04018872438458], "211 Jackson St, Hoboken, NJ, 07030","http://localhost:3000/public/images/211Jackson.jpeg", user1Id, 3, ['horror']);
-} catch (e) {
-  console.log(e)
+
+allUsers = await userData.getAllUsers();
+
+allUsers.forEach(x => {
+  if (x.emailAddress === "ejinks2@stevens.edu"){
+    user1Id = x._id;
+  }
+});
+
+try {
+    lib1 = await libraryData.create("Evan's Library", [40.74158452735219, -74.04018872438458], "211 Jackson St, Hoboken, NJ, 07030","http://localhost:3000/public/images/211Jackson.jpeg", user1Id, 3, ['horror']);
+} catch (error) {
+    console.log(error)
 }
 
 try {
-  let user2 = await users.createUser("Daniel", "Smith", "dsmith@stevens.edu", "Test123!!", 30, "dsmith");
+    await userData.createUser("George","Alapatt","galapatt@stevens.edu","5@4Mx7Eb&z","21","galapatt")
+} catch (error) {
+    console.log(error)
+}
+try {
+    await userData.createUser("Danielle","Dauphinais","djdauph@icloud.com","123Love!","20","ddauph")
+} catch (error) {
+    console.log(error)
+}
+user2 = await userData.getUserByEmail("galapatt@stevens.edu")
 
-  allUsers = await users.getAllUsers();
-  allUsers.forEach(x => {
-    if (x.emailAddress === "dsmith@stevens.edu"){
-      user2Id = x._id.toString();
-    }
-  });
-} catch (e) {
-  console.log(e)
+try {
+    await libraryData.create("George's library", [40.74242381352739, -74.03200659795047],"Church Square Park, Hoboken, NJ, 07030", "http://localhost:3000/public/images/5thandWillow.jpeg", user2._id, 2, ['mystery', 'horror'])   
+} catch (error) {
+    console.log(error)
 }
 
-try { // Church Square park
-  let library2 = await libraries.create("Daniel's library", [40.74242381352739, -74.03200659795047],"Church Square Park, Hoboken, NJ, 07030", "http://localhost:3000/public/images/5thandWillow.jpeg", user2Id, 2, ['mystery', 'horror']);
-} catch (e) {
-  console.log(e)
+try {
+    lib2 = await libraryData.getLibraryByName("George's library")
+} catch (error) {
+    console.log(error)
 }
 
-console.log("Done seeding the database")
+
+try {
+    await userData.favoriteLibrary(user2._id,lib2._id) 
+} catch (error) {
+    console.log(error)
+}
+
+user2 = await userData.getUserByEmail("galapatt@stevens.edu")
 
 await closeConnection();

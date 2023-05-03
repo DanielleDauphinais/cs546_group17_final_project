@@ -3,7 +3,6 @@ const router = Router();
 import { libraryData, userData } from "../data/index.js";
 import validation from "../public/js/validators/validation.js";
 import {checkImageFileString} from "../public/js/validators/util.js";
-import multer from "multer";
 import axios from 'axios';
 import xss from 'xss';
 import fs from "fs";
@@ -18,184 +17,223 @@ router.route("/").get(async (req, res) => {
   }
 });
 
+const createNewLibrary = async (newLibraryData, address, req, genresInput, res, errors) => {
+  try {
+    const { name, lat, lng, fullness } = newLibraryData;
+
+    if (!process.env.DOMAIN) return res.status(500).render("error", { errorCode: 500 });
+
+    const newLibrary = await libraryData.create(
+      name,
+      [lat, lng],
+      address,
+      process.env.DOMAIN + req.file.path,
+      req.session.user._id,
+      fullness,
+      genresInput
+    );
+
+    return res.redirect(`/libraries/${newLibrary._id}`);
+  } catch (e) {
+    if ((typeof e === "string") && e.startsWith("VError")) {
+      errors.push(e.substr(1));
+
+      return res.status(400).render(
+        "libraries/new",
+        {
+          title: "Creating a Library",
+          user: req.session.user,
+          editOrCreate: "Create",
+          nameError: e.substr(1),
+          hasErrors: true,
+          library: newLibraryData
+        }
+      );
+    }
+
+    console.error(e);
+    return res.status(500).render("error", { errorCode: 500, title: "error", id: req.session.user._id });
+  }
+}
+
+const reverseGeoCodeCoordinates = async (newLibraryData) => {
+  let city = '';
+  let city2 = '';
+  let address = '';
+
+  /** This axios request does reverse geocatching to get the address of the library */
+  let data = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${newLibraryData.lat},${newLibraryData.lng}&key=AIzaSyAPxSPvWssw3gI4W1qJaFk9xlBqBicI3iY`);
+
+  if (!data.data.results || (data.data.results.length === 0) || (data.data.status === "ZERO_RESULTS")) throw "Error: Location not found for these co-ordinates";
+
+  city2 = data.data.results[5].address_components[0].long_name;
+  city = data.data.results[7].address_components[0].long_name;
+
+  if (city !== "Hoboken" && city2 === "Hoboken" || city2 === "07030") {
+    address = data.data.results[0].formatted_address;
+  } else {
+    address = data.data.results[1].formatted_address;
+  }
+
+  return { city, city2, address };
+}
+
+const handleValidationErrors = (res, req, action, errorField, error, newLibraryData) => {
+  let errorObj = {
+    title: "Creating a Library",
+    user: req.session.user,
+    editOrCreate: action,
+    hasErrors: true,
+    library: newLibraryData
+  };
+  errorObj[errorField] = error;
+
+  /** We don't have to let the user know if any error has occured while deleting the image */
+  if (req.file) fs.unlink(req.file.path, () => { });
+
+  return res.status(400).render("libraries/new", errorObj);
+}
+
+async function routeValidationsForLibrary(newLibraryData, res, req) {
+  let errors = [];
+
+  try {
+    newLibraryData.name = validation.checkString(newLibraryData.name, "Library name");
+  } catch (e) {
+    return handleValidationErrors(res, req, "Create", "nameError", e, newLibraryData);
+  }
+
+  try {
+    newLibraryData.lat = Number(newLibraryData.lat);
+    newLibraryData.lat = validation.isValidNumber(newLibraryData.lat, "Librarys Latitude");
+  } catch (error) {
+    return handleValidationErrors(res, req, "Create", "latError", e, newLibraryData);
+  }
+
+  try {
+    newLibraryData.lng = Number(newLibraryData.lng);
+    newLibraryData.lng = validation.isValidNumber(newLibraryData.lng, "Librarys Longitude");
+  } catch (error) {
+    return handleValidationErrors(res, req, "Create", "lngError", e, newLibraryData);
+  }
+
+  /** Something went wrong saving the image */
+  if (!req.file) return handleValidationErrors(res, req, "Create", "imageError", "Image is of invalid type or no image has been selected", newLibraryData);
+
+  let addressObj = {};
+
+  try {
+    addressObj = await reverseGeoCodeCoordinates(newLibraryData);
+  } catch (e) {
+    if (
+      (typeof e === "string") &&
+      (e === "Error: Location not found for these co-ordinates")
+    ) return handleValidationErrors(res, req, "Create", "latError", e, newLibraryData);
+
+    if (req.file) fs.unlink(req.file.path, () => { });
+
+    console.error(e);
+    return res.status(500).render('error', { errorNum: 500, title: "Error" });
+  }
+
+  let { city, city2, address } = addressObj;
+
+  if (
+    (city !== "Hoboken" && city2 !== "Hoboken" && city2 !== "07030") ||
+    !address.includes("Hoboken") ||
+    !address.toLowerCase().includes("hoboken")
+  ) {
+    newLibraryData.lat = ''
+    newLibraryData.lng = ''
+    errors.push("The location of the little free library must be in Hoboken");
+
+    return handleValidationErrors(res, req, "Create", "latError", "The location of the little free library must be in Hoboken", newLibraryData);
+  }
+
+  if (address === '') {
+    if (req.file) fs.unlink(req.file.path, () => { });
+
+    console.error(e);
+    return res.status(500).render('error', { errorNum: 500, title: "Error" });
+  }
+
+  try {
+    req.session.user._id = validation.checkValidId(req.session.user._id, "Library Owner ID");
+  } catch (e) {
+    return handleValidationErrors(res, req, "Create", "userError", e, newLibraryData);
+  }
+
+  /** Grab all the inputs from the request body. */
+  let genresInput = [
+    newLibraryData.pictureBooks,
+    newLibraryData.youngAdultFiction,
+    newLibraryData.fantasyFiction,
+    newLibraryData.fairyTale,
+    newLibraryData.boardBook,
+    newLibraryData.nonFiction,
+    newLibraryData.mystery,
+    newLibraryData.graphicNovel,
+    newLibraryData.chapterBooks,
+  ];
+
+  /** For every value, if it does not exist, then the checkbox was not selected. */
+  genresInput = genresInput.filter((genre) => {
+    return typeof genre === "string";
+  });
+
+  try {
+    newLibraryData.fullness = validation.isValidNumber(parseInt(newLibraryData.fullness), "Fullness Rating");
+
+    if (0 > newLibraryData.fullness || newLibraryData.fullness > 5) {
+      errors.push("Fullness rating must be between 0-5");
+      return handleValidationErrors(res, req, "Create", "fullnessError", "Fullness rating must be between 0-5.", newLibraryData);
+    }
+
+    genresInput = validation.checkStringArray(genresInput, "Genres Available");
+
+    if (genresInput.length === 0 && newLibraryData.fullness !== 0) {
+      errors.push("Must specify at least one genre for a non-empty library.");
+      return handleValidationErrors(res, req, "Create", "genresError", "Must specify at least one genre for a non-empty library.", newLibraryData);
+    }
+  } catch (e) {
+    errors.push(e);
+    return handleValidationErrors(res, req, "Create", "fullnessError", e, newLibraryData);
+  }
+
+  try {
+    checkImageFileString(req.file.path, "Image upload");
+  } catch (e) {
+    /** This can be used to remove file from data */
+    errors.push(e);
+    return handleValidationErrors(res, req, "Create", "imageError", e, newLibraryData);
+  }
+
+  /** If there are errors found on the routes rerender the pages with errors! */
+  if (errors.length > 0) {
+    fs.unlink(req.file.path, () => { });
+    return handleValidationErrors(res, req, "Create", "errors", errors, newLibraryData);
+  }
+
+  newLibraryData.address = address;
+  newLibraryData.genresInput = genresInput;
+  newLibraryData.errors = errors;
+}
+
 router
   .route("/new")
   .get(async (req, res) => {
-      res.render("libraries/new", { title: "Creating a Library", editOrCreate: "Create", user: req.session.user});
+    res.render("libraries/new", { title: "Creating a Library", editOrCreate: "Create", user: req.session.user });
   })
-  .post(upload.single('image'), 
-    async (req, res) => { 
-    if(!req.file){ // Something went wrong saving the image
-      return res.status(500).render('error', { title: "Error", errorCode:500 });
-    }
+  .post(upload.single('image'), async (req, res) => {
     const newLibraryData = req.body;
-    let errors = [];
-    try {
-      newLibraryData.name = validation.checkString(
-        newLibraryData.name,
-        "Library name"
-      ); 
-    } catch (e) {
-      errors.push(e);
-    }
-    try {
-      newLibraryData.lat = Number(newLibraryData.lat);
-      newLibraryData.lat = validation.isValidNumber(
-        newLibraryData.lat,
-        "Librarys Latitude"
-      );
-    } catch (error) {
-      errors.push(e);
-    }
-    try {
-      newLibraryData.lng = Number(newLibraryData.lng);
-      newLibraryData.lng = validation.isValidNumber(
-        newLibraryData.lng,
-        "Librarys Longitude"
-      );
-    } catch (error) {
-      errors.push(e);
-    }
-    // Getting the address of the library
-    let city2 = ''
-    let city = ''
-    let address = ''
-    try{
-      // This axios request does reverse geocatching to get the address of the library
-      let data = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${newLibraryData.lat},${newLibraryData.lng}&key=AIzaSyAPxSPvWssw3gI4W1qJaFk9xlBqBicI3iY`);
-      city = data.data.results[0].address_components[2].long_name
-      city2 =data.data.results[4].formatted_address
-      if(city!== "Hoboken" && city2 === "Hoboken, NJ, USA"){
-        address = data.data.results[0].formatted_address
-      }
-      else{
-        address = data.data.results[1].formatted_address
-      }
-    }
-    catch(e){
-      return res.status(500).render('error', {errorNum: 500, title: "Error"})
-    }
-    if(city !== "Hoboken" && city2 !== "Hoboken, NJ, USA" && city2 !== "Hoboken, NJ 07030, USA") {
-      newLibraryData.lat = ''
-      newLibraryData.lng = ''
-      errors.push("The location of the little free library must be in Hoboken");
-    }
-    if(address === ''){
-      return res.status(500).render('error', {errorNum: 500, title: "Error"})
-    }
-    try {
-      req.session.user._id= validation.checkValidId(
-        req.session.user._id,
-        "Library Owner ID"
-      );
-    } catch (e) {
-      errors.push(e);
-    }
 
-    // Grab all of the inputs from the request body.
-    let genresInput = [
-      newLibraryData.pictureBooks,
-      newLibraryData.youngAdultFiction,
-      newLibraryData.fantasyFiction,
-      newLibraryData.fairyTale,
-      newLibraryData.boardBook,
-      newLibraryData.nonFiction,
-      newLibraryData.mystery,
-      newLibraryData.graphicNovel,
-      newLibraryData.chapterBooks,
-    ];
+    await routeValidationsForLibrary(newLibraryData, res, req);
 
-    // For every value, if it does not exist, then the checkbox was not selected.
-    genresInput = genresInput.filter((genre) => {
-      return typeof genre === "string";
-    });
-
-    try {
-      newLibraryData.fullness = validation.isValidNumber(
-        parseInt(newLibraryData.fullness),
-        "Fullness Rating"
-      );
-      if (0 > newLibraryData.fullness || newLibraryData.fullness > 5) {
-        errors.push("Fullness rating must be between 0-5");
-      }
-      genresInput = validation.checkStringArray(
-        genresInput,
-        "Genres Available"
-      );
-      if (genresInput.length === 0 && newLibraryData.fullness !== 0) {
-        errors.push("Must specify at least one genre for a non-empty library.");
-      }
-
-    } catch (e) {
-      return res
-        .status(500)
-        .render("error", { errorCode: 500, title: "Error" });
-    }
-    try {
-      checkImageFileString(req.file.path, "Image upload")
-    } catch (e) {
-      // This can be used to remove file from data
-      fs.unlink(req.file.path, (err) => {
-        if (err) {
-          return res
-            .status(500)
-            .render("error", { errorCode: 500, title: "Error" });
-        }})
-      errors.push(e)
-    }
-
-    // If there are errors found on the routes rerender the pages with errors!
-    if (errors.length > 0) {
-      fs.unlink(req.file.path, (err) => {
-        if (err) {
-          return res
-            .status(500)
-            .render("error", { errorCode: 500, title: "Error" });
-        }})
-      res.render("libraries/new", {
-        title: "Creating a Library",
-        user: req.session.user,
-        editOrCreate: "Create", 
-        errors: errors,
-        hasErrors: true,
-        library: newLibraryData
-      });
-      return;
-    }
-    try {
-      const { name, lat, lng, image, fullness } = newLibraryData;
-      if (!process.env.DOMAIN) throw "Error: Env file not provided.";
-      const newLibrary = await libraryData.create(
-        newLibraryData.name,
-        [newLibraryData.lat, newLibraryData.lng],
-        address,
-        process.env.DOMAIN+req.file.path,
-        req.session.user._id,
-        newLibraryData.fullness,
-        genresInput // TODO:Need to be updated
-      );
-      // TODO: will need to figure out where it will sent
-      res.redirect(`/libraries/${newLibrary._id}`); // TODO: will probably be to the library's page
-    } catch (e) {
-      if (e.startsWith("VError")) {
-        errors.push(e.substr(1))
-        res.status(400).render(
-          "libraries/new", {
-            title: "Creating a Library",
-            user: req.session.user,
-            editOrCreate: "Create", 
-            errors: errors,
-            hasErrors: true,
-            library: newLibraryData
-          })
-          
-      }
-      else{
-        res
-        .status(500)
-        .render("error", { errorCode: 500, title: "error", id: req.session.user._id});
-      }
-    }
+    /** 
+     * By default the status code is 200 and we don't send any 200 in the above function
+     * this will prevent resending the headers.
+     */
+    if (res.statusCode === 200) await createNewLibrary(newLibraryData, newLibraryData.address, req, newLibraryData.genresInput, res, newLibraryData.errors);
   });
 
 router
