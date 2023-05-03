@@ -171,6 +171,13 @@ let exportedMethods = {
     let library = await librariesCollection.findOne({
       _id: new ObjectId(libraryId),
     });
+    try {
+      for (let i = 0; i < library.favorites.length; i++) {
+        await userFunctions.favoriteLibrary(library.favorites[i], libraryId)
+      }
+    } catch (e) {
+      throw `Error: Could not delete library with id of ${libraryId}`;
+    }
     if (userId === library.ownerID) {
       const deletionInfo = await librariesCollection.findOneAndDelete({
         _id: new ObjectId(libraryId),
