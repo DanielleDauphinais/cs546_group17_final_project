@@ -129,12 +129,12 @@ margin-right: 10px;
 }
 
 .login-page .error {
-	color: red;
+	color: #ee0000;
 	font-weight: bold;
 }
 
 .newLibrary .error {
-	color: red;
+	color: #ee0000;
 	font-weight: bold;
 	margin-bottom: 10px;
 }
