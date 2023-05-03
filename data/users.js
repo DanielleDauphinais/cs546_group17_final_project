@@ -190,6 +190,9 @@ let exportedMethods = {
     const user = await userCollection.findOne({_id: new ObjectId(id)});
     if (!user) throw 'VError: User not found';
 
+    let isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) throw "Invalid Password";
+
     let userFromDB = await userCollection.findOne({ emailAddress: emailAddress });
     if (user.emailAddress !== emailAddress && userFromDB) throw "VError: User already exists with your new email address";
 
