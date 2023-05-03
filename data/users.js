@@ -167,6 +167,15 @@ let exportedMethods = {
     throw "Either the email address or password is invalid";
   },
 
+  /**
+   * This function will update a user's profile with the given information.
+   * @param {string} firstName 
+   * @param {string} lastName 
+   * @param {string} emailAddress 
+   * @param {string} password 
+   * @param {Number} age 
+   * @param {string} userName 
+   */
   async update (id,firstName, lastName, emailAddress, password, age, userName) {
     
     id = validation.checkValidId(id,"User ID")

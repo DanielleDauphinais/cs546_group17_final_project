@@ -3,6 +3,7 @@ const router = Router();
 import {userData,libraryData} from '../data/index.js';
 import validation from '../public/js/validators/validation.js';
 import { validationsForCheckUser, validationsForCreateUser } from '../public/js/validators/user.js';
+import xss from 'xss'
 
 const { createUser, checkUser } = userData;
   
@@ -15,7 +16,9 @@ router.post("/login", async (req, res) => {
   try {
     if (!req.body) return res.status(400).send("Error: Email and password are required");
 
-    let { emailAddressInput: emailAddress, passwordInput: password } = req.body;
+    let emailAddress = xss(req.body.emailAddressInput)
+    let password = xss(req.body.passwordInput)
+
     validationsForCheckUser(emailAddress.trim(), password.trim());
 
     let user = await checkUser(emailAddress, password);
@@ -46,15 +49,13 @@ router.post("/signup", async (req, res) => {
   try {
     if (!req.body) return res.status(400).send("Error: Body cannot be empty");
 
-    let {
-      firstNameInput: firstName,
-      lastNameInput: lastName,
-      emailAddressInput: emailAddress,
-      passwordInput: password,
-      confirmPasswordInput,
-      ageInput: age,
-      userNameInput: userName
-    } = req.body;
+    let firstName = xss(req.body.firstNameInput)
+    let lastName = xss(req.body.lastNameInput)
+    let emailAddress = xss(req.body.emailAddressInput)
+    let password = xss(req.body.passwordInput)
+    let confirmPasswordInput = xss(req.body.confirmPasswordInput)
+    let age = xss(req.body.ageInput)
+    let userName = xss(req.body.userNameInput)
 
     validationsForCreateUser(firstName.trim(), lastName.trim(), emailAddress.trim(), password, Number(age), userName);
 
@@ -144,6 +145,9 @@ router
     return res.status(200).redirect(`/users/${userId}`)
   });
 
+/**
+ * @name http://localhost:3000/users/edit/:id
+ */
   router
   .route('/edit/:id')
   .get(async (req,res) => {
@@ -176,14 +180,12 @@ router
       user = await userData.getUserById(id)
       if (!req.body) throw "Error: No parameters inputted";
       
-      let {
-        firstNameInput: firstName,
-        lastNameInput: lastName,
-        emailAddressInput: emailAddress,
-        passwordInput: password,
-        ageInput: age,
-        userNameInput: userName
-      } = req.body;
+      let firstName = xss(req.body.firstNameInput)
+      let lastName = xss(req.body.lastNameInput)
+      let emailAddress = xss(req.body.emailAddressInput)
+      let password = xss(req.body.passwordInput)
+      let age = xss(req.body.ageInput)
+      let userName = xss(req.body.userNameInput)
 
       validationsForCreateUser(firstName.trim(), lastName.trim(), emailAddress.trim(), password, Number(age), userName);
       await userData.update(id, firstName, lastName, emailAddress, password, age, userName)
