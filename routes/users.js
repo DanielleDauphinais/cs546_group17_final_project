@@ -143,4 +143,33 @@ router
     return res.status(200).redirect(`/users/${userId}`)
   });
 
+  router
+  .route('/edit/:id')
+  .get(async (req,res) => {
+    let id, user;
+
+    try {
+      id = validation.checkValidId(req.params.id,"user_id");
+      user = await userData.getUserById(id)
+    } catch (error) {
+      return res.status(400).render('error',
+      { searchValue:"user", 
+        errorCode:"400"
+      })
+    }
+
+    if (req.session.user._id !== id){
+      return res.status(403).render('error',{
+        searchValue:"user", 
+        errorCode:"400"      
+      })
+    }
+    console.log(user)
+    return res.status(200).render('users/edit-profile', {
+      updateUser : user
+    })
+  })
+  .post(async (req,res) => {
+
+  });
 export default router;
