@@ -18,14 +18,10 @@ import {validationsForStrings} from './validators/util.js';
     try {
       text = textArea.val();
       validationsForStrings("Comment body", text);
-      //$(error).attr("hidden", true);
       error.text("");
     } catch (e) {
       event.preventDefault();
       console.log(e);
-      //$(error).attr("hidden", false);
-      // $(error).attr("display", "block");
-      // $(error).attr("innerHTML", e); // Not sure why this isn't rendering???
       error.text(e);
       return;
     }
@@ -40,7 +36,6 @@ import {validationsForStrings} from './validators/util.js';
         })
       };
       
-      console.log("Made it here");
       $.ajax(requestConfig).then(function (responseMessage) {
         let newElement = $(responseMessage);
         commentSection.append(newElement);
@@ -49,3 +44,20 @@ import {validationsForStrings} from './validators/util.js';
       });
   });
 })(window.jQuery);
+
+
+
+let comment = document.getElementById("comments");
+let comments = comment.childNodes;
+
+for (let i = 1; i < comments.length; i+=2){
+  
+}
+
+function editComment(event) {
+  try {
+    validationsForStrings("Comment body", text);
+  } catch (e) {
+    event.preventDefault();
+  }
+} 
