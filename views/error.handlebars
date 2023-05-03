@@ -12,7 +12,7 @@ This page renders if the user searches either a library or user that does not ex
     {{else if (eq errorCode "500")}}
     <h1>{{errorCode}} Error: Server Error</h1>
     <p>Oops, it looks like there is problem on our end.</p>
-    {{else if (eq errorCode "430")}}
+    {{else if (eq errorCode "403")}}
     <h1>{{errorCode}} Error: Forbidden</h1>
     <p>Oops, looks like you do not have the right permissions to access this page.</p>
     {{/if}}
