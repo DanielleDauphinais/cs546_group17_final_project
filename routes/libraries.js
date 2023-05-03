@@ -594,7 +594,7 @@ router
       return res.status(500).render("error", { errorCode: "500" });
     }
   })
-  .post(async (req, res) => {
+  .post(upload.single("image"), async (req, res) => {
     // Update the library with the form data
     const updatedLibraryData = req.body;
     console.log(req.body);
