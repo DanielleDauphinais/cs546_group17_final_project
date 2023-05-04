@@ -17,14 +17,15 @@ let exportedMethods = {
     fullnessRating,
     genres
   ) {
+    let currentDate, lastServayed;
     try {
       // All these tests should result in rerendering the page so if there is an error it should start with a V
       name = validation.checkString(name, "Library Name");
       ownerID = validation.checkValidId(ownerID, "Library Owner ID");
       fullnessRating = validation.isValidNumber(fullnessRating, "Fullness Rating");
       genres = validation.checkStringArray(genres, "Genres Available");
-      const currentDate = new Date();
-      const lastServayed = currentDate.toLocaleString(undefined, {
+      currentDate = new Date();
+      lastServayed = currentDate.toLocaleString(undefined, {
         // should be in form "7/22/2016, 04:21 AM"
         day: "numeric",
         month: "numeric",
@@ -36,8 +37,6 @@ let exportedMethods = {
     } catch (e) {
       throw "V" + e;
     }
-    // TODO: Need to make it so can only have library with one name and one location
-    // TODO: Need to add function to update user with this library as something it owns
     let newLibrary = {
       name: name,
       coordinates: coordinates,
