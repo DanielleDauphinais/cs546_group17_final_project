@@ -148,7 +148,6 @@ const reverseGeoCodeCoordinates = async (newLibraryData) => {
   let data = await axios.get(
     `https://maps.googleapis.com/maps/api/geocode/json?latlng=${newLibraryData.lat},${newLibraryData.lng}&key=AIzaSyAPxSPvWssw3gI4W1qJaFk9xlBqBicI3iY`
   );
-
   if (
     !data.data.results ||
     data.data.results.length === 0 ||
@@ -160,7 +159,7 @@ const reverseGeoCodeCoordinates = async (newLibraryData) => {
   city = data.data.results[7].address_components[0].long_name;
 
   if ((city !== "Hoboken" && city2 === "Hoboken") || city2 === "07030") {
-    address = data.data.results[0].formatted_address;
+  address = data.data.results[0].formatted_address;
   } else {
     address = data.data.results[1].formatted_address;
   }
@@ -325,25 +324,25 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
 
   /** Grab all the inputs from the request body. */
   let genresInput = [
-    newLibraryData.pictureBooks,
-    newLibraryData.youngAdultFiction,
-    newLibraryData.fantasyFiction,
-    newLibraryData.fairyTale,
-    newLibraryData.boardBook,
-    newLibraryData.nonFiction,
-    newLibraryData.mystery,
-    newLibraryData.graphicNovel,
-    newLibraryData.chapterBooks,
+    xss(newLibraryData.pictureBooks),
+    xss(newLibraryData.youngAdultFiction),
+    xss(newLibraryData.fantasyFiction),
+    xss(newLibraryData.fairyTale),
+    xss(newLibraryData.boardBook),
+    xss(newLibraryData.nonFiction),
+    xss(newLibraryData.mystery),
+    xss(newLibraryData.graphicNovel),
+    xss(newLibraryData.chapterBooks),
   ];
 
   /** For every value, if it does not exist, then the checkbox was not selected. */
   genresInput = genresInput.filter((genre) => {
-    return typeof genre === "string";
+    return genre !== "";
   });
 
   try {
     newLibraryData.fullness = validation.isValidNumber(
-      parseInt(newLibraryData.fullness),
+      parseInt(xss(newLibraryData.fullness)),
       "Fullness Rating"
     );
 
@@ -432,7 +431,6 @@ router
   })
   .post(upload.single("image"), async (req, res) => {
     const newLibraryData = req.body;
-
     await routeValidationsForLibrary(newLibraryData, "Create", res, req);
 
     /**
