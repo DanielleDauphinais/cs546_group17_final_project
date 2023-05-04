@@ -119,6 +119,7 @@ const editLibrary = async (
         name: name,
         lat: lat,
         lng: lng,
+        coordinates: [lat, lng],
         image: image,
         fullnessRating: fullness,
         genres: genresInput,
@@ -600,7 +601,7 @@ router
         .status(400)
         .render("error", { errorCode: "400", searchValue: "Library" });
     }
-
+    console.log(library)
     try {
       res.render("libraries/new", {
         title: "Editing a Library",
