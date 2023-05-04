@@ -1,37 +1,41 @@
 <article class="comment">
-    <h2>{{userName}}</h2>
-    <p>{{dateCreated}}</p>
-    <p>{{text}}</p>
-    <p>{{numLikes}}</p>
-    {{#if (ne @root.userid userId)}}
-        <div class="commentLike">
-            <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}" method="POST">
-                <button type="submit" name="addCommentLike" value="{{_id}}">Like</button>
-            </form>
-        </div>
-    {{/if}}
-    {{#if (eq @root.userid userId)}}
-        <div class="commentEdit">
-            <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/edit" class="edit-form" method="POST">
-                <label for="update_text_input">
-                    <textarea name="update_text_input" id="update_text_input" placeholder="Input text here to edit comment above"></textarea>
-                </label>
-                <button type="submit">Edit</button>
-                <div class="error">{{error}}</div>
-            </form>
-            <div id="commentEditError-{{_id}}" hidden></div>
-        </div>
-        <div id="commentDelete">
-            <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/delete" method="POST">
-                <button type="submit">Delete</button>
-            </form>
-        </div>
-    {{/if}}
-    {{#if (eq @root.userid @root.ownerID)}}
-        <div id="commentDelete">
-            <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/delete" method="POST">
-                <button type="submit">Delete</button>
-            </form>
-        </div>
+    {{#if errors}}
+        <p>{{errorMessage}}</p>
+    {{else}}
+        <h2>{{userName}}</h2>
+        <p>{{dateCreated}}</p>
+        <p class="commentText">{{text}}</p>
+        <p>Likes: {{numLikes}}</p>
+        {{#if (ne @root.userid userId)}}
+            <div class="commentLike">
+                <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}" method="POST">
+                    <button type="submit" name="addCommentLike" value="{{_id}}">Like</button>
+                </form>
+            </div>
+        {{/if}}
+        {{#if (eq @root.userid userId)}}
+            <div class="commentEdit">
+                <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/edit" class="edit-form" method="POST">
+                    <label for="update_text_input">
+                        <textarea name="update_text_input" id="update_text_input" placeholder="Input text here to edit comment above"></textarea>
+                    </label>
+                    <button type="submit">Edit</button>
+                    <div class="error">{{error}}</div>
+                </form>
+                <div id="commentEditError-{{_id}}" hidden></div>
+            </div>
+            <div id="commentDelete">
+                <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/delete" method="POST">
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+        {{/if}}
+        {{#if (eq @root.userid @root.ownerID)}}
+            <div id="commentDelete">
+                <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/delete" method="POST">
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+        {{/if}}
     {{/if}}
 </article>

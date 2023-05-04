@@ -21,11 +21,11 @@ import { validationsForStrings } from './validators/util.js';
       error.text("");
     } catch (e) {
       event.preventDefault();
-      console.log(e);
-      error.text(e);
+      error.text(e.substring(1));
       return;
     }
 
+    text = textArea.val();
     
       let requestConfig = {
         method: 'POST',
