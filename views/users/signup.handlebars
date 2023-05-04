@@ -2,6 +2,8 @@
 <div class="login-page">
     <h1>Sign Up</h1>
     <form action="/users/signup" method="post" id="registration-form">
+        <span id="error" class="error">{{{error}}}</span>
+
         <label for="firstNameInput">First Name</label>
         <input type="text" name="firstNameInput" id="firstNameInput">
 
@@ -23,7 +25,6 @@
         <label for="confirmPasswordInput">Confirm Password</label>
         <input type="password" name="confirmPasswordInput" id="confirmPasswordInput">
 
-        <span id="error" class="error">{{{error}}}</span>
         <a href="/users/login">Log In</a>
         <input type="submit" value="Submit">
     </form>

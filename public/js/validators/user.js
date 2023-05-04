@@ -32,14 +32,14 @@ const validationsForCreateUser = (firstName, lastName, emailAddress, password, a
 
     if (password.includes(" ")) throw "VError: Password must not contain any spaces.";
 
-    if (password.toLowerCase() === password) throw "VError: Atleast one letter should be capital";
+    if (password.toLowerCase() === password) throw "VError: At least one letter should be capital";
 
     let specialCharsRegex = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
     let numbersRegex = /[0-9]/;
 
-    if (!password.match(numbersRegex)) throw "VError: Password must contain atleast one number";
+    if (!password.match(numbersRegex)) throw "VError: Password must contain at least one number";
 
-    if (!password.match(specialCharsRegex)) throw "VError: Password must contain atleast one special char";
+    if (!password.match(specialCharsRegex)) throw "VError: Password must contain at least one special char";
 };
 
 /**

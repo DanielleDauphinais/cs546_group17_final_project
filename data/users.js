@@ -112,10 +112,15 @@ let exportedMethods = {
     lastName = lastName.trim();
     emailAddress = emailAddress.trim();
     emailAddress = emailAddress.toLowerCase();
+    userName = userName.toLowerCase();
 
     let userFromDB = await userCollection.findOne({ emailAddress });
 
     if (userFromDB) throw "VError: User already exists with this email address";
+
+    userFromDB = await userCollection.findOne({ userName });
+
+    if (userFromDB) throw "VError: Username is already taken";
 
     password = await bcrypt.hash(password, await bcrypt.genSalt(10));
 
@@ -217,6 +222,66 @@ let exportedMethods = {
       };
     throw "Either the email address or password is invalid";
   },
+
+  /**
+   * This function will update a user's profile with the given information.
+   * @param {string} id
+   * @param {string} firstName 
+   * @param {string} lastName 
+   * @param {string} emailAddress 
+   * @param {string} password 
+   * @param {Number} age 
+   * @param {string} userName 
+   */
+  async update (id,firstName, lastName, emailAddress, password, age, userName) {
+    
+    id = validation.checkValidId(id,"User ID")
+    validationsForCreateUser(firstName.trim(), lastName.trim(), emailAddress.trim(), password, Number(age), userName);
+
+    firstName = firstName.trim();
+    lastName = lastName.trim();
+    emailAddress = emailAddress.trim().toLowerCase();
+
+    const userCollection = await users();
+    const user = await userCollection.findOne({_id: new ObjectId(id)});
+    if (!user) throw 'VError: User not found';
+
+    let isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) throw "Invalid Password";
+
+    let userFromDB = await userCollection.findOne({ emailAddress: emailAddress });
+    if (user.emailAddress !== emailAddress && userFromDB) throw "VError: User already exists with your new email address";
+
+    userFromDB = await userCollection.findOne({ userName : userName });
+    if (user.userName !== userName && userFromDB) throw "VError: User already exists with your new username";
+
+    let updateUser = {
+      firstName : firstName, 
+      lastName : lastName, 
+      emailAddress : emailAddress,
+      age: Number(age),
+      userName : userName 
+    }
+
+    let same = true
+    for (const key in updateUser) {
+        if (updateUser[key] !== user[key]) same = false;
+    }
+    
+    if (same) throw "Error: No changes have been made.";
+
+    const updateInfo = await userCollection.findOneAndUpdate(
+      {_id: new ObjectId(id)},
+      {$set: updateUser},
+      {returnDocument: 'after'}
+    );
+
+    if (updateInfo.lastErrorObject.n === 0)
+      throw `VError: Update failed, could not find the searched user`;
+
+    return {updatedUser : true};
+
+  }
 };
 
 export default exportedMethods;

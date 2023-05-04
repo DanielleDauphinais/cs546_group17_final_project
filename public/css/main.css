@@ -139,6 +139,12 @@ margin-right: 10px;
 	margin-bottom: 10px;
 }
 
+#update-form .error {
+	color: red;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
 .commentEdit .error {
 	color: red;
 	font-weight: bold;
@@ -239,4 +245,8 @@ html {
 	margin: auto;
 	width: 20%;
 	border-radius: 10px;
+}
+
+.confirm-changes {
+	display: none;
 }
