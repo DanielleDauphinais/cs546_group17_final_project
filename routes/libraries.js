@@ -55,6 +55,7 @@ const createNewLibrary = async (
         library: newLibraryData,
         formAction: "/libraries/new",
         formMethod: "POST",
+        isLoggedIn: true
       });
     }
 
@@ -126,6 +127,7 @@ const editLibrary = async (
         library: editedLibraryData,
         formAction: "/libraries/edit",
         formMethod: "POST",
+        isLoggedIn: true
       });
     }
 
@@ -197,6 +199,7 @@ const handleValidationErrors = (
     library: newLibraryData,
     formAction: `/libraries/${formAction(action)}`,
     formMethod: "POST",
+    isLoggedIn: true
   };
   errorObj[errorField] = error;
 
@@ -424,6 +427,7 @@ router
       user: req.session.user,
       formAction: "/libraries/new",
       formMethod: "POST",
+      isLoggedIn: true
     });
   })
   .post(upload.single("image"), async (req, res) => {
@@ -588,6 +592,7 @@ router
         libraryObject: JSON.stringify(library),
         name: library.name,
         image: library.image,
+        isLoggedIn: true
       });
     } catch (e) {
       return res.status(500).render("error", { errorCode: "500" });

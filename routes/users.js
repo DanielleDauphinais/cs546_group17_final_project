@@ -6,6 +6,7 @@ import {
   validationsForCheckUser,
   validationsForCreateUser,
 } from "../public/js/validators/user.js";
+import xss from 'xss'
 
 const { createUser, checkUser } = userData;
 
@@ -21,7 +22,9 @@ router.post("/login", async (req, res) => {
     if (!req.body)
       return res.status(400).send("Error: Email and password are required");
 
-    let { emailAddressInput: emailAddress, passwordInput: password } = req.body;
+    let emailAddress = xss(req.body.emailAddressInput)
+    let password = xss(req.body.passwordInput)
+
     validationsForCheckUser(emailAddress.trim(), password.trim());
 
     let user = await checkUser(emailAddress, password);
@@ -59,15 +62,13 @@ router.post("/signup", async (req, res) => {
   try {
     if (!req.body) return res.status(400).send("Error: Body cannot be empty");
 
-    let {
-      firstNameInput: firstName,
-      lastNameInput: lastName,
-      emailAddressInput: emailAddress,
-      passwordInput: password,
-      confirmPasswordInput,
-      ageInput: age,
-      userNameInput: userName,
-    } = req.body;
+    let firstName = xss(req.body.firstNameInput)
+    let lastName = xss(req.body.lastNameInput)
+    let emailAddress = xss(req.body.emailAddressInput)
+    let password = xss(req.body.passwordInput)
+    let confirmPasswordInput = xss(req.body.confirmPasswordInput)
+    let age = xss(req.body.ageInput)
+    let userName = xss(req.body.userNameInput)
 
     validationsForCreateUser(
       firstName.trim(),
@@ -170,13 +171,71 @@ router
     try {
       userId = validation.checkValidId(req.params.id, "User ID");
       libId = validation.checkValidId(req.body.libId, "Library ID");
-      await userData.favoriteLibrary(userId, libId);
+      await userData.favoriteLibrary(userId,libId)
     } catch (error) {
-      return res
-        .status(500)
-        .render("error", { searchValue: "user", errorCode: "500" });
+      return res.status(500).render('error',
+      { searchValue:"user", 
+        errorCode:"500"
+      })
     }
-    return res.status(200).redirect(`/users/${userId}`);
+    return res.status(200).redirect(`/users/${userId}`)
   });
+  
+  /**
+ * @name http://localhost:3000/users/edit/:id
+ */
+  router
+  .route('/edit/:id')
+  .get(async (req,res) => {
+    let id, user;
 
+    try {
+      id = validation.checkValidId(req.params.id,"user_id");
+      user = await userData.getUserById(id)
+    } catch (error) {
+      return res.status(400).render('error',
+      { searchValue:"user", 
+        errorCode:"400"
+      })
+    }
+
+    if (req.session.user._id !== id){
+      return res.status(403).render('error',{
+        searchValue:"user", 
+        errorCode:"403"      
+      })
+    }
+    return res.status(200).render('users/edit-profile', {
+      updateUser : user
+    })
+  })
+  .post(async (req,res) => {
+    let id, user;
+    try {
+      id = validation.checkValidId(req.params.id,"user_id");
+      user = await userData.getUserById(id)
+      if (!req.body) throw "Error: No parameters inputted";
+      
+      let firstName = xss(req.body.firstNameInput)
+      let lastName = xss(req.body.lastNameInput)
+      let emailAddress = xss(req.body.emailAddressInput)
+      let password = xss(req.body.passwordInput)
+      let age = xss(req.body.ageInput)
+      let userName = xss(req.body.userNameInput)
+
+      validationsForCreateUser(firstName.trim(), lastName.trim(), emailAddress.trim(), password, Number(age), userName);
+      await userData.update(id, firstName, lastName, emailAddress, password, age, userName)
+      return res.status(200).redirect(`/users/${id}`)
+
+    } catch (err) {
+      console.error(err);
+
+      if (typeof err === "string") 
+        return err.startsWith("VError") ? 
+          res.status(400).render('users/edit-profile', { updateUser: user, error: `400 - ${err.substr(1)}`}) : 
+          res.status(400).render('users/edit-profile', { updateUser: user, error: `400 - ${err}` });
+
+      return res.status(500).send("Internal Server Error");
+    }
+  });
 export default router;
