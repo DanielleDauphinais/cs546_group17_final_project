@@ -76,17 +76,15 @@ const editLibrary = async (
   res,
   errors
 ) => {
+  let image;
+  const { name, lat, lng, fullness } = editedLibraryData;
   try {
     id = req.params.id;
     id = validation.checkValidId(id);
 
-    const { name, lat, lng, fullness } = editedLibraryData;
-
     if (!process.env.DOMAIN)
       return res.status(500).render("error", { errorCode: 500 });
     
-
-    let image;
     if (!req.file){
       let library;
       try {
@@ -117,16 +115,39 @@ const editLibrary = async (
   } catch (e) {
     if (typeof e === "string" && e.startsWith("VError")) {
       errors.push(e.substr(1));
-
+      let library = {
+        name: name,
+        lat: lat,
+        lng: lng,
+        image: image,
+        fullnessRating: fullness,
+        genres: genresInput,
+      }
+/*
+  title: "Editing a Library",
+        editOrCreate: "Edit",
+        user: req.session.user,
+        formAction: `/libraries/${id}/edit`,
+        formMethod: "POST",
+        libraryObject: JSON.stringify(library),
+        name: library.name,
+        image: library.image,
+        isLoggedIn: true
+*/
+      console.log(library.fullnessRating)
+      console.log(library.genres)
       return res.status(400).render("libraries/new", {
         title: "Editing a Library",
         user: req.session.user,
         editOrCreate: "Edit",
         nameError: e.substr(1),
         hasErrors: true,
-        library: editedLibraryData,
-        formAction: "/libraries/edit",
+        library: library,
+        formAction: `/libraries/${id}/edit`,
         formMethod: "POST",
+        name: library.name,
+        image: image,
+        libraryObject: JSON.stringify(library),
         isLoggedIn: true
       });
     }

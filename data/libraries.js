@@ -149,6 +149,22 @@ let exportedMethods = {
     if (library === null) throw "Error: No library found with given ID.";
     if (library.ownerID !== ownerID)
       throw "Error: User is not the library's owner.";
+    console.log(editedLibrary)
+    console.log(library)
+    let same = true
+    for (const key in editedLibrary) {
+      if (key!== "lastServayed" && key!== "coordinates" && key !== "genres" && editedLibrary[key] !== library[key]) {
+        same = false;
+        console.log(key)
+      }
+      if((key === "coordinates" || key === "genres") && JSON.stringify(editedLibrary[key]) != JSON.stringify(library[key])) {
+        same = false;
+        console.log("heere")
+      }
+    }
+      
+    if (same) throw "VError: No changes have been made.";
+
     const updateInfo = await librariesCollection.findOneAndUpdate(
       { _id: new ObjectId(libraryId) },
       { $set: editedLibrary },
