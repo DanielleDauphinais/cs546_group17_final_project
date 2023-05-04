@@ -16,6 +16,22 @@
         {{/each}}
     </ul>
     </div>
+    {{#if (eq ownerID userid)}}
+        <div>
+            <form action="/libraries/{{_id}}/edit" method="GET">
+                <button type="submit">Edit Library</button>
+            </form>
+        </div>
+        <div>
+            {{!-- 
+            Simple prompt on button press used from the reply to this post: https://stackoverflow.com/questions/6515502/javascript-form-submit-confirm-or-cancel-submission-dialog-box
+            Could not figure out doing client side javascript for the confirm button, this solution uses inline javascript.
+             --}}
+            <form action="/libraries/{{_id}}/delete" method="POST" id="deleteButton" onsubmit="return confirm('Are you sure you want to delete this library?');">
+                <button type="submit">Delete Library</button>
+            </form>
+        </div>
+    {{/if}}
     <form action="/libraries/{{_id}}/survey" method="GET">
         <button type="submit">Rate Fullness / Add Genres</button>
     </form>
