@@ -38,10 +38,15 @@
     <div id="favorites">
         <p>Count of users who follow {{name}}</p>
         {{#if (ne ownerID userid)}}
-        <p>Click here to add {{name}} to your favorites (or unfavorite)!</p>
         <form action="/libraries/{{_id}}" method="POST">
             <button type="submit">{{numFavorites}}</button>
         </form>
+        {{#if isFollower}}
+        <p>Click above to unfavorite {{name}}</p>
+        {{/if}}
+        {{#unless isFollower}}
+        <p>Click above to add {{name}} to your favorites!</p>
+        {{/unless}}
         {{/if}}
         {{#if (eq ownerID userid)}}
         <button>{{numFavorites}}</button>

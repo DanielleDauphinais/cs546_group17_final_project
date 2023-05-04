@@ -491,6 +491,7 @@ router
     try {
       let user = req.session.user;
       let numFavorites = library.favorites.length;
+      let isFollower = library.favorites.includes(user._id)
       res.render("libraries/library", {
         title: library.name,
         isLoggedIn: true,
@@ -499,6 +500,7 @@ router
         owner: owner.userName,
         libraryid: library._id,
         numFavorites: numFavorites,
+        isFollower: isFollower,
         ...library,
       });
     } catch (e) {
