@@ -124,19 +124,7 @@ const editLibrary = async (
         fullnessRating: fullness,
         genres: genresInput,
       }
-/*
-  title: "Editing a Library",
-        editOrCreate: "Edit",
-        user: req.session.user,
-        formAction: `/libraries/${id}/edit`,
-        formMethod: "POST",
-        libraryObject: JSON.stringify(library),
-        name: library.name,
-        image: library.image,
-        isLoggedIn: true
-*/
-      console.log(library.fullnessRating)
-      console.log(library.genres)
+
       return res.status(400).render("libraries/new", {
         title: "Editing a Library",
         user: req.session.user,
@@ -601,7 +589,7 @@ router
         .status(400)
         .render("error", { errorCode: "400", searchValue: "Library" });
     }
-    console.log(library)
+
     try {
       res.render("libraries/new", {
         title: "Editing a Library",
