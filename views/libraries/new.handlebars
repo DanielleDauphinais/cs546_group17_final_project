@@ -1,53 +1,35 @@
 {{!-- need to connect to the backend and check using front end JS --}}
 <div class="newLibrary">
-  <div id="leftSide">
-    <article>
+  <article>
+    <div id="leftSide">
       <h1>{{editOrCreate}} a Library</h1>
+      <p id="libraryObject" hidden>{{libraryObject}}</p>
+      <p id="type" hidden>{{editOrCreate}}</p>
       {{!-- form to create a new library! --}}
-      <form action="/libraries/new" method="POST" id="new-Library-form" class="new-Library-form"
-        enctype="multipart/form-data">
-        <label for="libraryName">
-          Library Name
-        </label>
-
-        <input type="text" id="libraryName" name="name" placeholder="Library Name" value="{{library.name}}"
-          class="half-width-input" />
-
+      <form action={{formAction}} method={{formMethod}} id="new-Library-form" name="new-Library-form" class="new-Library-form" enctype="multipart/form-data">
+        <label for="libraryName">Library Name</label>
+        <input type="text" id="libraryName" name="name" placeholder="Library Name" value="{{library.name}}" class="half-width-input">
         <div class="error" id="nameError">{{nameError}}</div>
-
-        <p class="bold">Please use the map on the left to select a location for your Little Free Library!</p>
+        <p class="bold">Please use the map on the right to select a location for your Little Free Library!</p>
         {{!-- These location data are text input because it gets mad about not integers --}}
-        <label for="lat">
-          Library Latitude
-        </label>
-
-        <input type="text" id="lat" name="lat" placeholder="Librarys Latitude" value="{{library.lat}}"
-          class="half-width-input" />
-
+        <label for="lat">Library Latitude</label>
+        <input type="text" id="lat" name="lat" placeholder="Librarys Latitude" value="{{library.lat}}" class="half-width-input">
         <div class="error" id="latError">{{latError}}</div>
-
-        <label for="lng">
-          Library Longitude
-        </label>
-        <input type="text" id="lng" name="lng" placeholder="Librarys Longitude" value="{{library.lng}}"
-          class="half-width-input" />
-
+        <label for="lng">Library Longitude</label>
+        <input type="text" id="lng" name="lng" placeholder="Librarys Longitude" value="{{library.lng}}" class="half-width-input">
         <div class="error" id="lngError">{{lngError}}</div>
-
+        {{#if (eq editOrCreate "Edit") }}
+          <p class="bold">Upload an image or leave it blank to use the one below.</p>
+          <img id="image-preview" alt="{{name}}" src="{{image}}">
+          <br>
+        {{/if}}
         <div class="mb-10">
-          <label for="library-image">
-            Library image
-          </label>
-          <input type="file" id="library-image" name="image" placeholder="Library image" value="{{library.image}}"
-            class="" />
-
+          <label for="library-image">Library image</label>
+          <input type="file" id="library-image" name="image" class="">
           <div class="error" id="imageError">{{imageError}}</div>
         </div>
-
         {{!-- This is to get data on the fullness --}}
-        <label for="fullness">
-          Please select how full the library is, 0 being empty and 5 being full
-        </label>
+        <label for="fullness">Please select how full the library is, 0 being empty and 5 being full</label>
         <select class="half-width-input" name="fullness" id="fullness">
           <option value="">Fullness is...</option>
           <option value="0">0</option>
@@ -57,9 +39,7 @@
           <option value="4">4</option>
           <option value="5">5</option>
         </select>
-
         <div class="error" id="fullnessError">{{fullnessError}}</div>
-
         <p>Please select the genres of books currently present in the library</p>
         <div id="genres">
           <label for="pictureBooks">
@@ -74,7 +54,8 @@
             <input type="checkbox" name="fairyTale" id="fairyTale" value="fairyTale">Fairy Tale</label>
           <label for="boardBook">
             <input type="checkbox" name="boardBook" id="boardBook" value="boardBook">Board Book</label>
-          <label for="nonFiction">
+          <br>
+        <label for="nonFiction">
             <input type="checkbox" name="nonFiction" id="nonFiction" value="nonFiction">Non-fiction</label>
           <label for="mystery">
             <input type="checkbox" name="mystery" id="mystery" value="mystery">Mystery</label>
@@ -83,33 +64,29 @@
           <label for="chapterBooks">
             <input type="checkbox" name="chapterBooks" id="chapterBooks" value="chapterBooks">Chapter Book</label>
         </div>
-
         <div class="error" id="genresError">{{genresError}}</div>
-
-        <button type="submit">Create New Library</button>
+        <button type="submit">{{editOrCreate}} Library</button>
         <button type="reset">Clear Form</button>
       </form>
-
       {{!-- front end js error --}}
       <ul id="error" class="error" hidden></ul>
       {{!-- backend js errors --}}
       {{#if hasErrors}}
-      <ul class="error-list">
-        {{#each errors}}
-        <li>
-          {{this}}
-        </li>
-        {{/each}}
-      </ul>
+        <ul class="error-list">
+          {{#each errors}}
+          <li>
+            {{this}}
+          </li>
+          {{/each}}
+        </ul>
       {{/if}}
-  </div>
-
-  {{!-- This part shits itself --}}
-  <div id="rightSide">
-    <iframe src="/selectLocation" frameborder="0" class="gmaps"></iframe>
-  </div>
-  <script src="/public/js/library/new.js" type="module"></script>
-
-
+    </div>
+    <div id="rightSide">
+      <iframe src="/selectLocation" frameborder="0" class="gmaps"></iframe>
+    </div>
+    <script src="/public/js/library/new.js" type="module"></script>
+    {{#if (eq editOrCreate "Edit") }}
+      <script src="/public/js/library/edit.js" type="module"></script>
+    {{/if}}
   </article>
 </div>
