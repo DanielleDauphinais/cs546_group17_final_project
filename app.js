@@ -9,9 +9,14 @@ import {dirname} from 'path';
 import exphbs from 'express-handlebars';
 import cookieParser from "cookie-parser";
 import session from 'express-session';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const uploadsDirPath = `${__dirname}/public/uploads`;
+
+/** If there is no uploads folder, then I am creating one */
+if (!fs.existsSync(uploadsDirPath)) fs.mkdirSync(uploadsDirPath, { recursive: true });
 
 const staticDir = express.static(__dirname + '/public');
 

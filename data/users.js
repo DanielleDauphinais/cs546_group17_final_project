@@ -112,10 +112,15 @@ let exportedMethods = {
     lastName = lastName.trim();
     emailAddress = emailAddress.trim();
     emailAddress = emailAddress.toLowerCase();
+    userName = userName.toLowerCase();
 
     let userFromDB = await userCollection.findOne({ emailAddress });
 
     if (userFromDB) throw "VError: User already exists with this email address";
+
+    userFromDB = await userCollection.findOne({ userName });
+
+    if (userFromDB) throw "VError: Username is already taken";
 
     password = await bcrypt.hash(password, await bcrypt.genSalt(10));
 
