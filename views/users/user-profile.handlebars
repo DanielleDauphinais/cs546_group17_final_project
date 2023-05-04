@@ -4,7 +4,13 @@
     <li>Name: {{searchedUser.firstName}} {{searchedUser.lastName}}</li>
     <li>Email: {{searchedUser.emailAddress}}</li>
     <li>Member Since: {{searchedUser.dateCreated}}</li>
+    <li>Age: {{searchedUser.age}}</li>
   </ul>
+{{#if (eq searchedUser._id user._id)}}    
+<form action="/users/edit/{{user._id}}" method="GET">
+    <button type="submit">Edit Profile</button>
+</form>
+{{/if}}
 <h1>Owned Libraries</h1>
     {{#each ownedLibs}}
     <div class="library">
