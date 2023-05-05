@@ -61,4 +61,6 @@ try {
 
 user2 = await userData.getUserByEmail("galapatt@stevens.edu")
 
+let lib2_followers = await userData.getFollowers(lib2._id);
+
 await closeConnection();

@@ -262,3 +262,84 @@ html {
 	display: none;
 }
 
+/* Style for the user information section */
+.user-info {
+	border-color: #5dbbc7;
+	border-style: groove;
+	box-sizing: border-box;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 10px #007984;
+	margin-bottom: 30px;
+	align-items: center;
+	text-align: center;
+}
+
+/* Style for the user library section */
+.user-libs {
+  border-color: #5dbbc7;
+  border-style: groove;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #007984;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* Style for the user name */
+.user-info h2 {
+	font-size: 36px;
+	margin: 0;
+  }
+
+
+/* Style for the library name */
+.user-libs h2 {
+	font-size: 36px;
+	margin: 0;
+  }
+
+
+.user-libs .lib-img {
+	width: 12%;
+	float: right;
+	margin-right: 25%;
+}
+
+.user-libs .text {
+	text-align: center;
+	margin-top: 3%;
+	margin-left: 25%;
+}
+
+.unfollow-button {
+	background-color: #d32f2f;
+	color: #fff;
+	padding: 8px;
+	font-size: 14px;
+	font-weight: bold;
+	transition: background-color 0.2s;
+	border-color: #999;
+  }
+
+.unfollow-button:hover {
+	background-color: #ff7d74;
+}
+
+.rating {
+	font-size: 20px;
+}
+
+ul {
+	display: inline-block;
+  }
+
+#show-favs-div {
+	display: none;
+}
+
+#fav-list-header{
+	font-size: 20px;
+}

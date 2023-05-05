@@ -1,11 +1,12 @@
 <h1>User Information</h1>
+<div class="user-info">
   <h2>{{searchedUser.userName}}</h2>
-  <ul>
-    <li>Name: {{searchedUser.firstName}} {{searchedUser.lastName}}</li>
-    <li>Email: {{searchedUser.emailAddress}}</li>
-    <li>Member Since: {{searchedUser.dateCreated}}</li>
-    <li>Age: {{searchedUser.age}}</li>
-  </ul>
+    <p>Name: {{searchedUser.firstName}} {{searchedUser.lastName}}</p>
+    <p>Email: {{searchedUser.emailAddress}}<p>
+    <p>Member Since: {{searchedUser.dateCreated}}</p>
+    <p>Age: {{searchedUser.age}}</p>
+</div>
+
 {{#if (eq searchedUser._id user._id)}}    
 <form action="/users/edit/{{user._id}}" method="GET">
     <button type="submit">Edit Profile</button>
@@ -13,10 +14,13 @@
 {{/if}}
 <h1>Owned Libraries</h1>
     {{#each ownedLibs}}
-    <div class="library">
-      <h2>{{this.name}}</h2>
-      <p>Fullness: {{this.fullnessRating}}</p>
-      <a href="/libraries/{{this._id}}">Expand</a>
+    <div class="user-libs">
+      <div class="text">
+        <h2>{{this.name}}</h2>
+        <p class="rating">Fullness: {{this.fullnessRating}}</p>
+        <a href="/libraries/{{this._id}}">Expand</a>
+      </div>
+      <img class="lib-img" alt={{name}} src="{{image}}">
     </div>
     {{/each}}
 {{#if (eq searchedUser._id user._id)}}    
@@ -26,16 +30,19 @@
 {{/if}}
 <h1>Favorited Libraries</h1>
     {{#each favLibs}}
-    <div class="library">
-      <h2>{{this.name}}</h2>
-      <p>Fullness: {{this.fullnessRating}} </p>
-      {{#if (eq ../searchedUser._id ../user._id)}}   
-      <form action='/users/{{../searchedUser._id}}' method="post">
-      <input type="hidden" name="libId" value={{this._id}}>
-      <button type="submit">Unfollow</button>
-      </form>
-      {{/if}}
+    <div class="user-libs">
+      <div class="text">
+        <h2>{{this.name}}</h2>
+        <p class="rating">Fullness: {{this.fullnessRating}} </p>
+        {{#if (eq ../searchedUser._id ../user._id)}}   
+        <form action='/users/{{../searchedUser._id}}' method="post">
+        <input type="hidden" name="libId" value={{this._id}}>
+        <button class="unfollow-button" type="submit">Unfollow</button>
+        </form>
       <br>
       <a href="/libraries/{{this._id}}">Expand</a>
+      {{/if}}
+      </div>
+      <img class="lib-img" alt={{name}} src="{{image}}">
     </div>
     {{/each}}

@@ -4,7 +4,20 @@
     <h1>{{name}}</h1>
     <img alt="{{name}}" src="{{image}}">
     <address>{{address}}</address>
-    <p>Created by: {{owner}}</p>
+    <p>Created by: <a href="/users/{{ownerID}}">{{owner}}</a></p>
+    {{#if (ne followers.length 0)}}
+    <p>Followers: {{followers.length}} <button id="show-favs-list">↓</button></p>
+    {{else}} 
+    <p>Followers: {{followers.length}} </p>
+    {{/if}}
+    <div id="show-favs-div">
+        <h2 id="fav-list-header">Favorited By: </h2>
+        <ul>
+            {{#each followers}}
+                <li><a href="/users/{{_id}}">{{userName}}</a></li>
+            {{/each}}
+        </ul>
+    </div>
     <h2>Fullness: {{fullnessRating}}/5</h2>
     <p>Last Rated On: {{lastServayed}}</p>
     <div id="listGenrers">

@@ -68,4 +68,21 @@ import { validationsForStrings } from './validators/util.js';
       e.preventDefault();
     }
   });
+
+  let showFavs = $("#show-favs-list");
+  let favListDiv = $("#show-favs-div");
+  let show = "↓"; 
+  let hide = "↑";
+  
+  showFavs.click(function () {
+    if (showFavs.html() === show) {
+      favListDiv.show()
+      showFavs.html(hide)
+    } else {
+      favListDiv.hide()
+      showFavs.html(show)
+    }
+  })
+
+
 })(window.jQuery);
