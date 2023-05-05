@@ -103,6 +103,11 @@ router.post("/signup", async (req, res) => {
         ? res.status(400).render("users/signup", {
             title: "Signup",
             error: `400 - ${err.substr(1)}`,
+            firstName: req.body.firstNameInput,
+            lastName: req.body.lastNameInput,
+            email: req.body.emailAddressInput,
+            age: req.body.ageInput,
+            userName: req.body.userNameInput
           })
         : res
             .status(400)
