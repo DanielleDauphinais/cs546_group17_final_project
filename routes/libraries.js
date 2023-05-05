@@ -30,21 +30,22 @@ const createNewLibrary = async (
 
     if (!process.env.DOMAIN)
       return res.status(500).render("error", { errorCode: 500 });
-
+    
     const newLibrary = await libraryData.create(
       xss(name),
-      [xss(lat), xss(lng)],
+      [lat, lng],
       address,
       process.env.DOMAIN + req.file.path,
       req.session.user._id,
-      xss(fullness),
+      fullness,
       genresInput
     );
 
     return res.redirect(`/libraries/${newLibrary._id}`);
   } catch (e) {
     if (typeof e === "string" && e.startsWith("VError")) {
-      errors.push(e.substr(1));
+      console.log(e)
+      //errors.push(e.substr(1));
 
       return res.status(400).render("libraries/new", {
         title: "Creating a Library",
@@ -167,12 +168,13 @@ const reverseGeoCodeCoordinates = async (newLibraryData) => {
 
   city2 = data.data.results[5].address_components[0].long_name;
   city = data.data.results[7].address_components[0].long_name;
-
-  if ((city !== "Hoboken" && city2 === "Hoboken") || city2 === "07030") {
   address = data.data.results[0].formatted_address;
-  } else {
-    address = data.data.results[1].formatted_address;
-  }
+
+  // if ((city !== "Hoboken" && city2 === "Hoboken") || city2 === "07030") {
+  // address = data.data.results[0].formatted_address;
+  // } else {
+  //   address = data.data.results[1].formatted_address;
+  // }
 
   return { city, city2, address };
 };
@@ -292,7 +294,6 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
   let { city, city2, address } = addressObj;
 
   if (
-    (city !== "Hoboken" && city2 !== "Hoboken" && city2 !== "07030") ||
     !address.includes("Hoboken") ||
     !address.toLowerCase().includes("hoboken")
   ) {
@@ -450,11 +451,11 @@ router
     if (res.statusCode === 200)
       await createNewLibrary(
         newLibraryData,
-        xss(newLibraryData.address),
+        newLibraryData.address,
         req,
-        xss(newLibraryData.genresInput),
+        newLibraryData.genresInput,
         res,
-        xss(newLibraryData.errors)
+        newLibraryData.errors
       );
   });
 
@@ -638,11 +639,11 @@ router
       await editLibrary(
         id,
         updatedLibraryData,
-        xss(updatedLibraryData.address),
+        updatedLibraryData.address,
         req,
-        xss(updatedLibraryData.genresInput),
+        updatedLibraryData.genresInput,
         res,
-        xss(updatedLibraryData.errors)
+        updatedLibraryData.errors
       );
   });
 
