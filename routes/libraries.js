@@ -508,7 +508,6 @@ router
 
     try {
       let user = req.session.user;
-      let numFavorites = library.favorites.length;
       let isFollower = library.favorites.includes(user._id)
       res.render("libraries/library", {
         title: library.name,
@@ -519,7 +518,6 @@ router
         followers : followers,
         ownerID: owner._id,
         libraryid: library._id,
-        numFavorites: numFavorites,
         isFollower: isFollower,
         errors: false,
         ...library,
@@ -703,7 +701,7 @@ router
     // If the library ID is not valid, render the error page with a status code of 400
     let id;
     try {
-      id = req.params.id;
+      xss(id = req.params.id);
       id = validation.checkValidId(id);
     } catch (e) {
       return res.status(400).render("error", {

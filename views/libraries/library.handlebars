@@ -49,23 +49,17 @@
     <form action="/libraries/{{_id}}/survey" method="GET">
         <button type="submit">Rate Fullness / Add Genres</button>
     </form>
-    <div id="favorites">
-        <p>Count of users who follow {{name}}</p>
-        {{#if (ne ownerID userid)}}
-        <form action="/libraries/{{_id}}" method="POST">
-            <button type="submit">{{numFavorites}}</button>
-        </form>
-        {{#if isFollower}}
-        <p>Click above to unfavorite {{name}}</p>
-        {{/if}}
-        {{#unless isFollower}}
-        <p>Click above to add {{name}} to your favorites!</p>
-        {{/unless}}
-        {{/if}}
-        {{#if (eq ownerID userid)}}
-        <button>{{numFavorites}}</button>
-        {{/if}}
-    </div>
+    {{#if (ne ownerID userid)}}
+        <div id="favorites">
+            <form action="/libraries/{{_id}}" method="POST">
+            {{#if isFollower}}
+            <button type="submit" class="unfollow-button">Unfollow</button>
+            {{else}}
+            <button type="submit" class="follow-button">Follow</button>
+            {{/if}}
+            </form>
+        </div>
+    {{/if}}
     <br>
     <div id="commentSectionLibs">
     <h2>Comments Section</h2>
