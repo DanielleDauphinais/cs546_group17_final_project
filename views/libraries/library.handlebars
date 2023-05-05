@@ -49,15 +49,17 @@
     <form action="/libraries/{{_id}}/survey" method="GET">
         <button type="submit">Rate Fullness / Add Genres</button>
     </form>
-    <div id="favorites">
-        <form action="/libraries/{{_id}}" method="POST">
-        {{#if isFollower}}
-        <button type="submit" class="unfollow-button">Unfollow</button>
-        {{else}}
-        <button type="submit" class="follow-button">Follow</button>
-        {{/if}}
-        </form>
-    </div>
+    {{#if (ne ownerID userid)}}
+        <div id="favorites">
+            <form action="/libraries/{{_id}}" method="POST">
+            {{#if isFollower}}
+            <button type="submit" class="unfollow-button">Unfollow</button>
+            {{else}}
+            <button type="submit" class="follow-button">Follow</button>
+            {{/if}}
+            </form>
+        </div>
+    {{/if}}
     <br>
     <div id="commentSectionLibs">
     <h2>Comments Section</h2>
