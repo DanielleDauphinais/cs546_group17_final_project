@@ -24,7 +24,7 @@ const validationsForCreateUser = (firstName, lastName, emailAddress, password, a
     if (!isEmail(emailAddress)) throw "VError: emailAddress is invalid";
 
     /** 100 years is a reasonable maximum age for human I guess */
-    if(!isNumber(age) || age < 13 || age > 100) throw "VError: Age is not valid";
+    if(!isNumber(age) || age < 13 || age > 100) throw "VError: Age is not valid, due to COPPA laws users must be at least 13";
 
     validationsForStrings("userName", userName, false);
 

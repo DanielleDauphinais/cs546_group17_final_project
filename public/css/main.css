@@ -129,12 +129,12 @@ margin-right: 10px;
 }
 
 .login-page .error {
-	color: red;
+	color: #ee0000;
 	font-weight: bold;
 }
 
 .newLibrary .error {
-	color: red;
+	color: #ee0000;
 	font-weight: bold;
 	margin-bottom: 10px;
 }
@@ -245,6 +245,17 @@ html {
 	margin: auto;
 	width: 20%;
 	border-radius: 10px;
+}
+
+.comment {
+	width:fit-content;
+	padding: 10px;
+	border: 2px solid #004589;
+	margin: auto;
+}
+
+.commentText {
+	font-style: italic;
 }
 
 .confirm-changes {

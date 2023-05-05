@@ -241,6 +241,7 @@ let exportedMethods = {
     firstName = firstName.trim();
     lastName = lastName.trim();
     emailAddress = emailAddress.trim().toLowerCase();
+    userName = userName.toLowerCase();
 
     const userCollection = await users();
     const user = await userCollection.findOne({_id: new ObjectId(id)});

@@ -86,6 +86,7 @@ if (newLibraryForm) {
       errorList.innerHTML += `<li> ${e} </li>`;
     }
     try {
+      if (fullnessVal==="") throw "You must select a fullness!";
       if (!isNumber(Number(fullnessVal))) throw "You must select a fullness!";
       if (fullnessVal < 0 || fullnessVal > 5)
         throw "Improper Range on Fullness";

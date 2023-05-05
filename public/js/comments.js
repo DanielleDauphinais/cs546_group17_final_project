@@ -21,11 +21,11 @@ import { validationsForStrings } from './validators/util.js';
       error.text("");
     } catch (e) {
       event.preventDefault();
-      console.log(e);
-      error.text(e);
+      error.text(e.substring(1));
       return;
     }
 
+    text = textArea.val();
     
       let requestConfig = {
         method: 'POST',
@@ -86,20 +86,3 @@ import { validationsForStrings } from './validators/util.js';
 
 
 })(window.jQuery);
-
-
-
-let comment = document.getElementById("comments");
-let comments = comment.childNodes;
-
-for (let i = 1; i < comments.length; i+=2){
-  
-}
-
-function editComment(event) {
-  try {
-    validationsForStrings("Comment body", text);
-  } catch (e) {
-    event.preventDefault();
-  }
-} 
