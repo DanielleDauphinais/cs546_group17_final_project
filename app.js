@@ -10,6 +10,7 @@ import exphbs from 'express-handlebars';
 import cookieParser from "cookie-parser";
 import session from 'express-session';
 import fs from 'fs';
+import xss from "xss";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -38,6 +39,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static('public'));
+
+const sanitisePayload = (payload) => Object.keys(payload).reduce((acc, curr) => { return { ...acc, [curr]: xss(payload[curr]) }  }, {});
+
+/** XSS protection :) */
+app.use((req, res, next) => {
+  req.body = sanitisePayload(req.body);
+  req.params = sanitisePayload(req.params);
+  next();
+});
 
 app.use(
 	session({
