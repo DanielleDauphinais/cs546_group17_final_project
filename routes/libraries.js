@@ -32,12 +32,12 @@ const createNewLibrary = async (
       return res.status(500).render("error", { errorCode: 500 });
 
     const newLibrary = await libraryData.create(
-      name,
-      [lat, lng],
+      xss(name),
+      [xss(lat), xss(lng)],
       address,
       process.env.DOMAIN + req.file.path,
       req.session.user._id,
-      fullness,
+      xss(fullness),
       genresInput
     );
 
@@ -450,11 +450,11 @@ router
     if (res.statusCode === 200)
       await createNewLibrary(
         newLibraryData,
-        newLibraryData.address,
+        xss(newLibraryData.address),
         req,
-        newLibraryData.genresInput,
+        xss(newLibraryData.genresInput),
         res,
-        newLibraryData.errors
+        xss(newLibraryData.errors)
       );
   });
 
