@@ -291,8 +291,8 @@ let exportedMethods = {
     commentId = validation.checkValidId(commentId, "Comment ID");
 
     const originalComment = await this.getComment(commentId);
-    const library = this.get(libraryId);
-    if (userId !== originalComment.userId && userId !== library.ownerId)
+    const library = await this.get(libraryId);
+    if (userId !== originalComment.userId && userId !== library.ownerID)
       throw "Error: User does not have permission to delete this comment";
 
     const libraryCollection = await libraries();

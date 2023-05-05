@@ -8,13 +8,14 @@
     <h2>Fullness: {{fullnessRating}}/5</h2>
     <p>Last Rated On: {{lastServayed}}</p>
     <div id="listGenrers">
-    <ul>
-        {{#each genres}}
-            <li>
-                <p>{{this}}</p>
-            </li>
-        {{/each}}
-    </ul>
+        <h3>Genres:</h3>
+        <ul>
+            {{#each genres}}
+                <li>
+                    <p>{{this}}</p>
+                </li>
+            {{/each}}
+        </ul>
     </div>
     {{#if (eq ownerID userid)}}
         <div>
@@ -55,6 +56,9 @@
     <br>
     <div id="commentSectionLibs">
     <h2>Comments Section</h2>
+    {{#if errors}}
+        <p>{{errorMessage}}</p>
+    {{/if}}
     <div id="comments">
         {{#each comments}}
             {{> comment }}

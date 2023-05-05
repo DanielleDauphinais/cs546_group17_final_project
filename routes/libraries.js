@@ -465,7 +465,7 @@ router
 
     // If the library ID is not valid, render the error page with a status code of 400
     try {
-      id = req.params.id;
+      id = xss(req.params.id);
       id = validation.checkValidId(id);
     } catch (e) {
       return res
@@ -511,6 +511,7 @@ router
         libraryid: library._id,
         numFavorites: numFavorites,
         isFollower: isFollower,
+        errors: false,
         ...library,
       });
     } catch (e) {
@@ -524,7 +525,7 @@ router
 
     // If the library ID is not valid, render the error page with a status code of 400
     try {
-      id = req.params.id;
+      id = xss(req.params.id);
       id = validation.checkValidId(id);
     } catch (e) {
       return res
@@ -852,7 +853,7 @@ router
     
     // If the library ID is not valid, render the error page with a status code of 400
     try {
-      id = req.params.id;
+      id = xss(req.params.id);
       id = validation.checkValidId(id);
     } catch (e) {
       res.status(400).render('error', {errorCode: "400", searchValue: "Library ID"});
@@ -870,16 +871,27 @@ router
     let text;
     
     try {
-      text = req.body.text;
+      text = xss(req.body.text);
       text = validation.checkString(text, "Comment Body");
     } catch (e) {
-      return res.status(400).render('error', {errorCode: "400", searchValue: "Comment Body"});
+      return res.render('partials/comment', {layout: null, errors: true, errorMessage: e});
+    }
+
+    let user = req.session.user;
+
+    try {
+      library.comments.forEach(x => {
+        let today = new Date().toLocaleDateString();
+        if ((x.userId === user._id) && (x.dateCreated.split(',')[0] === today)) throw "A maximum of one comment can be made per day. User has already commented on this post once today.";
+      })
+    } catch (e) {
+      let numFavorites = library.favorites.length;
+      return res.render('partials/comment', {layout: null, errors: true, errorMessage: e});
     }
 
     try {
-      let user = req.session.user;
       let createComment = await libraryData.createComment(id, user._id, user.userName, text);
-      res.render('partials/comment', {layout: null, library, libraryid: library._id, userid: user._id, userId: user._id, ...createComment});
+      res.render('partials/comment', {layout: null, library, libraryid: library._id, userid: user._id, numLikes: createComment.likes.length, userId: user._id, ...createComment});
     } catch (e) {
       res.status(500).render('error', {errorCode: "500", title: "Error Page"});
     }
@@ -893,7 +905,7 @@ router.route("/:id/comments/:commentid").post(async (req, res) => {
 
   // If the library ID is not valid, render the error page with a status code of 400
   try {
-    id = req.params.id;
+    id = xss(req.params.id);
     id = validation.checkValidId(id);
   } catch (e) {
     res
@@ -938,7 +950,7 @@ router.route("/:id/comments/:commentid/edit").post(async (req, res) => {
 
   // If the library ID is not valid, render the error page with a status code of 400
   try {
-    id = req.params.id;
+    id = xss(req.params.id);
     id = validation.checkValidId(id);
   } catch (e) {
     return res
@@ -948,7 +960,7 @@ router.route("/:id/comments/:commentid/edit").post(async (req, res) => {
 
   // If the comment ID is not valid, render the error page with a status code of 400
   try {
-    commentid = req.params.commentid;
+    commentid = xss(req.params.commentid);
     commentid = validation.checkValidId(commentid);
   } catch (e) {
     return res
@@ -970,7 +982,7 @@ router.route("/:id/comments/:commentid/edit").post(async (req, res) => {
 
   // If the input text is not valid, render the error page with a status code of 400
   try {
-    text = req.body.update_text_input;
+    text = xss(req.body.update_text_input);
     text = validation.checkString(text, "Comment Body");
   } catch (e) {
     return res
@@ -995,7 +1007,7 @@ router.route("/:id/comments/:commentid/delete").post(async (req, res) => {
 
   // If the library ID is not valid, render the error page with a status code of 400
   try {
-    id = req.params.id;
+    id = xss(req.params.id);
     id = validation.checkValidId(id);
   } catch (e) {
     res
@@ -1005,7 +1017,7 @@ router.route("/:id/comments/:commentid/delete").post(async (req, res) => {
 
   // If the comment ID is not valid, render the error page with a status code of 400
   try {
-    commentid = req.params.commentid;
+    commentid = xss(req.params.commentid);
     commentid = validation.checkValidId(commentid);
   } catch (e) {
     return res
@@ -1032,6 +1044,7 @@ router.route("/:id/comments/:commentid/delete").post(async (req, res) => {
     );
     res.redirect(`/libraries/${id}`);
   } catch (e) {
+    console.log(e);
     res.status(500).render("error", { errorCode: "500", title: "Error Page" });
   }
 });
