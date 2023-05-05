@@ -206,6 +206,7 @@ router
       })
     }
     return res.status(200).render('users/edit-profile', {
+      isLoggedIn: true,
       updateUser : user
     })
   })
@@ -232,8 +233,8 @@ router
 
       if (typeof err === "string") 
         return err.startsWith("VError") ? 
-          res.status(400).render('users/edit-profile', { updateUser: user, error: `400 - ${err.substr(1)}`}) : 
-          res.status(400).render('users/edit-profile', { updateUser: user, error: `400 - ${err}` });
+          res.status(400).render('users/edit-profile', { updateUser: user, isLoggedIn: true, error: `400 - ${err.substr(1)}`}) : 
+          res.status(400).render('users/edit-profile', { updateUser: user, isLoggedIn: true, error: `400 - ${err}` });
 
       return res.status(500).send("Internal Server Error");
     }

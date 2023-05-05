@@ -2,9 +2,9 @@ import { Router } from "express";
 const router = Router();
 import { libraryData, userData } from "../data/index.js";
 import validation from "../public/js/validators/validation.js";
-import { checkImageFileString } from "../public/js/validators/util.js";
-import axios from "axios";
-import xss from "xss";
+import {checkImageFileString, validationsForStrings} from "../public/js/validators/util.js";
+import axios from 'axios';
+import xss from 'xss';
 import fs from "fs";
 import { upload } from "./image.js";
 
@@ -76,17 +76,15 @@ const editLibrary = async (
   res,
   errors
 ) => {
+  let image;
+  const { name, lat, lng, fullness } = editedLibraryData;
   try {
     id = req.params.id;
     id = validation.checkValidId(id);
 
-    const { name, lat, lng, fullness } = editedLibraryData;
-
     if (!process.env.DOMAIN)
       return res.status(500).render("error", { errorCode: 500 });
     
-
-    let image;
     if (!req.file){
       let library;
       try {
@@ -117,6 +115,15 @@ const editLibrary = async (
   } catch (e) {
     if (typeof e === "string" && e.startsWith("VError")) {
       errors.push(e.substr(1));
+      let library = {
+        name: name,
+        lat: lat,
+        lng: lng,
+        coordinates: [lat, lng],
+        image: image,
+        fullnessRating: fullness,
+        genres: genresInput,
+      }
 
       return res.status(400).render("libraries/new", {
         title: "Editing a Library",
@@ -124,9 +131,12 @@ const editLibrary = async (
         editOrCreate: "Edit",
         nameError: e.substr(1),
         hasErrors: true,
-        library: editedLibraryData,
-        formAction: "/libraries/edit",
+        library: library,
+        formAction: `/libraries/${id}/edit`,
         formMethod: "POST",
+        name: library.name,
+        image: image,
+        libraryObject: JSON.stringify(library),
         isLoggedIn: true
       });
     }
@@ -148,7 +158,6 @@ const reverseGeoCodeCoordinates = async (newLibraryData) => {
   let data = await axios.get(
     `https://maps.googleapis.com/maps/api/geocode/json?latlng=${newLibraryData.lat},${newLibraryData.lng}&key=AIzaSyAPxSPvWssw3gI4W1qJaFk9xlBqBicI3iY`
   );
-
   if (
     !data.data.results ||
     data.data.results.length === 0 ||
@@ -160,7 +169,7 @@ const reverseGeoCodeCoordinates = async (newLibraryData) => {
   city = data.data.results[7].address_components[0].long_name;
 
   if ((city !== "Hoboken" && city2 === "Hoboken") || city2 === "07030") {
-    address = data.data.results[0].formatted_address;
+  address = data.data.results[0].formatted_address;
   } else {
     address = data.data.results[1].formatted_address;
   }
@@ -325,25 +334,25 @@ async function routeValidationsForLibrary(newLibraryData, action, res, req) {
 
   /** Grab all the inputs from the request body. */
   let genresInput = [
-    newLibraryData.pictureBooks,
-    newLibraryData.youngAdultFiction,
-    newLibraryData.fantasyFiction,
-    newLibraryData.fairyTale,
-    newLibraryData.boardBook,
-    newLibraryData.nonFiction,
-    newLibraryData.mystery,
-    newLibraryData.graphicNovel,
-    newLibraryData.chapterBooks,
+    xss(newLibraryData.pictureBooks),
+    xss(newLibraryData.youngAdultFiction),
+    xss(newLibraryData.fantasyFiction),
+    xss(newLibraryData.fairyTale),
+    xss(newLibraryData.boardBook),
+    xss(newLibraryData.nonFiction),
+    xss(newLibraryData.mystery),
+    xss(newLibraryData.graphicNovel),
+    xss(newLibraryData.chapterBooks),
   ];
 
   /** For every value, if it does not exist, then the checkbox was not selected. */
   genresInput = genresInput.filter((genre) => {
-    return typeof genre === "string";
+    return genre !== "";
   });
 
   try {
     newLibraryData.fullness = validation.isValidNumber(
-      parseInt(newLibraryData.fullness),
+      parseInt(xss(newLibraryData.fullness)),
       "Fullness Rating"
     );
 
@@ -432,7 +441,6 @@ router
   })
   .post(upload.single("image"), async (req, res) => {
     const newLibraryData = req.body;
-
     await routeValidationsForLibrary(newLibraryData, "Create", res, req);
 
     /**
@@ -493,6 +501,7 @@ router
     try {
       let user = req.session.user;
       let numFavorites = library.favorites.length;
+      let isFollower = library.favorites.includes(user._id)
       res.render("libraries/library", {
         title: library.name,
         isLoggedIn: true,
@@ -501,6 +510,7 @@ router
         owner: owner.userName,
         libraryid: library._id,
         numFavorites: numFavorites,
+        isFollower: isFollower,
         errors: false,
         ...library,
       });
@@ -533,7 +543,6 @@ router
         .status(404)
         .render("error", { errorCode: "404", searchValue: "Library" });
     }
-
     try {
       let favorite = await userData.favoriteLibrary(user._id, library._id);
       res.redirect(`/libraries/${library._id}`);

@@ -17,29 +17,26 @@ let exportedMethods = {
     fullnessRating,
     genres
   ) {
-    name = validation.checkString(name, "Library Name");
-    ownerID = validation.checkValidId(ownerID, "Library Owner ID");
-    fullnessRating = validation.isValidNumber(
-      fullnessRating,
-      "Fullness Rating"
-    );
-    genres = validation.checkStringArray(genres, "Genres Available");
-    const currentDate = new Date();
-    const lastServayed = currentDate.toLocaleString(undefined, {
-      // should be in form "7/22/2016, 04:21 AM"
-      day: "numeric",
-      month: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    let currentDate, lastServayed;
     try {
-      checkImageFileString(image, "Image input");
+      // All these tests should result in rerendering the page so if there is an error it should start with a V
+      name = validation.checkString(name, "Library Name");
+      ownerID = validation.checkValidId(ownerID, "Library Owner ID");
+      fullnessRating = validation.isValidNumber(fullnessRating, "Fullness Rating");
+      genres = validation.checkStringArray(genres, "Genres Available");
+      currentDate = new Date();
+      lastServayed = currentDate.toLocaleString(undefined, {
+        // should be in form "7/22/2016, 04:21 AM"
+        day: "numeric",
+        month: "numeric",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      checkImageFileString(image, "Image input")
     } catch (e) {
       throw "V" + e;
     }
-    // TODO: Need to make it so can only have library with one name and one location
-    // TODO: Need to add function to update user with this library as something it owns
     let newLibrary = {
       name: name,
       coordinates: coordinates,
@@ -53,9 +50,9 @@ let exportedMethods = {
       comments: [],
     };
     const librariesCollection = await libraries();
-    const lib = await librariesCollection.findOne({ name: name });
+    const lib = await librariesCollection.findOne({ address: address }); 
     if (lib !== null)
-      throw "VError: There already exists a library with the given name";
+      throw "VError: There already exists a library at the given address.";
     const insertInfo = await librariesCollection.insertOne(newLibrary);
     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
       throw "Error: Could not add Library";
@@ -152,6 +149,18 @@ let exportedMethods = {
     if (library === null) throw "Error: No library found with given ID.";
     if (library.ownerID !== ownerID)
       throw "Error: User is not the library's owner.";
+    let same = true
+    for (const key in editedLibrary) {
+      if (key!== "lastServayed" && key!== "coordinates" && key !== "genres" && editedLibrary[key] !== library[key]) {
+        same = false;
+      }
+      if((key === "coordinates" || key === "genres") && JSON.stringify(editedLibrary[key]) != JSON.stringify(library[key])) {
+        same = false;
+      }
+    }
+      
+    if (same) throw "VError: No changes have been made.";
+
     const updateInfo = await librariesCollection.findOneAndUpdate(
       { _id: new ObjectId(libraryId) },
       { $set: editedLibrary },
