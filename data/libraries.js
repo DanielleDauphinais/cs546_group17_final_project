@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import validation from "../public/js/validators/validation.js";
 import { checkImageFileString } from "../public/js/validators/util.js";
 import userFunctions from "./users.js";
+import fs from "fs";
 
 let exportedMethods = {
   /** This function creates a library and adds it to the collection
@@ -187,6 +188,7 @@ let exportedMethods = {
     } catch (e) {
       throw `Error: Could not delete library with id of ${libraryId}`;
     }
+    fs.unlink(library.image, () => {})
     if (userId === library.ownerID) {
       const deletionInfo = await librariesCollection.findOneAndDelete({
         _id: new ObjectId(libraryId),

@@ -43,7 +43,9 @@ let exportedMethods = {
 
     // Check if library exists
     let library = await libraryFunctions.get(libraryId);
-
+    if(library.ownerID === userId){
+      throw "Error: Owner can not like their own library."
+    }
     // Add libraryId to user's favorited libraries
     const userCollection = await users();
 
