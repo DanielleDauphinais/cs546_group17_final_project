@@ -52,13 +52,6 @@ try {
     console.log(error)
 }
 
-
-try {
-    await userData.favoriteLibrary(user2._id, lib2._id)
-} catch (error) {
-    console.log(error)
-}
-
 user2 = await userData.getUserByEmail("galapatt@stevens.edu")
 
 let lib2_followers = await userData.getFollowers(lib2._id);
