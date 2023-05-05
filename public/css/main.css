@@ -38,23 +38,6 @@ a:hover{
 	justify-content: center;
 }
 
-/* Style for the restaurant name */
-.restaurant h2 {
-margin-top: 0;
-margin-bottom: 5px;
-}
-
-/* Style for the restaurant description */
-.restaurant p {
-margin-top: 0;
-margin-bottom: 10px;
-}
-
-/* Style for the unfollow and expand buttons */
-.restaurant button {
-margin-right: 10px;
-}
-
 .login-page {
     display: flex;
     align-items: center;
@@ -320,9 +303,26 @@ html {
 	padding: 8px;
 	font-size: 14px;
 	font-weight: bold;
+	margin-top: 15px;
 	transition: background-color 0.2s;
 	border-color: #999;
   }
+
+.follow-button {
+background-color: #00838e;
+color: #fff;
+padding: 8px;
+font-size: 14px;
+font-weight: bold;
+margin-top: 15px;
+transition: background-color 0.2s;
+border-color: #999;
+}
+
+.follow-button:hover {
+	background-color: #5dbbc7;
+}
+
 
 .unfollow-button:hover {
 	background-color: #ff7d74;
@@ -342,4 +342,8 @@ ul {
 
 #fav-list-header{
 	font-size: 20px;
+}
+
+#show-favs-list {
+	margin-left: 5px;
 }
