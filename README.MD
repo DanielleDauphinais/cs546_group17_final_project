@@ -27,10 +27,13 @@ https://trello.com/b/HdvCPcRe/feature-delegation
 ```sh
 # Install the node_modules
 npm i
+# If you don't have the env file in the current directory, add it with this export authSecret
 # this is the authSecret used to generate and validate the session tokens
 export authSecret = "this could be anything and it wouldn't really matter"
 # if you would like to use the cloud mongo instead of local
 export DB_URL="PUT_THE_CLOUD_MONGO_URL_HERE"
+# seed the database
+npm run seed
 # and finally run the server
 npm start
 ```
