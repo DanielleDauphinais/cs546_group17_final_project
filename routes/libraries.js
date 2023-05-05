@@ -508,7 +508,6 @@ router
 
     try {
       let user = req.session.user;
-      let numFavorites = library.favorites.length;
       let isFollower = library.favorites.includes(user._id)
       res.render("libraries/library", {
         title: library.name,
@@ -519,7 +518,6 @@ router
         followers : followers,
         ownerID: owner._id,
         libraryid: library._id,
-        numFavorites: numFavorites,
         isFollower: isFollower,
         errors: false,
         ...library,
