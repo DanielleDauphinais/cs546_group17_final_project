@@ -701,7 +701,7 @@ router
     // If the library ID is not valid, render the error page with a status code of 400
     let id;
     try {
-      id = req.params.id;
+      xss(id = req.params.id);
       id = validation.checkValidId(id);
     } catch (e) {
       return res.status(400).render("error", {
