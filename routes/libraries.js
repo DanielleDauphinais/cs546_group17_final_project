@@ -480,6 +480,14 @@ router
         .render("error", { errorCode: "404", searchValue: "Library" });
     }
 
+    let followers;
+    try {
+      followers = await userData.getFollowers(id);
+    } catch (error) {
+      console.error(error)
+      return res.status(500).render("error", { errorCode: "500" });
+    }
+
     let owner;
 
     try {
@@ -499,6 +507,8 @@ router
         script_partial: "comment",
         userid: user._id,
         owner: owner.userName,
+        followers : followers,
+        ownerID: owner._id,
         libraryid: library._id,
         numFavorites: numFavorites,
         ...library,

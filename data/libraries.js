@@ -411,7 +411,7 @@ let exportedMethods = {
     }
     updateInfo.value._id = updateInfo.value._id.toString();
     return updateInfo.value;
-  },
+  }
 };
 
 export default exportedMethods;

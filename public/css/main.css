@@ -320,3 +320,15 @@ html {
 .rating {
 	font-size: 20px;
 }
+
+ul {
+	display: inline-block;
+  }
+
+#show-favs-div {
+	display: none;
+}
+
+#fav-list-header{
+	font-size: 20px;
+}

@@ -281,6 +281,25 @@ let exportedMethods = {
 
     return {updatedUser : true};
 
+  },
+  /**
+   * This function gets a list of all the followers of a library.
+   * @param {string} libraryId
+    */
+  async getFollowers(libraryId) {
+    libraryId = validation.checkValidId(libraryId);
+
+    await libraryFunctions.get(libraryId)
+    
+    const userCollection = await users();
+    let followers = await userCollection.find({ favLibraries: { $in: [libraryId] } }).toArray(function(err) { 
+      if (err) throw "Error: " + err; 
+    });
+    
+    return followers.map((user) => {
+      user._id = user._id.toString();
+      return user;
+    });
   }
 };
 
