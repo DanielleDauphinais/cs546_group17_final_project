@@ -29,13 +29,14 @@
                     <button type="submit">Delete</button>
                 </form>
             </div>
-        {{/if}}
-        {{#if (eq @root.userid @root.ownerID)}}
-            <div id="commentDelete">
-                <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/delete" method="POST">
-                    <button type="submit">Delete</button>
-                </form>
-            </div>
+        {{else}}
+            {{#if (eq @root.userid @root.ownerID)}}
+                <div id="commentDelete">
+                    <form action="/libraries/{{@root.libraryid}}/comments/{{_id}}/delete" method="POST">
+                        <button type="submit">Delete</button>
+                    </form>
+                </div>
+            {{/if}}
         {{/if}}
     {{/if}}
 </article>

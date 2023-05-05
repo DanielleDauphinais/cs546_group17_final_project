@@ -570,7 +570,7 @@ router
 
     // If the library ID is not valid, render the error page with a status code of 400
     try {
-      id = req.params.id;
+      id = xss(req.params.id);
       id = validation.checkValidId(id);
     } catch (e) {
       return res
@@ -623,7 +623,7 @@ router
 
     let id;
     try {
-      id = req.params.id;
+      id = xss(req.params.id);
       id = validation.checkValidId(id);
     } catch (e) {
       return res
@@ -638,11 +638,11 @@ router
       await editLibrary(
         id,
         updatedLibraryData,
-        updatedLibraryData.address,
+        xss(updatedLibraryData.address),
         req,
-        updatedLibraryData.genresInput,
+        xss(updatedLibraryData.genresInput),
         res,
-        updatedLibraryData.errors
+        xss(updatedLibraryData.errors)
       );
   });
 
@@ -652,7 +652,7 @@ router.route("/:id/delete").post(async (req, res) => {
 
   // If the library ID is not valid, render the error page with a status code of 400
   try {
-    id = req.params.id;
+    id = xss(req.params.id);
     id = validation.checkValidId(id);
   } catch (e) {
     return res
