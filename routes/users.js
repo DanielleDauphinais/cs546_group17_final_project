@@ -25,7 +25,7 @@ router.post("/login", async (req, res) => {
     let emailAddress = xss(req.body.emailAddressInput)
     let password = xss(req.body.passwordInput)
 
-    validationsForCheckUser(emailAddress.trim(), password.trim());
+    validationsForCheckUser(emailAddress.trim(), password);
 
     let user = await checkUser(emailAddress, password);
     req.session.user = user;
