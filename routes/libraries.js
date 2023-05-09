@@ -14,7 +14,7 @@ router.route("/").get(async (req, res) => {
     let libraries = await libraryData.getAllLibraries();
     res.send(libraries);
   } catch (e) {
-    res.status(500).render("error", { errorCode: 500 });
+    res.status(500).render("error", { errorCode: 500, title: "error", isLoggedIn: true });
   }
 });
 
@@ -30,7 +30,7 @@ const createNewLibrary = async (
     const { name, lat, lng, fullness } = newLibraryData;
 
     if (!process.env.DOMAIN)
-      return res.status(500).render("error", { errorCode: 500 });
+      return res.status(500).render("error", { errorCode: 500, title: "Error" });
     
     const newLibrary = await libraryData.create(
       xss(name),
@@ -85,7 +85,7 @@ const editLibrary = async (
     id = validation.checkValidId(id);
 
     if (!process.env.DOMAIN)
-      return res.status(500).render("error", { errorCode: 500 });
+      return res.status(500).render("error", { errorCode: 500, title: "Error" });
     
     if (!req.file){
       let library;
@@ -94,7 +94,7 @@ const editLibrary = async (
       } catch (e) {
         return res
           .status(404)
-          .render("error", { errorCode: "404", searchValue: "Library" });
+          .render("error", { errorCode: "404", searchValue: "Library", title: "Not Found" });
       }
       image = library.image
     }
@@ -143,6 +143,11 @@ const editLibrary = async (
       });
     }
 
+    if ((typeof e === "string") && (e === "Error: User is not the library's owner.")) {
+      return res
+        .status(403)
+        .render("error", { errorCode: "403", searchValue: "Library", title: "Forbidden" });
+    }
     return res.status(500).render("error", {
       errorCode: 500,
       title: "error",
@@ -472,7 +477,7 @@ router
     } catch (e) {
       return res
         .status(400)
-        .render("error", { errorCode: "400", searchValue: "Library ID" });
+        .render("error", { errorCode: "400", searchValue: "Library ID", title: "Bad Request" });
     }
 
     let library;
@@ -487,7 +492,7 @@ router
     } catch (e) {
       return res
         .status(404)
-        .render("error", { errorCode: "404", searchValue: "Library" });
+        .render("error", { errorCode: "404", searchValue: "Library", title: "Not Found" });
     }
 
     let followers;
@@ -495,7 +500,7 @@ router
       followers = await userData.getFollowers(id);
     } catch (error) {
       console.error(error)
-      return res.status(500).render("error", { errorCode: "500" });
+      return res.status(500).render("error", { errorCode: "500", title: "Error" });
     }
 
     let owner;
@@ -505,7 +510,7 @@ router
     } catch (e) {
       return res
         .status(404)
-        .render("error", { errorCode: "404", searchValue: "User" });
+        .render("error", { errorCode: "404", searchValue: "User", title: "Not Found" });
     }
 
     try {
@@ -525,7 +530,7 @@ router
         ...library,
       });
     } catch (e) {
-      res.status(500).render("error", { errorCode: "500" });
+      res.status(500).render("error", { errorCode: "500", title: "Error" });
     }
   })
   .post(async (req, res) => {
@@ -540,7 +545,7 @@ router
     } catch (e) {
       return res
         .status(400)
-        .render("error", { errorCode: "400", searchValue: "Library ID" });
+        .render("error", { errorCode: "400", searchValue: "Library ID", title: "Bad Request" });
     }
 
     let library;
@@ -551,13 +556,13 @@ router
     } catch (e) {
       return res
         .status(404)
-        .render("error", { errorCode: "404", searchValue: "Library" });
+        .render("error", { errorCode: "404", searchValue: "Library", title: "Not Found" });
     }
     try {
       let favorite = await userData.favoriteLibrary(user._id, library._id);
       res.redirect(`/libraries/${library._id}`);
     } catch (e) {
-      res.status(500).render("error", { errorCode: "500" });
+      res.status(500).render("error", { errorCode: "500", title: "Error" });
     }
   });
 
@@ -577,7 +582,7 @@ router
     } catch (e) {
       return res
         .status(400)
-        .render("error", { errorCode: "400", searchValue: "Library ID" });
+        .render("error", { errorCode: "400", searchValue: "Library ID", title: "Bad Request" });
     }
 
     let library;
@@ -588,7 +593,7 @@ router
     } catch (e) {
       return res
         .status(404)
-        .render("error", { errorCode: "404", searchValue: "Library" });
+        .render("error", { errorCode: "404", searchValue: "Library", title: "Not Found" });
     }
 
     try {
@@ -597,8 +602,8 @@ router
       }
     } catch (e) {
       return res
-        .status(400)
-        .render("error", { errorCode: "400", searchValue: "Library" });
+        .status(403)
+        .render("error", { errorCode: "403", searchValue: "Library", title: "Forbidden" });
     }
 
     try {
@@ -614,7 +619,7 @@ router
         isLoggedIn: true
       });
     } catch (e) {
-      return res.status(500).render("error", { errorCode: "500" });
+      return res.status(500).render("error", { errorCode: "500", title: "Error" });
     }
   })
   .post(upload.single("image"), sanitise, async (req, res) => {
@@ -630,7 +635,7 @@ router
     } catch (e) {
       return res
         .status(400)
-        .render("error", { errorCode: "400", searchValue: "Library ID" });
+        .render("error", { errorCode: "400", searchValue: "Library ID", title: "Bad Request" });
     }
     /**
      * By default the status code is 200 and we don't send any 200 in the above function
@@ -659,7 +664,7 @@ router.route("/:id/delete").post(async (req, res) => {
   } catch (e) {
     return res
       .status(400)
-      .render("error", { errorCode: "400", searchValue: "Library ID" });
+      .render("error", { errorCode: "400", searchValue: "Library ID", title: "Bad Request" });
   }
 
   let library;
@@ -674,7 +679,7 @@ router.route("/:id/delete").post(async (req, res) => {
   } catch (e) {
     return res
       .status(404)
-      .render("error", { errorCode: "404", searchValue: "Library" });
+      .render("error", { errorCode: "404", searchValue: "Library", title: "Not Found" });
   }
 
   try {
@@ -684,13 +689,13 @@ router.route("/:id/delete").post(async (req, res) => {
   } catch (e) {
     return res
       .status(400)
-      .render("error", { errorCode: "400", searchValue: "Library" });
+      .render("error", { errorCode: "400", searchValue: "Library", title: "Bad Request" });
   }
 
   try {
     await libraryData.removeLibrary(id, req.session.user._id);
   } catch (e) {
-    return res.status(500).render("error", { errorCode: "404" });
+    return res.status(500).render("error", { errorCode: "404", title: "Not Found" });
   }
 
   res.redirect(`/users/${req.session.user._id}`);
@@ -713,7 +718,7 @@ router
       });
     }
     try {
-      res.render("libraries/fullness", { id: id });
+      res.render("libraries/fullness", { id: id, title: "Fullness" });
     } catch (e) {
       res.status(500).render("error", { errorCode: 500, title: "Error Page" });
     }
@@ -866,7 +871,7 @@ router
       id = xss(req.params.id);
       id = validation.checkValidId(id);
     } catch (e) {
-      res.status(400).render('error', {errorCode: "400", searchValue: "Library ID"});
+      res.status(400).render('error', {errorCode: "400", searchValue: "Library ID", title: "Bad Request"});
     }
 
     let library;
@@ -875,7 +880,7 @@ router
     try {
       library = await libraryData.get(id);
     } catch (e) {
-      return res.status(404).render('error', {errorCode: "404", searchValue: "Library"});
+      return res.status(404).render('error', {errorCode: "404", searchValue: "Library", title: "Not Found"});
     }
 
     let text;
@@ -920,7 +925,7 @@ router.route("/:id/comments/:commentid").post(async (req, res) => {
   } catch (e) {
     res
       .status(400)
-      .render("error", { errorCode: "400", searchValue: "Library ID" });
+      .render("error", { errorCode: "400", searchValue: "Library ID", title: "Bad Request" });
   }
 
   // If the comment ID is not valid, render the error page with a status code of 400
@@ -930,7 +935,7 @@ router.route("/:id/comments/:commentid").post(async (req, res) => {
   } catch (e) {
     return res
       .status(400)
-      .render("error", { errorCode: "400", searchValue: "Comment ID" });
+      .render("error", { errorCode: "400", searchValue: "Comment ID", title: "Bad Request" });
   }
 
   let library;
@@ -940,7 +945,7 @@ router.route("/:id/comments/:commentid").post(async (req, res) => {
   } catch (e) {
     return res
       .status(404)
-      .render("error", { errorCode: "404", searchValue: "Library" });
+      .render("error", { errorCode: "404", searchValue: "Library", title: "Not Found" });
   }
 
   try {
@@ -965,7 +970,7 @@ router.route("/:id/comments/:commentid/edit").post(async (req, res) => {
   } catch (e) {
     return res
       .status(400)
-      .render("error", { errorCode: "400", searchValue: "Library ID" });
+      .render("error", { errorCode: "400", searchValue: "Library ID", title: "Bad Request" });
   }
 
   // If the comment ID is not valid, render the error page with a status code of 400
@@ -975,7 +980,7 @@ router.route("/:id/comments/:commentid/edit").post(async (req, res) => {
   } catch (e) {
     return res
       .status(400)
-      .render("error", { errorCode: "400", searchValue: "Comment ID" });
+      .render("error", { errorCode: "400", searchValue: "Comment ID", title: "Bad Request" });
   }
 
   let library;
@@ -985,7 +990,7 @@ router.route("/:id/comments/:commentid/edit").post(async (req, res) => {
   } catch (e) {
     return res
       .status(404)
-      .render("error", { errorCode: "404", searchValue: "Library" });
+      .render("error", { errorCode: "404", searchValue: "Library", title: "Not Found" });
   }
 
   let text;
@@ -997,7 +1002,7 @@ router.route("/:id/comments/:commentid/edit").post(async (req, res) => {
   } catch (e) {
     return res
       .status(400)
-      .render("error", { errorCode: "400", searchValue: "Comment Body" });
+      .render("error", { errorCode: "400", searchValue: "Comment Body", title: "Bad Request" });
   }
 
   try {
@@ -1022,7 +1027,7 @@ router.route("/:id/comments/:commentid/delete").post(async (req, res) => {
   } catch (e) {
     res
       .status(400)
-      .render("error", { errorCode: "400", searchValue: "Library ID" });
+      .render("error", { errorCode: "400", searchValue: "Library ID", title: "Bad Request" });
   }
 
   // If the comment ID is not valid, render the error page with a status code of 400
@@ -1032,7 +1037,7 @@ router.route("/:id/comments/:commentid/delete").post(async (req, res) => {
   } catch (e) {
     return res
       .status(400)
-      .render("error", { errorCode: "400", searchValue: "Comment ID" });
+      .render("error", { errorCode: "400", searchValue: "Comment ID", title: "Bad Request" });
   }
 
   let library;
@@ -1042,7 +1047,7 @@ router.route("/:id/comments/:commentid/delete").post(async (req, res) => {
   } catch (e) {
     return res
       .status(404)
-      .render("error", { errorCode: "404", searchValue: "Library" });
+      .render("error", { errorCode: "404", searchValue: "Library", title: "Not Found" });
   }
 
   try {
@@ -1055,7 +1060,7 @@ router.route("/:id/comments/:commentid/delete").post(async (req, res) => {
     res.redirect(`/libraries/${id}`);
   } catch (e) {
     console.log(e);
-    res.status(500).render("error", { errorCode: "500", title: "Error Page" });
+    res.status(500).render("error", { errorCode: "500", title: "Error Page", title: "Error" });
   }
 });
 
