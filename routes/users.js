@@ -138,7 +138,7 @@ router
     } catch (error) {
       return res
         .status(400)
-        .render("error", { searchValue: "user", errorCode: "400" });
+        .render("error", { searchValue: "user", errorCode: "400", title: "Bad Request" });
     }
 
     try {
@@ -146,7 +146,7 @@ router
     } catch (error) {
       return res
         .status(404)
-        .render("error", { searchValue: "user", errorCode: "404" });
+        .render("error", { searchValue: "user", errorCode: "404", title: "Not Found" });
     }
 
     let favLibs, ownedLibs;
@@ -168,7 +168,7 @@ router
       console.error(error);
       return res
         .status(500)
-        .render("error", { searchValue: "user", errorCode: "500" });
+        .render("error", { searchValue: "user", errorCode: "500", title: "Error" });
     }
   })
   .post(async (req, res) => {
@@ -180,7 +180,7 @@ router
     } catch (error) {
       return res.status(500).render('error',
       { searchValue:"user", 
-        errorCode:"500"
+        errorCode:"500", title: "Server"
       })
     }
     return res.status(200).redirect(`/users/${userId}`)
@@ -200,19 +200,19 @@ router
     } catch (error) {
       return res.status(400).render('error',
       { searchValue:"user", 
-        errorCode:"400"
+        errorCode:"400", title: "Bad Request"
       })
     }
 
     if (req.session.user._id !== id){
       return res.status(403).render('error',{
         searchValue:"user", 
-        errorCode:"403"      
+        errorCode:"403"     , title: "Forbidden" 
       })
     }
     return res.status(200).render('users/edit-profile', {
       isLoggedIn: true,
-      updateUser : user
+      updateUser : user, title: "Edit Profile"
     })
   })
   .post(async (req,res) => {
@@ -238,8 +238,8 @@ router
 
       if (typeof err === "string") 
         return err.startsWith("VError") ? 
-          res.status(400).render('users/edit-profile', { updateUser: user, isLoggedIn: true, error: `400 - ${err.substr(1)}`}) : 
-          res.status(400).render('users/edit-profile', { updateUser: user, isLoggedIn: true, error: `400 - ${err}` });
+          res.status(400).render('users/edit-profile', { updateUser: user, isLoggedIn: true, error: `400 - ${err.substr(1)}`, title: "Bad Request"}) : 
+          res.status(400).render('users/edit-profile', { updateUser: user, isLoggedIn: true, error: `400 - ${err}`, title: "Bad Request" });
 
       return res.status(500).send("Internal Server Error");
     }
