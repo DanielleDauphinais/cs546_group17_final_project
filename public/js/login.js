@@ -17,7 +17,7 @@ import { validationsForCheckUser, validationsForCreateUser } from './validators/
         let password = passwordInput.val();
 
         try {
-            validationsForCheckUser(email, password);
+            validationsForCheckUser(email.trim(), password);
             error.text('');
         } catch (err) {
             if ((typeof err === "string") && err.startsWith("VError")) {

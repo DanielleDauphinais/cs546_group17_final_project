@@ -7,6 +7,7 @@ import axios from 'axios';
 import xss from 'xss';
 import fs from "fs";
 import { upload } from "./image.js";
+import { sanitise } from "../middlewares/xss.js";
 
 router.route("/").get(async (req, res) => {
   try {
@@ -440,7 +441,7 @@ router
       isLoggedIn: true
     });
   })
-  .post(upload.single("image"), async (req, res) => {
+  .post(upload.single("image"), sanitise, async (req, res) => {
     const newLibraryData = req.body;
     await routeValidationsForLibrary(newLibraryData, "Create", res, req);
 
@@ -616,7 +617,7 @@ router
       return res.status(500).render("error", { errorCode: "500" });
     }
   })
-  .post(upload.single("image"), async (req, res) => {
+  .post(upload.single("image"), sanitise, async (req, res) => {
     // Update the library with the form data
     const updatedLibraryData = req.body;
 

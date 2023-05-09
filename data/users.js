@@ -107,14 +107,14 @@ let exportedMethods = {
       emailAddress.trim(),
       password,
       Number(age),
-      userName
+      userName.trim()
     );
 
     firstName = firstName.trim();
     lastName = lastName.trim();
     emailAddress = emailAddress.trim();
     emailAddress = emailAddress.toLowerCase();
-    userName = userName.toLowerCase();
+    userName = userName.trim().toLowerCase();
 
     let userFromDB = await userCollection.findOne({ emailAddress });
 
