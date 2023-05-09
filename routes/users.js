@@ -76,7 +76,7 @@ router.post("/signup", async (req, res) => {
       emailAddress.trim(),
       password,
       Number(age),
-      userName
+      userName.trim()
     );
 
     if (password !== confirmPasswordInput)
