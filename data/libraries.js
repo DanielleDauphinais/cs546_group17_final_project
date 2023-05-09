@@ -51,6 +51,10 @@ let exportedMethods = {
       comments: [],
     };
     const librariesCollection = await libraries();
+    const currentList = await this.getAllLibraries();
+    currentList.forEach(x =>  {
+      if (x.name.toLowerCase() === name.toLowerCase()) throw "VError: There already exists a library with the given name."
+    })
     const lib = await librariesCollection.findOne({ address: address }); 
     if (lib !== null)
       throw "VError: There already exists a library at the given address.";
@@ -146,6 +150,10 @@ let exportedMethods = {
     };
     /* Pretty much the same code from the FormUpdate */
     const librariesCollection = await libraries();
+    const currentList = await this.getAllLibraries();
+    currentList.forEach(x =>  {
+      if (x.name.toLowerCase() === name.toLowerCase()) throw "VError: There already exists a library with the given name."
+    })
     let library = await librariesCollection.findOne({ _id: new ObjectId(libraryId) });
     if (library === null) throw "Error: No library found with given ID.";
     if (library.ownerID !== ownerID)

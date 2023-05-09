@@ -454,7 +454,9 @@ router
      * By default the status code is 200 and we don't send any 200 in the above function
      * this will prevent resending the headers.
      */
-    if (res.statusCode === 200)
+
+    try {
+      if (res.statusCode === 200)
       await createNewLibrary(
         newLibraryData,
         newLibraryData.address,
@@ -463,6 +465,14 @@ router
         res,
         newLibraryData.errors
       );
+    } catch (e) {
+      return res.status(500).render("error", {
+        errorCode: 500,
+        title: "error",
+        id: req.session.user._id,
+      });
+    }
+    
   });
 
 router
@@ -641,16 +651,25 @@ router
      * By default the status code is 200 and we don't send any 200 in the above function
      * this will prevent resending the headers.
      */
-    if (res.statusCode === 200)
-      await editLibrary(
-        id,
-        updatedLibraryData,
-        updatedLibraryData.address,
-        req,
-        updatedLibraryData.genresInput,
-        res,
-        updatedLibraryData.errors
-      );
+
+      try {
+        if (res.statusCode === 200)
+          await editLibrary(
+            id,
+            updatedLibraryData,
+            updatedLibraryData.address,
+            req,
+            updatedLibraryData.genresInput,
+            res,
+            updatedLibraryData.errors
+          );
+      } catch (e) {
+        return res.status(500).render("error", {
+          errorCode: 500,
+          title: "error",
+          id: req.session.user._id,
+        });
+      }
   });
 
 router.route("/:id/delete").post(async (req, res) => {
